@@ -1,4 +1,5 @@
 import React from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Advantages from './components/Advantages';
@@ -31,6 +32,7 @@ const App: React.FC = () => {
       </main>
       <Footer />
       <QuantumAssistant />
+      <SpeedInsights />
     </div>
   );
 };
