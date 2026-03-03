@@ -9,7 +9,6 @@ import Partnerships from './components/Partnerships';
 import Testimonials from './components/Testimonials';
 import News from './components/News';
 import ClientLogos from './components/ClientLogos';
-import StaffManagement from './components/StaffManagement';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import QuantumAssistant from './components/QuantumAssistant';
@@ -23,7 +22,6 @@ const App: React.FC = () => {
         <Advantages />
         <Solutions />
         <AdvancedSolutions />
-        <StaffManagement />
         <Comparison />
         <Partnerships />
         <Testimonials />
