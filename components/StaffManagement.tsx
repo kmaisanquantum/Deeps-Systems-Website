@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserPlus, Trash2, Shield, User } from 'lucide-react';
+import { UserPlus, Trash2 } from 'lucide-react';
 
 interface StaffMember {
   id: string;
