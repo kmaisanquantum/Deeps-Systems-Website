@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Phone, Mail, MapPin, Cpu } from 'lucide-react';
+import { Phone, Mail, MapPin, Cpu, ShoppingBag } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const handleSmoothScroll = useCallback((e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
@@ -29,7 +29,7 @@ const Footer: React.FC = () => {
               <div className="p-2 rounded-lg quantum-gradient group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg group-hover:shadow-teal-500/20">
                 <Cpu className="text-white w-6 h-6" />
               </div>
-              <span className="font-montserrat text-2xl font-bold tracking-tight">
+              <span className="font-montserrat text-2xl font-bold tracking-tight text-white">
                 Deeps <span className="text-teal-400 group-hover:text-teal-300 transition-colors">Systems</span>
               </span>
             </a>
@@ -39,7 +39,7 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h4 className="font-bold mb-6 text-lg">Quick Links</h4>
+            <h4 className="font-bold mb-6 text-lg text-white">Quick Links</h4>
             <ul className="space-y-4 text-slate-400">
               <li>
                 <a 
@@ -69,6 +69,16 @@ const Footer: React.FC = () => {
                 </a>
               </li>
               <li>
+                <a
+                  href="#online-store"
+                  onClick={(e) => handleSmoothScroll(e, '#online-store')}
+                  className="hover:text-teal-400 hover:pl-2 transition-all duration-300 inline-flex items-center gap-2 group/store"
+                >
+                  <ShoppingBag className="w-3.5 h-3.5 text-teal-500/50 group-hover/store:text-teal-400 transition-colors" />
+                  Our Online Store
+                </a>
+              </li>
+              <li>
                 <a 
                   href="#partners" 
                   onClick={(e) => handleSmoothScroll(e, '#partners')}
@@ -81,7 +91,7 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h4 className="font-bold mb-6 text-lg">Contact Us</h4>
+            <h4 className="font-bold mb-6 text-lg text-white">Contact Us</h4>
             <ul className="space-y-4 text-slate-400">
               <li className="flex items-center gap-3 group cursor-pointer">
                 <div className="p-1 rounded-lg transition-all duration-500 group-hover:bg-teal-500/10">
@@ -105,11 +115,11 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h4 className="font-bold mb-6 text-lg">Credentials</h4>
+            <h4 className="font-bold mb-6 text-lg text-white">Credentials</h4>
             <div className="glass p-6 rounded-2xl text-sm text-slate-400 border border-white/10 hover:border-teal-500/20 transition-all duration-500 cursor-default shadow-lg hover:shadow-teal-500/5">
-              <p className="mb-2 flex justify-between"><span className="text-white font-medium uppercase text-[10px] tracking-wider">IPA Reg:</span> <span>6-165201</span></p>
-              <p className="mb-2 flex justify-between"><span className="text-white font-medium uppercase text-[10px] tracking-wider">TIN (IRC):</span> <span>500286059</span></p>
-              <p className="flex justify-between"><span className="text-white font-medium uppercase text-[10px] tracking-wider">Est:</span> <span>2014</span></p>
+              <p className="mb-2 flex justify-between font-mono"><span className="text-white font-medium uppercase text-[10px] tracking-wider">IPA Reg:</span> <span>6-165201</span></p>
+              <p className="mb-2 flex justify-between font-mono"><span className="text-white font-medium uppercase text-[10px] tracking-wider">TIN (IRC):</span> <span>500286059</span></p>
+              <p className="flex justify-between font-mono"><span className="text-white font-medium uppercase text-[10px] tracking-wider">Est:</span> <span>2014</span></p>
             </div>
           </div>
         </div>

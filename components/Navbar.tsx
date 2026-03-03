@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, ChevronDown, Moon, Sun, Cloud, Rocket } from 'lucide-react';
-import { servicesItems, advantageItems } from './navbarData';
+import { Menu, X, ChevronDown, Moon, Sun, Cloud, Rocket, ShoppingBag } from 'lucide-react';
+import { servicesItems, advantageItems, storeItem } from './navbarData';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -157,6 +157,11 @@ const Navbar: React.FC = () => {
 
           <a href="#gap" onClick={(e) => handleSmoothScroll(e, '#gap')} className="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white transition-all">The Gap</a>
           
+          <a href={storeItem.href} onClick={(e) => handleSmoothScroll(e, storeItem.href)} className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-400 hover:text-white transition-all group">
+            <ShoppingBag className="w-4 h-4" />
+            <span>Our Online Store</span>
+          </a>
+
           <div className="ml-2 pl-4 border-l border-white/10 flex items-center gap-4">
             <button
               onClick={toggleTheme}
@@ -196,6 +201,16 @@ const Navbar: React.FC = () => {
                 {theme === 'dark' ? <><Moon className="w-5 h-5" /> Dark Mode</> : <><Sun className="w-5 h-5" /> Light Mode</>}
               </button>
             </div>
+
+            {/* Online Store Link Mobile */}
+            <a
+              href={storeItem.href}
+              onClick={(e) => handleSmoothScroll(e, storeItem.href)}
+              className="w-full flex items-center gap-3 p-4 glass rounded-2xl text-teal-400 active:bg-white/5 transition-all"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              <span className="font-bold text-sm uppercase tracking-widest">{storeItem.name}</span>
+            </a>
 
             {/* Advantages Mobile Submenu */}
             <div className="space-y-2">
