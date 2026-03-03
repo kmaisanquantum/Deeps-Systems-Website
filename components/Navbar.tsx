@@ -159,7 +159,7 @@ const Navbar: React.FC = () => {
           
           <a href={storeItem.href} onClick={(e) => handleSmoothScroll(e, storeItem.href)} className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-400 hover:text-white transition-all group">
             <ShoppingBag className="w-4 h-4" />
-            <span>Online Store</span>
+            <span>Our Online Store</span>
           </a>
 
           <div className="ml-2 pl-4 border-l border-white/10 flex items-center gap-4">
