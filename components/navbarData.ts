@@ -1,5 +1,5 @@
 import React from 'react';
-import { Landmark, Truck, Sprout, Rocket, Cloud, Zap, Smartphone } from 'lucide-react';
+import { Landmark, Truck, Sprout, Rocket, Cloud, Zap, Smartphone, ShoppingBag } from 'lucide-react';
 
 export const servicesItems = [
   { name: 'Financial Institutions', icon: React.createElement(Landmark, { className: "w-5 h-5" }), href: '#details-financial', desc: 'SME-in-a-Box SaaS solutions.' },
@@ -13,3 +13,10 @@ export const advantageItems = [
   { name: 'Scalability', icon: React.createElement(Zap, { className: "w-5 h-5" }), href: '#advantages', desc: 'Elastic cloud power.' },
   { name: 'Resilience', icon: React.createElement(Smartphone, { className: "w-5 h-5" }), href: '#advantages', desc: 'Mobile-first design.' },
 ];
+
+export const storeItem = {
+  name: 'Our Online Store',
+  icon: React.createElement(ShoppingBag, { className: "w-5 h-5" }),
+  href: '#online-store',
+  desc: 'Shop for BITC optimization tools and hardware.'
+};
