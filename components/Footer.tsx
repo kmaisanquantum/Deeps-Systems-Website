@@ -1,136 +1,126 @@
-import React, { useCallback } from 'react';
-import { Phone, Mail, MapPin, Cpu, ShoppingBag } from 'lucide-react';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Binary, Mail, Phone, MapPin,
+  ShieldCheck, ArrowUpRight, ShoppingBag
+} from 'lucide-react';
+import { storeItem } from './navbarData';
 
 const Footer: React.FC = () => {
-  const handleSmoothScroll = useCallback((e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
-    e.preventDefault();
-    const cleanId = targetId.replace('#', '');
-    const targetElement = document.getElementById(cleanId);
-    if (targetElement) {
-      const offset = 80;
-      const elementPosition = targetElement.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
+  const currentYear = new Date().getFullYear();
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-      
-      window.history.pushState(null, '', `#${cleanId}`);
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('/#') || href.startsWith('#')) {
+      const hash = href.includes('#') ? href.split('#')[1] : href.replace('#', '');
+      const element = document.getElementById(hash);
+      if (element) {
+        e.preventDefault();
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
-  }, []);
+  };
+
+  const quickLinks = [
+    { name: 'BITC Advantage', href: '/advantage' },
+    { name: 'Sector Solutions', href: '/solutions' },
+    { name: 'Insights', href: '/insights' },
+    { name: storeItem.name, href: storeItem.href, icon: <ShoppingBag className="w-4 h-4" /> },
+    { name: 'Partners', href: '/advantage#partners' },
+  ];
+
+  const contactInfo = [
+    { icon: <Phone className="w-5 h-5 text-teal-400" />, text: '+675 79452732', href: 'tel:+67579452732' },
+    { icon: <Mail className="w-5 h-5 text-teal-400" />, text: 'wokman@dspnq.tech', href: 'mailto:wokman@dspnq.tech' },
+    { icon: <MapPin className="w-5 h-5 text-teal-400" />, text: 'Port Moresby, PNG', href: '#' },
+  ];
 
   return (
-    <footer id="contact" className="bg-slate-900/50 pt-24 pb-12 border-t border-white/5">
+    <footer className="bg-[#050505] border-t border-white/5 pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          <div className="lg:col-span-1">
-            <a href="#" onClick={(e) => handleSmoothScroll(e, '#')} className="flex items-center gap-2 mb-6 group">
-              <div className="p-2 rounded-lg quantum-gradient group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg group-hover:shadow-teal-500/20">
-                <Cpu className="text-white w-6 h-6" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
+
+          {/* Brand Column */}
+          <div className="space-y-6">
+            <Link to="/" className="flex items-center gap-2 group">
+              <div className="p-2 rounded-lg quantum-gradient">
+                <Binary className="w-6 h-6 text-white" />
               </div>
-              <span className="font-montserrat text-2xl font-bold tracking-tight text-white">
-                Deeps <span className="text-teal-400 group-hover:text-teal-300 transition-colors">Systems</span>
+              <span className="text-2xl font-montserrat font-extrabold tracking-tight text-white">
+                Deeps <span className="text-teal-400">Systems</span>
               </span>
-            </a>
-            <p className="text-slate-400 mb-6 leading-relaxed">
+            </Link>
+            <p className="text-slate-400 leading-relaxed text-sm">
               Leading PNG into the future with Quantum-Inspired Optimization and BITC solutions since 2014.
             </p>
           </div>
 
+          {/* Quick Links */}
           <div>
-            <h4 className="font-bold mb-6 text-lg text-white">Quick Links</h4>
-            <ul className="space-y-4 text-slate-400">
-              <li>
-                <a 
-                  href="#advantages" 
-                  onClick={(e) => handleSmoothScroll(e, '#advantages')}
-                  className="hover:text-teal-400 hover:pl-2 transition-all duration-300 inline-block"
-                >
-                  BITC Advantage
-                </a>
-              </li>
-              <li>
-                <a 
-                  href="#solutions" 
-                  onClick={(e) => handleSmoothScroll(e, '#solutions')}
-                  className="hover:text-teal-400 hover:pl-2 transition-all duration-300 inline-block"
-                >
-                  Sector Solutions
-                </a>
-              </li>
-              <li>
-                <a 
-                  href="#gap" 
-                  onClick={(e) => handleSmoothScroll(e, '#gap')}
-                  className="hover:text-teal-400 hover:pl-2 transition-all duration-300 inline-block"
-                >
-                  The Gap
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#online-store"
-                  onClick={(e) => handleSmoothScroll(e, '#online-store')}
-                  className="hover:text-teal-400 hover:pl-2 transition-all duration-300 inline-flex items-center gap-2 group/store"
-                >
-                  <ShoppingBag className="w-3.5 h-3.5 text-teal-500/50 group-hover/store:text-teal-400 transition-colors" />
-                  Our Online Store
-                </a>
-              </li>
-              <li>
-                <a 
-                  href="#partners" 
-                  onClick={(e) => handleSmoothScroll(e, '#partners')}
-                  className="hover:text-teal-400 hover:pl-2 transition-all duration-300 inline-block"
-                >
-                  Partners
-                </a>
-              </li>
+            <h4 className="text-white font-bold mb-6">Quick Links</h4>
+            <ul className="space-y-4">
+              {quickLinks.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    to={link.href}
+                    onClick={(e) => handleLinkClick(e, link.href)}
+                    className="text-slate-500 hover:text-teal-400 transition-colors text-sm flex items-center gap-2 group"
+                  >
+                    {link.icon && <span className="text-teal-400/50 group-hover:text-teal-400 transition-colors">{link.icon}</span>}
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
+          {/* Contact Info */}
           <div>
-            <h4 className="font-bold mb-6 text-lg text-white">Contact Us</h4>
-            <ul className="space-y-4 text-slate-400">
-              <li className="flex items-center gap-3 group cursor-pointer">
-                <div className="p-1 rounded-lg transition-all duration-500 group-hover:bg-teal-500/10">
-                  <Phone className="w-5 h-5 text-teal-400 group-hover:scale-125 group-hover:text-teal-200 group-hover:drop-shadow-[0_0_10px_rgba(20,184,166,0.6)] transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1)" />
-                </div>
-                <a href="tel:+67579452732" className="hover:text-white transition-colors duration-200">+675 79452732</a>
-              </li>
-              <li className="flex items-center gap-3 group cursor-pointer">
-                <div className="p-1 rounded-lg transition-all duration-500 group-hover:bg-teal-500/10">
-                  <Mail className="w-5 h-5 text-teal-400 group-hover:scale-125 group-hover:text-teal-200 group-hover:drop-shadow-[0_0_10px_rgba(20,184,166,0.6)] transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1)" />
-                </div>
-                <a href="mailto:wokman@dspnq.tech" className="hover:text-white transition-colors duration-200">wokman@dspnq.tech</a>
-              </li>
-              <li className="flex items-center gap-3 group cursor-pointer">
-                <div className="p-1 rounded-lg transition-all duration-500 group-hover:bg-teal-500/10">
-                  <MapPin className="w-5 h-5 text-teal-400 group-hover:scale-125 group-hover:text-teal-200 group-hover:drop-shadow-[0_0_10px_rgba(20,184,166,0.6)] transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1)" />
-                </div>
-                <span className="group-hover:text-white transition-colors duration-200">Port Moresby, PNG</span>
-              </li>
+            <h4 className="text-white font-bold mb-6">Contact Us</h4>
+            <ul className="space-y-4">
+              {contactInfo.map((item, idx) => (
+                <li key={idx}>
+                  <a
+                    href={item.href}
+                    className="flex items-center gap-4 text-slate-500 hover:text-white transition-colors group"
+                  >
+                    <div className="p-2 rounded-lg bg-white/5 group-hover:bg-teal-400/10 transition-colors">
+                      {item.icon}
+                    </div>
+                    <span className="text-sm">{item.text}</span>
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
+          {/* Credentials */}
           <div>
-            <h4 className="font-bold mb-6 text-lg text-white">Credentials</h4>
-            <div className="glass p-6 rounded-2xl text-sm text-slate-400 border border-white/10 hover:border-teal-500/20 transition-all duration-500 cursor-default shadow-lg hover:shadow-teal-500/5">
-              <p className="mb-2 flex justify-between font-mono"><span className="text-white font-medium uppercase text-[10px] tracking-wider">IPA Reg:</span> <span>6-165201</span></p>
-              <p className="mb-2 flex justify-between font-mono"><span className="text-white font-medium uppercase text-[10px] tracking-wider">TIN (IRC):</span> <span>500286059</span></p>
-              <p className="flex justify-between font-mono"><span className="text-white font-medium uppercase text-[10px] tracking-wider">Est:</span> <span>2014</span></p>
+            <h4 className="text-white font-bold mb-6">Credentials</h4>
+            <div className="glass p-6 rounded-2xl border border-white/5 space-y-4">
+              <div className="flex justify-between items-center text-[10px] tracking-widest uppercase font-bold">
+                <span className="text-slate-500">IPA REG:</span>
+                <span className="text-white">6-165201</span>
+              </div>
+              <div className="flex justify-between items-center text-[10px] tracking-widest uppercase font-bold">
+                <span className="text-slate-500">TIN (IRC):</span>
+                <span className="text-white">500286059</span>
+              </div>
+              <div className="flex justify-between items-center text-[10px] tracking-widest uppercase font-bold">
+                <span className="text-slate-500">EST:</span>
+                <span className="text-white">2014</span>
+              </div>
             </div>
           </div>
+
         </div>
 
-        <div className="border-t border-white/5 pt-12 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-slate-500 text-sm">
-            © {new Date().getFullYear()} Deeps Systems. All rights reserved.
+        <div className="pt-10 border-t border-white/5 flex flex-col md:row items-center justify-between gap-6">
+          <p className="text-slate-600 text-xs text-center md:text-left">
+            © {currentYear} Deeps Systems. All rights reserved.
           </p>
-          <div className="flex gap-8 text-slate-500 text-sm">
-            <a href="#" className="hover:text-white hover:scale-105 transition-all">Privacy Policy</a>
-            <a href="#" className="hover:text-white hover:scale-105 transition-all">Terms of Service</a>
+          <div className="flex gap-8">
+            <a href="#" className="text-slate-600 hover:text-white transition-colors text-xs">Privacy Policy</a>
+            <a href="#" className="text-slate-600 hover:text-white transition-colors text-xs">Terms of Service</a>
           </div>
         </div>
       </div>
