@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, Cpu, ChevronDown, Landmark, Truck, Sprout, Cloud, Zap, Smartphone, Moon, Sun, Rocket } from 'lucide-react';
+import { Menu, X, ChevronDown, Moon, Sun, Cloud, Rocket } from 'lucide-react';
+import { servicesItems, advantageItems } from './navbarData';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -66,19 +67,6 @@ const Navbar: React.FC = () => {
     }
   };
 
-  const servicesItems = [
-    { name: 'Financial Institutions', icon: <Landmark className="w-5 h-5" />, href: '#details-financial', desc: 'SME-in-a-Box SaaS solutions.' },
-    { name: 'Energy & Logistics', icon: <Truck className="w-5 h-5" />, href: '#details-logistics', desc: 'Quantum-inspired pathfinding.' },
-    { name: 'Agribusiness', icon: <Sprout className="w-5 h-5" />, href: '#details-agribusiness', desc: 'Traceability-as-a-Service.' },
-    { name: 'Advanced Suite', icon: <Rocket className="w-5 h-5" />, href: '#advanced-solutions', desc: 'Disruptive BITC SaaS outcomes.' },
-  ];
-
-  const advantageItems = [
-    { name: 'Infrastructure', icon: <Cloud className="w-5 h-5" />, href: '#advantages', desc: 'Zero legacy physical burden.' },
-    { name: 'Scalability', icon: <Zap className="w-5 h-5" />, href: '#advantages', desc: 'Elastic cloud power.' },
-    { name: 'Resilience', icon: <Smartphone className="w-5 h-5" />, href: '#advantages', desc: 'Mobile-first design.' },
-  ];
-
   const toggleDropdown = (name: string) => {
     setActiveDropdown(activeDropdown === name ? null : name);
   };
@@ -97,29 +85,17 @@ const Navbar: React.FC = () => {
       ref={dropdownRef}
     >
       <div className="max-w-7xl mx-auto px-5 md:px-6 flex items-center justify-between relative z-10">
-        <a href="#" className="flex items-center gap-2 group">
-          <div className="p-1.5 md:p-2 rounded-lg quantum-gradient group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-lg">
-            <Cpu className="text-white w-5 h-5 md:w-6 md:h-6" />
+        <a href="#" onClick={(e) => handleSmoothScroll(e, '#')} className="flex items-center gap-2 group">
+          <div className="p-1.5 md:p-2 rounded-lg quantum-gradient group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg group-hover:shadow-teal-500/20">
+            <Rocket className="text-white w-5 h-5 md:w-6 md:h-6" />
           </div>
-          <span className="font-montserrat text-lg md:text-xl font-bold tracking-tight text-white transition-colors duration-500">
-            Deeps <span className="text-teal-400">Systems</span>
+          <span className="font-montserrat text-xl md:text-2xl font-bold tracking-tight text-white">
+            Deeps <span className="text-teal-400 group-hover:text-teal-300 transition-colors">Systems</span>
           </span>
         </a>
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-2">
-          <div className="mr-4 flex items-center">
-            <button 
-              onClick={toggleTheme}
-              className="relative w-14 h-7 rounded-full glass border border-white/10 dark:border-white/10 flex items-center p-1 transition-all duration-500 hover:border-teal-500/40 group active-click"
-            >
-              <div className={`relative w-5 h-5 rounded-full flex items-center justify-center transition-all duration-500 ${theme === 'dark' ? 'translate-x-7 bg-slate-800 text-teal-400' : 'translate-x-0 bg-white text-blue-600'}`}>
-                {theme === 'dark' ? <Moon className="w-3 h-3" /> : <Sun className="w-3 h-3" />}
-              </div>
-            </button>
-          </div>
-
-          {/* Advantages Dropdown */}
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center lg:gap-8 md:gap-4">
           <div className="relative">
             <button 
               onClick={() => toggleDropdown('advantages')}
@@ -148,14 +124,13 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
-          {/* Services Dropdown */}
           <div className="relative">
             <button 
               onClick={() => toggleDropdown('services')}
               onMouseEnter={() => setActiveDropdown('services')}
               className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg group ${activeDropdown === 'services' ? 'text-teal-400' : 'text-slate-300 hover:text-white'}`}
             >
-              Services <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'services' ? 'rotate-180' : ''}`} />
+              Outcome Solutions <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'services' ? 'rotate-180' : ''}`} />
             </button>
             {activeDropdown === 'services' && (
               <div 
@@ -182,21 +157,21 @@ const Navbar: React.FC = () => {
 
           <a href="#gap" onClick={(e) => handleSmoothScroll(e, '#gap')} className="px-3 py-2 text-sm font-medium text-slate-300 hover:text-white transition-all">The Gap</a>
           
-          <div className="ml-2 pl-4 border-l border-white/10">
+          <div className="ml-2 pl-4 border-l border-white/10 flex items-center gap-4">
+            <button
+              onClick={toggleTheme}
+              className="p-2 glass rounded-lg text-teal-400 hover:scale-110 transition-transform"
+            >
+              {theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            </button>
             <a href="#contact-form" onClick={(e) => handleSmoothScroll(e, '#contact-form')} className="px-5 py-2.5 rounded-full quantum-gradient text-white text-sm font-bold btn-cta-pulse active-click shadow-lg">
               Contact Us
             </a>
           </div>
         </div>
 
-        {/* Mobile Menu Toggle & Theme */}
+        {/* Mobile Menu Toggle */}
         <div className="flex items-center gap-3 md:hidden">
-          <button 
-            onClick={toggleTheme}
-            className="p-2 glass rounded-lg text-teal-400"
-          >
-            {theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-          </button>
           <button 
             className="text-white p-2 glass rounded-lg" 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -212,6 +187,16 @@ const Navbar: React.FC = () => {
         <div className="md:hidden fixed inset-0 top-0 pt-[72px] bg-black/98 backdrop-blur-3xl z-[45] flex flex-col animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex-grow overflow-y-auto px-6 py-8 space-y-4">
             
+            {/* Theme Toggle Mobile */}
+            <div className="flex justify-center pb-4">
+              <button
+                onClick={toggleTheme}
+                className="flex items-center gap-3 px-6 py-3 glass rounded-2xl text-teal-400 font-bold text-sm uppercase tracking-widest"
+              >
+                {theme === 'dark' ? <><Moon className="w-5 h-5" /> Dark Mode</> : <><Sun className="w-5 h-5" /> Light Mode</>}
+              </button>
+            </div>
+
             {/* Advantages Mobile Submenu */}
             <div className="space-y-2">
               <button 
