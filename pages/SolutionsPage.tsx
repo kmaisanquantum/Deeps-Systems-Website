@@ -1,0 +1,16 @@
+import React from 'react';
+import Solutions from '../components/Solutions';
+import AdvancedSolutions from '../components/AdvancedSolutions';
+import Comparison from '../components/Comparison';
+
+const SolutionsPage: React.FC = () => {
+  return (
+    <div className="pt-20">
+      <Solutions />
+      <AdvancedSolutions />
+      <Comparison />
+    </div>
+  );
+};
+
+export default SolutionsPage;

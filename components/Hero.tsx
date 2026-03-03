@@ -1,37 +1,38 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ArrowRight, Zap, Binary, Mail, Twitter, Linkedin, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import {
+  ArrowRight, Zap, Binary,
+  Mail, Twitter, Linkedin, X
+} from 'lucide-react';
 
 const Hero: React.FC = () => {
   const [showGlow, setShowGlow] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const driftTypes = ['drift-1', 'drift-2', 'drift-3', 'drift-4'];
+  const particles = useMemo(() => Array.from({ length: 25 }).map(() => {
+    const size = Math.random() * 4 + 1;
+    const isTeal = Math.random() > 0.5;
+    const driftType = driftTypes[Math.floor(Math.random() * driftTypes.length)];
+    return {
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      size: `${size}px`,
+      duration: `${Math.random() * 40 + 40}s`,
+      delay: `${Math.random() * -60}s`,
+      pulseDuration: `${Math.random() * 8 + 4}s`,
+      opacity: Math.random() * 0.08 + 0.01,
+      blur: size > 3 ? '4px' : size > 2 ? '2px' : '0px',
+      color: isTeal ? 'bg-teal-500' : 'bg-blue-400',
+      driftType
+    };
+  }), []);
 
-  const particles = useMemo(() => {
-    return Array.from({ length: 25 }).map(() => {
-      const size = Math.random() * 4 + 1;
-      const isTeal = Math.random() > 0.5;
-      const driftType = driftTypes[Math.floor(Math.random() * driftTypes.length)];
-      
-      return {
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        size: `${size}px`,
-        duration: `${Math.random() * 40 + 40}s`,
-        delay: `${Math.random() * -60}s`,
-        pulseDuration: `${Math.random() * 8 + 4}s`,
-        opacity: Math.random() * 0.08 + 0.01,
-        blur: size > 3 ? '4px' : size > 2 ? '2px' : '0px', 
-        color: isTeal ? 'bg-teal-500' : 'bg-blue-400',
-        driftType
-      };
-    });
-  }, []);
-
-  const line1 = "Optimization for the Pacific.";
-  const line2 = "Classical Roots. Quantum Future.";
-  const wordsLine1 = line1.split(" ");
-  const wordsLine2 = line2.split(" ");
+  const headlineLine1 = "Optimization for the Pacific.";
+  const headlineLine2 = "Classical Roots. Quantum Future.";
+  const wordsLine1 = headlineLine1.split(" ");
+  const wordsLine2 = headlineLine2.split(" ");
   
   const wordDelay = 0.08;
   const lineGap = 0.3;
@@ -44,13 +45,8 @@ const Hero: React.FC = () => {
     return () => clearTimeout(timer);
   }, [totalAnimationTime]);
 
-  const handleScrollToSection = (targetId: string) => {
-    const cleanId = targetId.replace('#', '');
-    const element = document.getElementById(cleanId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      window.history.pushState(null, '', `#${cleanId}`);
-    }
+  const handleAction = (path: string) => {
+    navigate(path);
   };
 
   const renderAnimatedWords = (words: string[], baseDelay: number) => {
@@ -133,13 +129,13 @@ const Hero: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 opacity-0 animate-[fade-in_1s_ease-out_1.8s_forwards]">
           <button 
-            onClick={() => handleScrollToSection('#advanced-solutions')}
+            onClick={() => handleAction('/solutions')}
             className="group w-full sm:w-auto px-10 md:px-12 py-5 md:py-6 rounded-full quantum-gradient text-white font-bold text-lg md:text-xl flex items-center justify-center gap-2 btn-cta-pulse active-click z-20 relative ring-1 ring-white/10 shadow-2xl shadow-teal-500/20"
           >
             Get Optimized <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform duration-300" />
           </button>
           <button 
-            onClick={() => handleScrollToSection('#solutions')}
+            onClick={() => handleAction('/advantage')}
             className="w-full sm:w-auto px-10 md:px-12 py-5 md:py-6 rounded-full glass text-white font-bold text-base md:text-lg btn-secondary-cta active-click border border-white/10"
           >
             Our Approach
