@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Binary, Mail, Phone, MapPin,
+  Binary, Mail, MapPin,
   ShieldCheck, ArrowUpRight, ShoppingBag
 } from 'lucide-react';
 import { storeItem } from './navbarData';
@@ -29,7 +29,6 @@ const Footer: React.FC = () => {
   ];
 
   const contactInfo = [
-    { icon: <Phone className="w-5 h-5 text-teal-400" />, text: '+675 79452732', href: 'tel:+67579452732' },
     { icon: <Mail className="w-5 h-5 text-teal-400" />, text: 'wokman@dspnq.tech', href: 'mailto:wokman@dspnq.tech' },
     { icon: <MapPin className="w-5 h-5 text-teal-400" />, text: 'Port Moresby, PNG', href: '#' },
   ];
