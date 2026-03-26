@@ -125,10 +125,10 @@ const Contact: React.FC = () => {
     await new Promise(r => setTimeout(r, 600));
     addLog('Routing through Pacific Cloud Grid...');
     await new Promise(r => setTimeout(r, 600));
-    addLog('Dispatching to wokman@dspnq.tech...');
+    addLog('Dispatching to wokman@dspng.tech...');
     
     setTimeout(() => {
-      console.log(`[BITC DISPATCH] Destination: wokman@dspnq.tech`);
+      console.log(`[BITC DISPATCH] Destination: wokman@dspng.tech`);
       setStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
       setTouched({});
@@ -164,7 +164,7 @@ const Contact: React.FC = () => {
               Ready to <span className="quantum-text-gradient">Optimize?</span>
             </h2>
             <p className="text-slate-400 text-lg mb-8 leading-relaxed max-w-lg">
-              Initiate your quantum consultation. Every inquiry is analyzed by our <span className="text-teal-400 font-bold">BITC Grid</span> and routed to our specialist team at <span className="text-teal-400 font-mono underline">wokman@dspnq.tech</span>.
+              Initiate your quantum consultation. Every inquiry is analyzed by our <span className="text-teal-400 font-bold">BITC Grid</span> and routed to our specialist team at <span className="text-teal-400 font-mono underline">wokman@dspng.tech</span>.
             </p>
             
             <div className="space-y-6">
@@ -197,7 +197,7 @@ const Contact: React.FC = () => {
                   <div className="absolute inset-0 bg-teal-400/20 rounded-full animate-ping"></div>
                 </div>
                 <h3 className="text-3xl font-bold mb-4 font-montserrat">Dispatch Confirmed</h3>
-                <p className="text-slate-400 mb-8">Payload successfully routed to <span className="text-teal-400 font-mono">wokman@dspnq.tech</span>.</p>
+                <p className="text-slate-400 mb-8">Payload successfully routed to <span className="text-teal-400 font-mono">wokman@dspng.tech</span>.</p>
                 
                 {aiAnalysis && (
                   <div className="bg-black/40 rounded-2xl p-6 border border-white/10 text-left mb-8 animate-in slide-in-from-bottom-4 duration-700 delay-300">
