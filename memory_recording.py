@@ -1,0 +1,14 @@
+import json
+
+memories = {
+    "task": "Remove phone number from the Deeps Systems website footer.",
+    "learned_patterns": [
+        "Phone number '+675 79452732' and 'Phone' icon removed from 'components/Footer.tsx'.",
+        "Repository uses Playwright for UI verification via 'verify_pages.py'.",
+        "Development server runs on port 3000.",
+        "Lucide-react icons are used throughout the project."
+    ]
+}
+
+with open("verification/memories.json", "w") as f:
+    json.dump(memories, f, indent=4)
