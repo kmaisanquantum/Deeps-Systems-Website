@@ -128,7 +128,7 @@ const Contact: React.FC = () => {
     addLog('Dispatching to wokman@dspng.tech...');
     
     setTimeout(() => {
-      console.log(`[BITC DISPATCH] Destination: wokman@dspng.tech`);
+      window.location.href = `mailto:wokman@dspng.tech?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent("From: " + formData.name + " <" + formData.email + ">\n\n" + formData.message)}`;
       setStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
       setTouched({});
