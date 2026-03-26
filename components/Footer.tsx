@@ -29,7 +29,7 @@ const Footer: React.FC = () => {
   ];
 
   const contactInfo = [
-    { icon: <Mail className="w-5 h-5 text-teal-400" />, text: 'wokman@dspnq.tech', href: 'mailto:wokman@dspnq.tech' },
+    { icon: <Mail className="w-5 h-5 text-teal-400" />, text: 'wokman@dspng.tech', href: 'mailto:wokman@dspng.tech' },
     { icon: <MapPin className="w-5 h-5 text-teal-400" />, text: 'Port Moresby, PNG', href: '#' },
   ];
 
