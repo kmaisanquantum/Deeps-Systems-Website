@@ -149,13 +149,13 @@ const Contact: React.FC = () => {
     if (touched[fieldName] && errors[fieldName]) {
       return `${base} border-red-500/50 focus:border-red-500 bg-red-500/5`;
     }
-    return `${base} border-white/10 focus:border-teal-500/50`;
+    return `${base} border-white/10 focus:border-green-500/50`;
   };
 
   return (
     <section id="contact-form" className="py-24 relative overflow-hidden">
-      <div className="absolute top-1/2 left-0 w-64 h-64 bg-teal-500/5 rounded-full blur-[100px] -z-10"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-600/5 rounded-full blur-[120px] -z-10"></div>
+      <div className="absolute top-1/2 left-0 w-64 h-64 bg-green-500/5 rounded-full blur-[100px] -z-10"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-amber-600/5 rounded-full blur-[120px] -z-10"></div>
 
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -164,25 +164,25 @@ const Contact: React.FC = () => {
               Ready to <span className="quantum-text-gradient">Optimize?</span>
             </h2>
             <p className="text-slate-400 text-lg mb-8 leading-relaxed max-w-lg">
-              Initiate your quantum consultation. Every inquiry is analyzed by our <span className="text-teal-400 font-bold">BITC Grid</span> and routed to our specialist team at <span className="text-teal-400 font-mono underline">wokman@dspng.tech</span>.
+              Initiate your quantum consultation. Every inquiry is analyzed by our <span className="text-green-400 font-bold">BITC Grid</span> and routed to our specialist team at <span className="text-green-400 font-mono underline">wokman@dspng.tech</span>.
             </p>
             
             <div className="space-y-6">
-              <div className="flex items-start gap-4 p-5 rounded-2xl glass border border-white/5 hover:border-teal-500/20 transition-all duration-300 group cursor-default shadow-xl">
-                <div className="p-3 rounded-xl bg-teal-500/10 text-teal-400 group-hover:scale-110 transition-transform">
+              <div className="flex items-start gap-4 p-5 rounded-2xl glass border border-white/5 hover:border-green-500/20 transition-all duration-300 group cursor-default shadow-xl">
+                <div className="p-3 rounded-xl bg-green-500/10 text-green-400 group-hover:scale-110 transition-transform">
                   <ShieldCheck className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-white group-hover:text-teal-400 transition-colors">Quantum Security</h4>
+                  <h4 className="font-bold text-white group-hover:text-green-400 transition-colors">Quantum Security</h4>
                   <p className="text-sm text-slate-500">End-to-end encrypted dispatch through regional cloud nodes.</p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 p-5 rounded-2xl glass border border-white/5 hover:border-blue-500/20 transition-all duration-300 group cursor-default shadow-xl">
-                <div className="p-3 rounded-xl bg-blue-500/10 text-blue-400 group-hover:scale-110 transition-transform">
+              <div className="flex items-start gap-4 p-5 rounded-2xl glass border border-white/5 hover:border-amber-500/20 transition-all duration-300 group cursor-default shadow-xl">
+                <div className="p-3 rounded-xl bg-amber-500/10 text-amber-400 group-hover:scale-110 transition-transform">
                   <Sparkles className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-white group-hover:text-blue-400 transition-colors">Gemini-Powered Routing</h4>
+                  <h4 className="font-bold text-white group-hover:text-amber-400 transition-colors">Gemini-Powered Routing</h4>
                   <p className="text-sm text-slate-500">Inquiries are qualified by AI for ultra-fast executive response.</p>
                 </div>
               </div>
@@ -191,19 +191,19 @@ const Contact: React.FC = () => {
 
           <div className="relative min-h-[500px] flex items-center">
             {status === 'success' ? (
-              <div className="glass rounded-[2.5rem] p-10 md:p-12 text-center border border-teal-500/40 animate-in zoom-in duration-500 shadow-[0_0_50px_rgba(20,184,166,0.15)] w-full">
-                <div className="w-20 h-20 bg-teal-500/20 rounded-full flex items-center justify-center mx-auto mb-8 relative">
-                  <CheckCircle className="w-10 h-10 text-teal-400" />
-                  <div className="absolute inset-0 bg-teal-400/20 rounded-full animate-ping"></div>
+              <div className="glass rounded-[2.5rem] p-10 md:p-12 text-center border border-green-500/40 animate-in zoom-in duration-500 shadow-[0_0_50px_rgba(34,197,94,0.15)] w-full">
+                <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-8 relative">
+                  <CheckCircle className="w-10 h-10 text-green-400" />
+                  <div className="absolute inset-0 bg-green-400/20 rounded-full animate-ping"></div>
                 </div>
                 <h3 className="text-3xl font-bold mb-4 font-montserrat">Dispatch Confirmed</h3>
-                <p className="text-slate-400 mb-8">Payload successfully routed to <span className="text-teal-400 font-mono">wokman@dspng.tech</span>.</p>
+                <p className="text-slate-400 mb-8">Payload successfully routed to <span className="text-green-400 font-mono">wokman@dspng.tech</span>.</p>
                 
                 {aiAnalysis && (
                   <div className="bg-black/40 rounded-2xl p-6 border border-white/10 text-left mb-8 animate-in slide-in-from-bottom-4 duration-700 delay-300">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-[10px] font-bold text-teal-400 uppercase tracking-widest">AI Qualitative Summary</span>
-                      <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest ${aiAnalysis.priority === 'CRITICAL' || aiAnalysis.priority === 'HIGH' ? 'bg-red-500/20 text-red-400' : 'bg-teal-500/20 text-teal-400'}`}>
+                      <span className="text-[10px] font-bold text-green-400 uppercase tracking-widest">AI Qualitative Summary</span>
+                      <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest ${aiAnalysis.priority === 'CRITICAL' || aiAnalysis.priority === 'HIGH' ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
                         Priority: {aiAnalysis.priority}
                       </span>
                     </div>
@@ -213,29 +213,29 @@ const Contact: React.FC = () => {
                 
                 <button 
                   onClick={() => setStatus('idle')}
-                  className="inline-flex items-center gap-2 text-teal-400 font-bold hover:text-white transition-all active-click px-8 py-4 rounded-full glass btn-secondary-cta"
+                  className="inline-flex items-center gap-2 text-green-400 font-bold hover:text-white transition-all active-click px-8 py-4 rounded-full glass btn-secondary-cta"
                 >
                   Initiate New Transmission <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             ) : status === 'submitting' ? (
               <div className="glass rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl w-full min-h-[400px] flex flex-col justify-between overflow-hidden relative">
-                 <div className="absolute top-0 left-0 w-full h-1 bg-teal-500/10 overflow-hidden">
-                    <div className="h-full bg-teal-500 w-1/3 animate-[loading_1.5s_infinite]"></div>
+                 <div className="absolute top-0 left-0 w-full h-1 bg-green-500/10 overflow-hidden">
+                    <div className="h-full bg-green-500 w-1/3 animate-[loading_1.5s_infinite]"></div>
                  </div>
                  
                  <div className="flex items-center gap-3 mb-6">
-                    <Terminal className="w-5 h-5 text-teal-400" />
+                    <Terminal className="w-5 h-5 text-green-400" />
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">BITC Dispatch Log</span>
                  </div>
                  
-                 <div className="flex-grow font-mono text-[11px] md:text-xs text-teal-400/80 space-y-2 overflow-y-auto max-h-[250px] scrollbar-none">
+                 <div className="flex-grow font-mono text-[11px] md:text-xs text-green-400/80 space-y-2 overflow-y-auto max-h-[250px] scrollbar-none">
                     {logs.map((log, i) => (
                       <div key={i} className="animate-in fade-in slide-in-from-left-2 duration-300">
                         <span className="text-slate-600 mr-2">{'>'}</span> {log}
                       </div>
                     ))}
-                    <div className="flex items-center gap-2 text-teal-400 animate-pulse">
+                    <div className="flex items-center gap-2 text-green-400 animate-pulse">
                       <span className="text-slate-600 mr-2">{'>'}</span>
                       Processing...
                       <Loader2 className="w-3 h-3 animate-spin" />
@@ -250,9 +250,9 @@ const Contact: React.FC = () => {
               <form onSubmit={handleSubmit} noValidate className="glass rounded-[2.5rem] p-8 md:p-10 border border-white/10 shadow-2xl space-y-6 w-full animate-in fade-in duration-500">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold uppercase tracking-widest text-teal-400 ml-1">Full Name</label>
+                    <label className="text-xs font-bold uppercase tracking-widest text-green-400 ml-1">Full Name</label>
                     <div className="relative group">
-                      <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${touched.name && errors.name ? 'text-red-400' : 'text-slate-500 group-focus-within:text-teal-400'}`} />
+                      <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${touched.name && errors.name ? 'text-red-400' : 'text-slate-500 group-focus-within:text-green-400'}`} />
                       <input 
                         type="text" 
                         name="name"
@@ -271,9 +271,9 @@ const Contact: React.FC = () => {
                     )}
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-bold uppercase tracking-widest text-teal-400 ml-1">Email Address</label>
+                    <label className="text-xs font-bold uppercase tracking-widest text-green-400 ml-1">Email Address</label>
                     <div className="relative group">
-                      <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${touched.email && errors.email ? 'text-red-400' : 'text-slate-500 group-focus-within:text-teal-400'}`} />
+                      <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${touched.email && errors.email ? 'text-red-400' : 'text-slate-500 group-focus-within:text-green-400'}`} />
                       <input 
                         type="email" 
                         name="email"
@@ -294,9 +294,9 @@ const Contact: React.FC = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold uppercase tracking-widest text-teal-400 ml-1">Subject</label>
+                  <label className="text-xs font-bold uppercase tracking-widest text-green-400 ml-1">Subject</label>
                   <div className="relative group">
-                    <Tag className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${touched.subject && errors.subject ? 'text-red-400' : 'text-slate-500 group-focus-within:text-teal-400'}`} />
+                    <Tag className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${touched.subject && errors.subject ? 'text-red-400' : 'text-slate-500 group-focus-within:text-green-400'}`} />
                     <input 
                       type="text" 
                       name="subject"
@@ -316,9 +316,9 @@ const Contact: React.FC = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold uppercase tracking-widest text-teal-400 ml-1">Message</label>
+                  <label className="text-xs font-bold uppercase tracking-widest text-green-400 ml-1">Message</label>
                   <div className="relative group">
-                    <MessageSquare className={`absolute left-4 top-4 w-4 h-4 transition-colors ${touched.message && errors.message ? 'text-red-400' : 'text-slate-500 group-focus-within:text-teal-400'}`} />
+                    <MessageSquare className={`absolute left-4 top-4 w-4 h-4 transition-colors ${touched.message && errors.message ? 'text-red-400' : 'text-slate-500 group-focus-within:text-green-400'}`} />
                     <textarea 
                       name="message"
                       rows={4}
@@ -340,7 +340,7 @@ const Contact: React.FC = () => {
                 <button 
                   type="submit" 
                   disabled={status === 'submitting' || (Object.keys(errors).length > 0 && Object.keys(touched).length > 0)}
-                  className="w-full py-5 rounded-2xl quantum-gradient text-white font-bold text-lg flex items-center justify-center gap-3 btn-cta-pulse active-click transition-all duration-300 shadow-xl shadow-teal-500/20 group ring-1 ring-white/5 hover:ring-white/20 disabled:opacity-50 disabled:grayscale"
+                  className="w-full py-5 rounded-2xl quantum-gradient text-white font-bold text-lg flex items-center justify-center gap-3 btn-cta-pulse active-click transition-all duration-300 shadow-xl shadow-green-500/20 group ring-1 ring-white/5 hover:ring-white/20 disabled:opacity-50 disabled:grayscale"
                 >
                   Secure Dispatch
                   <Zap className="w-5 h-5 group-hover:scale-125 transition-transform" />

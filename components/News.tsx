@@ -16,13 +16,13 @@ const News: React.FC = () => {
       name: 'Twitter',
       icon: <Twitter className="w-5 h-5" />,
       url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(article.url)}&text=${encodeURIComponent(article.title)}`,
-      color: 'hover:text-blue-400'
+      color: 'hover:text-amber-400'
     },
     {
       name: 'LinkedIn',
       icon: <Linkedin className="w-5 h-5" />,
       url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(article.url)}`,
-      color: 'hover:text-blue-600'
+      color: 'hover:text-amber-600'
     }
   ];
 
@@ -40,14 +40,14 @@ const News: React.FC = () => {
           {articles.map((article, idx) => (
             <div 
               key={article.id} 
-              className="glass flex flex-col rounded-3xl overflow-hidden border border-white/5 hover:border-teal-500/20 transition-all duration-500 group reveal-on-scroll"
+              className="glass flex flex-col rounded-3xl overflow-hidden border border-white/5 hover:border-green-500/20 transition-all duration-500 group reveal-on-scroll"
               style={{ transitionDelay: `${idx * 0.1}s` }}
             >
               <div className="h-48 bg-slate-900/50 relative overflow-hidden flex items-center justify-center">
                 <div className="absolute inset-0 quantum-gradient opacity-5 group-hover:opacity-10 transition-opacity"></div>
-                <Zap className="w-12 h-12 text-teal-400/20 group-hover:text-teal-400/40 transition-colors" />
+                <Zap className="w-12 h-12 text-green-400/20 group-hover:text-green-400/40 transition-colors" />
                 <div className="absolute bottom-4 left-4">
-                  <span className="px-3 py-1 rounded-full bg-teal-500/10 text-teal-400 text-[10px] font-bold uppercase tracking-widest border border-teal-500/20">
+                  <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-[10px] font-bold uppercase tracking-widest border border-green-500/20">
                     {article.category}
                   </span>
                 </div>
@@ -65,7 +65,7 @@ const News: React.FC = () => {
                   </div>
                 </div>
                 
-                <h3 className="text-xl font-bold mb-4 group-hover:text-teal-400 transition-colors leading-snug">
+                <h3 className="text-xl font-bold mb-4 group-hover:text-green-400 transition-colors leading-snug">
                   {article.title}
                 </h3>
                 
@@ -74,14 +74,14 @@ const News: React.FC = () => {
                 </p>
 
                 <div className="mt-auto flex items-center justify-between pt-6 border-t border-white/5">
-                  <a href={article.url} className="flex items-center gap-2 text-sm font-bold text-white hover:text-teal-400 transition-all group/read active-click px-4 py-2 rounded-xl glass btn-secondary-cta border-none bg-transparent">
+                  <a href={article.url} className="flex items-center gap-2 text-sm font-bold text-white hover:text-green-400 transition-all group/read active-click px-4 py-2 rounded-xl glass btn-secondary-cta border-none bg-transparent">
                     Read Article
                     <ArrowRight className="w-4 h-4 group-hover/read:translate-x-1 transition-transform" />
                   </a>
                   
                   <button 
                     onClick={() => setActiveShare(article)}
-                    className="p-2.5 rounded-xl glass border border-white/5 text-slate-400 hover:text-teal-400 active-click transition-all group/share btn-secondary-cta"
+                    className="p-2.5 rounded-xl glass border border-white/5 text-slate-400 hover:text-green-400 active-click transition-all group/share btn-secondary-cta"
                     aria-label="Share article"
                   >
                     <Share2 className="w-4 h-4 group-hover/share:scale-110 transition-transform" />
@@ -128,7 +128,7 @@ const News: React.FC = () => {
                 navigator.clipboard.writeText(activeShare.url);
                 alert('Article link copied to clipboard!');
               }}
-              className="w-full mt-6 py-3 rounded-xl border border-white/5 hover:border-teal-500/30 text-slate-300 hover:text-teal-400 text-sm font-bold transition-all active-click btn-secondary-cta"
+              className="w-full mt-6 py-3 rounded-xl border border-white/5 hover:border-green-500/30 text-slate-300 hover:text-green-400 text-sm font-bold transition-all active-click btn-secondary-cta"
             >
               Copy Direct Link
             </button>
