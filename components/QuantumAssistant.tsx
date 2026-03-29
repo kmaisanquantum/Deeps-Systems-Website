@@ -76,8 +76,8 @@ const QuantumAssistant: React.FC = () => {
              </div>
              <div>
                 <h3 className="font-bold text-sm">Quantum Assistant</h3>
-                <span className="flex items-center gap-1.5 text-[10px] text-teal-400 font-bold uppercase tracking-widest">
-                  <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
+                <span className="flex items-center gap-1.5 text-[10px] text-green-400 font-bold uppercase tracking-widest">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
                   Online
                 </span>
              </div>
@@ -91,7 +91,7 @@ const QuantumAssistant: React.FC = () => {
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 duration-300`}>
                 <div className={`max-w-[85%] p-3 rounded-2xl text-sm transition-all duration-300 hover:brightness-105 ${
                   m.role === 'user' 
-                    ? 'bg-blue-600 text-white rounded-br-none shadow-md shadow-blue-500/10' 
+                    ? 'bg-amber-600 text-white rounded-br-none shadow-md shadow-amber-500/10'
                     : 'bg-slate-800/80 text-slate-200 rounded-bl-none border border-white/5 shadow-md shadow-black/20'
                 }`}>
                   {m.text}
@@ -101,7 +101,7 @@ const QuantumAssistant: React.FC = () => {
             {isLoading && (
               <div className="flex justify-start">
                 <div className="bg-slate-800/80 p-3 rounded-2xl rounded-bl-none border border-white/5 flex items-center gap-2 shadow-md">
-                  <Loader2 className="w-4 h-4 text-teal-400 animate-spin" />
+                  <Loader2 className="w-4 h-4 text-green-400 animate-spin" />
                   <span className="text-xs text-slate-400 italic">Processing...</span>
                 </div>
               </div>
@@ -116,7 +116,7 @@ const QuantumAssistant: React.FC = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Ask about BITC..."
-              className="flex-grow bg-slate-900/50 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-teal-500 transition-all duration-300 placeholder:text-slate-600 focus:shadow-[0_0_15px_rgba(20,184,166,0.15)]"
+              className="flex-grow bg-slate-900/50 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-green-500 transition-all duration-300 placeholder:text-slate-600 focus:shadow-[0_0_15px_rgba(34,197,94,0.15)]"
             />
             <button 
               onClick={handleSend}

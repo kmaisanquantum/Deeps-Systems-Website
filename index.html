@@ -21,7 +21,7 @@
         --text-main: #f8fafc;
         --glass-bg: rgba(255, 255, 255, 0.03);
         --glass-border: rgba(255, 255, 255, 0.1);
-        --card-glow: rgba(20, 184, 166, 0.05);
+        --card-glow: rgba(34, 197, 94, 0.05);
       }
 
       .light {
@@ -29,7 +29,7 @@
         --text-main: #0f172a;
         --glass-bg: rgba(15, 23, 42, 0.03);
         --glass-border: rgba(15, 23, 42, 0.1);
-        --card-glow: rgba(20, 184, 166, 0.02);
+        --card-glow: rgba(34, 197, 94, 0.02);
       }
 
       body {
@@ -55,8 +55,8 @@
       }
       
       @keyframes target-pulse {
-        0%, 100% { border-color: rgba(20, 184, 166, 0.2); box-shadow: 0 0 20px rgba(0, 0, 0, 0); }
-        50% { border-color: rgba(20, 184, 166, 0.8); box-shadow: 0 0 40px rgba(20, 184, 166, 0.2); transform: scale(1.005); }
+        0%, 100% { border-color: rgba(34, 197, 94, 0.2); box-shadow: 0 0 20px rgba(0, 0, 0, 0); }
+        50% { border-color: rgba(34, 197, 94, 0.8); box-shadow: 0 0 40px rgba(34, 197, 94, 0.2); transform: scale(1.005); }
       }
 
       section:target, div:target {
@@ -65,10 +65,10 @@
       }
 
       .quantum-gradient {
-        background: linear-gradient(135deg, #14b8a6 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #22c55e 0%, #fbbf24 100%);
       }
       .quantum-text-gradient {
-        background: linear-gradient(135deg, #14b8a6 0%, #3b82f6 100%);
+        background: linear-gradient(135deg, #22c55e 0%, #fbbf24 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
@@ -149,12 +149,12 @@
 
       /* SECTOR ICON ANIMATIONS - CONTINUOUS & DISTINCT */
       @keyframes icon-pulse-quantum {
-        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(20, 184, 166, 0)); }
-        50% { transform: scale(1.12); filter: drop-shadow(0 0 10px rgba(20, 184, 166, 0.6)); }
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(34, 197, 94, 0)); }
+        50% { transform: scale(1.12); filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.6)); }
       }
       @keyframes icon-float-quantum {
-        0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 2px rgba(20, 184, 166, 0.2)); }
-        50% { transform: translateY(-12px); filter: drop-shadow(0 0 15px rgba(20, 184, 166, 0.5)); }
+        0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 2px rgba(34, 197, 94, 0.2)); }
+        50% { transform: translateY(-12px); filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.5)); }
       }
       @keyframes icon-sway-quantum {
         0%, 100% { transform: rotate(-8deg); }
@@ -189,12 +189,12 @@
       /* REFINED VOLUMETRIC QUANTUM GLOW */
       @keyframes headline-glow {
         0%, 100% { 
-          filter: drop-shadow(0 0 0px rgba(20, 184, 166, 0)); 
-          text-shadow: 0 0 8px rgba(20, 184, 166, 0.1); 
+          filter: drop-shadow(0 0 0px rgba(34, 197, 94, 0));
+          text-shadow: 0 0 8px rgba(34, 197, 94, 0.1);
         }
         50% { 
-          filter: drop-shadow(0 0 15px rgba(20, 184, 166, 0.2)); 
-          text-shadow: 0 0 12px rgba(20, 184, 166, 0.4), 0 0 25px rgba(59, 130, 246, 0.3); 
+          filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.2));
+          text-shadow: 0 0 12px rgba(34, 197, 94, 0.4), 0 0 25px rgba(251, 191, 36, 0.3);
         }
       }
       .headline-glow-active { animation: headline-glow 5s ease-in-out infinite; }
@@ -249,8 +249,8 @@
 
       .btn-cta-pulse:hover {
         box-shadow: 
-          0 0 60px rgba(20, 184, 166, 0.8), 
-          0 0 120px rgba(59, 130, 246, 0.6),
+          0 0 60px rgba(34, 197, 94, 0.8),
+          0 0 120px rgba(251, 191, 36, 0.6),
           0 35px 70px -15px rgba(0, 0, 0, 0.8);
         filter: brightness(1.3);
         animation: btn-hover-heartbeat 2s ease-in-out infinite;
@@ -272,9 +272,9 @@
         transform: translateY(-6px) scale(1.05);
         box-shadow: 
           0 25px 50px -12px rgba(0, 0, 0, 0.6), 
-          0 0 40px rgba(20, 184, 166, 0.35);
+          0 0 40px rgba(34, 197, 94, 0.35);
         filter: brightness(1.2);
-        border-color: rgba(20, 184, 166, 0.6);
+        border-color: rgba(34, 197, 94, 0.6);
         background: rgba(255, 255, 255, 0.05);
         animation: btn-pulse-breathing 3s ease-in-out infinite;
       }
@@ -290,7 +290,7 @@
       ::-webkit-scrollbar { width: 6px; }
       ::-webkit-scrollbar-track { background: var(--bg-main); transition: background 0.8s ease; }
       ::-webkit-scrollbar-thumb { background: rgba(120, 120, 120, 0.2); border-radius: 4px; }
-      ::-webkit-scrollbar-thumb:hover { background: rgba(20, 184, 166, 0.4); }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(34, 197, 94, 0.4); }
 
       /* Mobile text balance */
       .text-balance {
@@ -307,7 +307,7 @@
       .light .bg-slate-900\/20,
       .light .bg-slate-900\/50,
       .light .bg-black\/20,
-      .light .bg-teal-900\/5 {
+      .light .bg-green-900\/5 {
         background-color: rgba(15, 23, 42, 0.02) !important;
       }
 
@@ -330,7 +330,7 @@
       }
 
       .light .quantum-gradient {
-        background: linear-gradient(135deg, #0d9488 0%, #2563eb 100%);
+        background: linear-gradient(135deg, #16a34a 0%, #d97706 100%);
       }
     </style>
   <script type="importmap">

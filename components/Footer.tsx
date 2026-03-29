@@ -29,8 +29,8 @@ const Footer: React.FC = () => {
   ];
 
   const contactInfo = [
-    { icon: <Mail className="w-5 h-5 text-teal-400" />, text: 'wokman@dspng.tech', href: 'mailto:wokman@dspng.tech' },
-    { icon: <MapPin className="w-5 h-5 text-teal-400" />, text: 'Port Moresby, PNG', href: '#' },
+    { icon: <Mail className="w-5 h-5 text-green-400" />, text: 'wokman@dspng.tech', href: 'mailto:wokman@dspng.tech' },
+    { icon: <MapPin className="w-5 h-5 text-green-400" />, text: 'Port Moresby, PNG', href: '#' },
   ];
 
   return (
@@ -45,7 +45,7 @@ const Footer: React.FC = () => {
                 <Binary className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-montserrat font-extrabold tracking-tight text-white">
-                Deeps <span className="text-teal-400">Systems</span>
+                Deeps <span className="text-green-400">Systems</span>
               </span>
             </Link>
             <p className="text-slate-400 leading-relaxed text-sm">
@@ -62,9 +62,9 @@ const Footer: React.FC = () => {
                   <Link
                     to={link.href}
                     onClick={(e) => handleLinkClick(e, link.href)}
-                    className="text-slate-500 hover:text-teal-400 transition-colors text-sm flex items-center gap-2 group"
+                    className="text-slate-500 hover:text-green-400 transition-colors text-sm flex items-center gap-2 group"
                   >
-                    {link.icon && <span className="text-teal-400/50 group-hover:text-teal-400 transition-colors">{link.icon}</span>}
+                    {link.icon && <span className="text-green-400/50 group-hover:text-green-400 transition-colors">{link.icon}</span>}
                     {link.name}
                   </Link>
                 </li>
@@ -82,7 +82,7 @@ const Footer: React.FC = () => {
                     href={item.href}
                     className="flex items-center gap-4 text-slate-500 hover:text-white transition-colors group"
                   >
-                    <div className="p-2 rounded-lg bg-white/5 group-hover:bg-teal-400/10 transition-colors">
+                    <div className="p-2 rounded-lg bg-white/5 group-hover:bg-green-400/10 transition-colors">
                       {item.icon}
                     </div>
                     <span className="text-sm">{item.text}</span>

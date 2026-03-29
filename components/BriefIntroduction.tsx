@@ -6,15 +6,15 @@ const BriefIntroduction: React.FC = () => {
   const sectors = [
     {
       name: 'Financial',
-      icon: <Landmark className="w-8 h-8 text-teal-400" />,
+      icon: <Landmark className="w-8 h-8 text-green-400" />,
       desc: 'SME-in-a-Box SaaS outcomes for the modern economy.',
-      color: 'teal'
+      color: 'green'
     },
     {
       name: 'Logistics',
-      icon: <Truck className="w-8 h-8 text-blue-400" />,
+      icon: <Truck className="w-8 h-8 text-amber-400" />,
       desc: 'Quantum-inspired pathfinding for complex supply chains.',
-      color: 'blue'
+      color: 'amber'
     },
     {
       name: 'Agribusiness',
@@ -26,10 +26,10 @@ const BriefIntroduction: React.FC = () => {
 
   return (
     <section className="py-24 bg-[#0a0a0a] border-y border-white/5 relative overflow-hidden">
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-500/5 rounded-full blur-[120px] -z-10"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-500/5 rounded-full blur-[120px] -z-10"></div>
 
       <div className="max-w-5xl mx-auto px-6 text-center">
-        <div className="inline-block px-4 py-2 rounded-full glass border border-white/10 text-[10px] font-bold text-teal-400 uppercase tracking-widest mb-8">
+        <div className="inline-block px-4 py-2 rounded-full glass border border-white/10 text-[10px] font-bold text-green-400 uppercase tracking-widest mb-8">
           The Deeps Mission
         </div>
 

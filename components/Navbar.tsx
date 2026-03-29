@@ -78,11 +78,11 @@ const Navbar: React.FC = () => {
           className="flex items-center gap-2 group relative z-[60]"
           onClick={(e) => handleLinkClick(e, '/')}
         >
-          <div className="p-2 rounded-xl quantum-gradient group-hover:rotate-[360deg] transition-transform duration-700 shadow-lg shadow-teal-500/20">
+          <div className="p-2 rounded-xl quantum-gradient group-hover:rotate-[360deg] transition-transform duration-700 shadow-lg shadow-green-500/20">
             <Binary className="w-6 h-6 text-white" />
           </div>
-          <span className="text-xl md:text-2xl font-montserrat font-extrabold tracking-tight text-white group-hover:text-teal-400 transition-colors">
-            Deeps <span className="text-teal-400 group-hover:text-white transition-colors">Systems</span>
+          <span className="text-xl md:text-2xl font-montserrat font-extrabold tracking-tight text-white group-hover:text-green-400 transition-colors">
+            Deeps <span className="text-green-400 group-hover:text-white transition-colors">Systems</span>
           </span>
         </Link>
 
@@ -92,7 +92,7 @@ const Navbar: React.FC = () => {
           <div className="relative">
             <button 
               onMouseEnter={() => setActiveDropdown('advantages')}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${activeDropdown === 'advantages' ? 'text-teal-400' : 'text-slate-300 hover:text-white'}`}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${activeDropdown === 'advantages' ? 'text-green-400' : 'text-slate-300 hover:text-white'}`}
             >
               Advantages <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'advantages' ? 'rotate-180' : ''}`} />
             </button>
@@ -109,11 +109,11 @@ const Navbar: React.FC = () => {
                       onClick={(e) => handleLinkClick(e, item.href)}
                       className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all group/item"
                     >
-                      <div className="p-2 rounded-lg bg-teal-500/10 text-teal-400 group-hover/item:scale-110 transition-all">
+                      <div className="p-2 rounded-lg bg-green-500/10 text-green-400 group-hover/item:scale-110 transition-all">
                         {item.icon}
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-white mb-0.5 group-hover/item:text-teal-400 transition-colors">{item.name}</div>
+                        <div className="text-xs font-bold text-white mb-0.5 group-hover/item:text-green-400 transition-colors">{item.name}</div>
                         <div className="text-[10px] text-slate-400 leading-tight">{item.desc}</div>
                       </div>
                     </Link>
@@ -126,7 +126,7 @@ const Navbar: React.FC = () => {
           <div className="relative">
             <button 
               onMouseEnter={() => setActiveDropdown('services')}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${activeDropdown === 'services' ? 'text-teal-400' : 'text-slate-300 hover:text-white'}`}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${activeDropdown === 'services' ? 'text-green-400' : 'text-slate-300 hover:text-white'}`}
             >
               Outcome Solutions <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'services' ? 'rotate-180' : ''}`} />
             </button>
@@ -136,7 +136,7 @@ const Navbar: React.FC = () => {
                 className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-80 glass bg-black/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl p-4 animate-in fade-in slide-in-from-top-2 duration-300"
               >
                 <div className="space-y-1">
-                  <div className="text-[9px] font-bold text-teal-400 uppercase tracking-widest px-2 mb-2">Outcome Solutions</div>
+                  <div className="text-[9px] font-bold text-green-400 uppercase tracking-widest px-2 mb-2">Outcome Solutions</div>
                   {servicesItems.map((item) => (
                     <Link
                       key={item.name}
@@ -144,11 +144,11 @@ const Navbar: React.FC = () => {
                       onClick={(e) => handleLinkClick(e, item.href)}
                       className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all group/item"
                     >
-                      <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400 group-hover/item:scale-110 transition-all">
+                      <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 group-hover/item:scale-110 transition-all">
                         {item.icon}
                       </div>
                       <div>
-                        <div className="text-sm font-bold text-white group-hover/item:text-teal-400 transition-colors">{item.name}</div>
+                        <div className="text-sm font-bold text-white group-hover/item:text-green-400 transition-colors">{item.name}</div>
                         <div className="text-[11px] text-slate-500 leading-tight">{item.desc}</div>
                       </div>
                     </Link>
@@ -163,7 +163,7 @@ const Navbar: React.FC = () => {
           <Link
             to={storeItem.href}
             onClick={(e) => handleLinkClick(e, storeItem.href)}
-            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-400 hover:text-white transition-all group"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-green-400 hover:text-white transition-all group"
           >
             <ShoppingBag className="w-4 h-4" />
             <span>Our Online Store</span>
@@ -172,7 +172,7 @@ const Navbar: React.FC = () => {
           <div className="ml-2 pl-4 border-l border-white/10 flex items-center gap-4">
             <button
               onClick={toggleTheme}
-              className="p-2 glass rounded-lg text-teal-400 hover:scale-110 transition-transform"
+              className="p-2 glass rounded-lg text-green-400 hover:scale-110 transition-transform"
             >
               {theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
             </button>
@@ -204,7 +204,7 @@ const Navbar: React.FC = () => {
             <div className="flex justify-center pb-4">
               <button
                 onClick={toggleTheme}
-                className="flex items-center gap-3 px-6 py-3 glass rounded-2xl text-teal-400 font-bold text-sm uppercase tracking-widest"
+                className="flex items-center gap-3 px-6 py-3 glass rounded-2xl text-green-400 font-bold text-sm uppercase tracking-widest"
               >
                 {theme === 'dark' ? <><Moon className="w-5 h-5" /> Dark Mode</> : <><Sun className="w-5 h-5" /> Light Mode</>}
               </button>
@@ -213,7 +213,7 @@ const Navbar: React.FC = () => {
             <Link
               to={storeItem.href}
               onClick={(e) => handleLinkClick(e, storeItem.href)}
-              className="w-full flex items-center gap-3 p-4 glass rounded-2xl text-teal-400 active:bg-white/5 transition-all"
+              className="w-full flex items-center gap-3 p-4 glass rounded-2xl text-green-400 active:bg-white/5 transition-all"
             >
               <ShoppingBag className="w-5 h-5" />
               <span className="font-bold text-sm uppercase tracking-widest">{storeItem.name}</span>
@@ -225,7 +225,7 @@ const Navbar: React.FC = () => {
                 className="w-full flex items-center justify-between p-4 glass rounded-2xl text-white"
               >
                 <div className="flex items-center gap-3">
-                   <Cloud className="w-5 h-5 text-teal-400" />
+                   <Cloud className="w-5 h-5 text-green-400" />
                    <span className="font-bold text-sm uppercase tracking-widest">Advantages</span>
                 </div>
                 <ChevronDown className={`w-5 h-5 transition-transform ${mobileActiveSubmenu === 'advantages' ? 'rotate-180' : ''}`} />
@@ -240,7 +240,7 @@ const Navbar: React.FC = () => {
                       onClick={(e) => handleLinkClick(e, item.href)}
                       className="flex items-center gap-4 p-4 glass rounded-xl text-white"
                     >
-                      <div className="p-2 rounded-lg bg-teal-500/10 text-teal-400">{item.icon}</div>
+                      <div className="p-2 rounded-lg bg-green-500/10 text-green-400">{item.icon}</div>
                       <div className="flex flex-col">
                         <span className="font-bold text-sm">{item.name}</span>
                         <span className="text-[10px] text-slate-500">{item.desc}</span>
@@ -257,7 +257,7 @@ const Navbar: React.FC = () => {
                 className="w-full flex items-center justify-between p-4 glass rounded-2xl text-white"
               >
                 <div className="flex items-center gap-3">
-                   <Rocket className="w-5 h-5 text-blue-400" />
+                   <Rocket className="w-5 h-5 text-amber-400" />
                    <span className="font-bold text-sm uppercase tracking-widest">Outcome Solutions</span>
                 </div>
                 <ChevronDown className={`w-5 h-5 transition-transform ${mobileActiveSubmenu === 'services' ? 'rotate-180' : ''}`} />
@@ -272,7 +272,7 @@ const Navbar: React.FC = () => {
                       onClick={(e) => handleLinkClick(e, item.href)}
                       className="flex items-center gap-4 p-4 glass rounded-xl text-white"
                     >
-                      <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">{item.icon}</div>
+                      <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">{item.icon}</div>
                       <div className="flex flex-col">
                         <span className="font-bold text-sm">{item.name}</span>
                         <span className="text-[10px] text-slate-500">{item.desc}</span>
@@ -288,7 +288,7 @@ const Navbar: React.FC = () => {
             <div className="pt-8">
               <Link
                 to="/contact"
-                className="block w-full text-center py-4 rounded-2xl quantum-gradient text-white font-bold text-lg shadow-xl shadow-teal-500/20"
+                className="block w-full text-center py-4 rounded-2xl quantum-gradient text-white font-bold text-lg shadow-xl shadow-green-500/20"
               >
                 Start Consultation
               </Link>

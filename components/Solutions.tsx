@@ -85,7 +85,7 @@ const Solutions: React.FC = () => {
     <section id="solutions" className="py-16 md:py-24 scroll-mt-24">
       <div className="max-w-7xl mx-auto px-5 md:px-6">
         <div className="mb-12 md:mb-16 reveal-on-scroll">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-[9px] md:text-[10px] font-bold uppercase tracking-widest mb-4 md:mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-[9px] md:text-[10px] font-bold uppercase tracking-widest mb-4 md:mb-6">
             <Zap className="w-3 h-3" />
             Outcome Driven
           </div>
@@ -102,22 +102,22 @@ const Solutions: React.FC = () => {
           {solutions.map((sol, idx) => (
             <div key={idx} className="flex flex-col group reveal-on-scroll" style={{ transitionDelay: `${idx * 0.1}s` }}>
               <div className="flex items-center gap-4 mb-6 md:mb-8">
-                <div className="p-3 rounded-xl quantum-gradient text-white group-hover:scale-110 transition-all duration-500 shadow-lg shadow-teal-500/10">
+                <div className="p-3 rounded-xl quantum-gradient text-white group-hover:scale-110 transition-all duration-500 shadow-lg shadow-green-500/10">
                   {sol.icon("w-5 h-5 md:w-6 md:h-6")}
                 </div>
                 <div className="relative inline-block">
-                  <h3 className="text-lg md:text-xl font-bold font-montserrat transition-all duration-500 group-hover:text-teal-400 group-hover:drop-shadow-[0_0_10px_rgba(20,184,166,0.5)] leading-tight">
+                  <h3 className="text-lg md:text-xl font-bold font-montserrat transition-all duration-500 group-hover:text-green-400 group-hover:drop-shadow-[0_0_10px_rgba(34,197,94,0.5)] leading-tight">
                     {sol.sector}
                   </h3>
-                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-teal-400 transition-all duration-500 group-hover:w-full shadow-[0_0_8px_rgba(20,184,166,0.6)]"></span>
+                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-green-400 transition-all duration-500 group-hover:w-full shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
                 </div>
               </div>
               
-              <div className="glass rounded-2xl md:rounded-3xl flex-grow flex flex-col overflow-hidden border border-white/5 hover:border-teal-500/20 transition-all duration-500 shadow-lg">
+              <div className="glass rounded-2xl md:rounded-3xl flex-grow flex flex-col overflow-hidden border border-white/5 hover:border-green-500/20 transition-all duration-500 shadow-lg">
                 <ul className="divide-y divide-white/5 flex-grow">
                   {sol.items.map((item, i) => (
-                    <li key={i} className="p-4 md:p-5 hover:bg-teal-500/5 hover:pl-6 transition-all duration-300 flex items-center gap-3 cursor-default group/li">
-                      <div className="shrink-0 w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-teal-400 group-hover/li:scale-150 transition-all"></div>
+                    <li key={i} className="p-4 md:p-5 hover:bg-green-500/5 hover:pl-6 transition-all duration-300 flex items-center gap-3 cursor-default group/li">
+                      <div className="shrink-0 w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-green-400 group-hover/li:scale-150 transition-all"></div>
                       <span className="text-slate-300 font-medium text-xs md:text-sm group-hover/li:text-white transition-colors">{item}</span>
                     </li>
                   ))}
@@ -127,11 +127,11 @@ const Solutions: React.FC = () => {
                   <a 
                     href={`#${sol.id}`}
                     onClick={(e) => handleSmoothScroll(e, sol.id)}
-                    className="w-full py-3 rounded-xl glass border border-white/10 text-teal-400 font-bold text-[10px] md:text-xs flex items-center justify-center gap-3 btn-secondary-cta active-click group/btn overflow-hidden"
+                    className="w-full py-3 rounded-xl glass border border-white/10 text-green-400 font-bold text-[10px] md:text-xs flex items-center justify-center gap-3 btn-secondary-cta active-click group/btn overflow-hidden"
                   >
                     <span>{sol.buttonText}</span>
                     <div className="flex flex-col h-4 overflow-hidden relative">
-                       <ChevronDown className="w-3.5 h-3.5 text-teal-400 animate-arrow-down" />
+                       <ChevronDown className="w-3.5 h-3.5 text-green-400 animate-arrow-down" />
                     </div>
                   </a>
                 </div>
@@ -149,16 +149,16 @@ const Solutions: React.FC = () => {
               className="scroll-mt-32 glass rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 lg:p-16 border border-white/5 relative overflow-hidden group shadow-2xl reveal-on-scroll outline-none focus:ring-0"
             >
               {/* Volumetric background glow */}
-              <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-teal-500/5 rounded-full blur-[80px] md:blur-[100px] -z-10 group-target:bg-teal-500/10 transition-colors duration-1000"></div>
+              <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-green-500/5 rounded-full blur-[80px] md:blur-[100px] -z-10 group-target:bg-green-500/10 transition-colors duration-1000"></div>
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-12 items-center">
                 <div>
                   <div className="flex flex-wrap gap-2 mb-6 md:mb-8">
-                    <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full glass border border-white/10 text-[9px] md:text-[10px] font-bold text-teal-400 uppercase tracking-widest">
+                    <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full glass border border-white/10 text-[9px] md:text-[10px] font-bold text-green-400 uppercase tracking-widest">
                       <ArrowUpRight className="w-3 h-3" />
                       BITC Outcome
                     </div>
-                    <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full glass border border-blue-500/20 text-[9px] md:text-[10px] font-bold text-blue-400 uppercase tracking-widest">
+                    <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full glass border border-amber-500/20 text-[9px] md:text-[10px] font-bold text-amber-400 uppercase tracking-widest">
                       <Scale className="w-3 h-3" />
                       Industrial Scale
                     </div>
@@ -172,13 +172,13 @@ const Solutions: React.FC = () => {
                   </p>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-8">
-                    <div className="p-5 md:p-6 rounded-2xl bg-white/3 border border-white/5 hover:border-teal-500/20 transition-all group/card">
-                      <BarChart3 className="w-6 h-6 md:w-8 md:h-8 text-teal-400 mb-3 md:mb-4 group-hover/card:scale-110 transition-transform" />
+                    <div className="p-5 md:p-6 rounded-2xl bg-white/3 border border-white/5 hover:border-green-500/20 transition-all group/card">
+                      <BarChart3 className="w-6 h-6 md:w-8 md:h-8 text-green-400 mb-3 md:mb-4 group-hover/card:scale-110 transition-transform" />
                       <h4 className="font-bold text-white mb-1 md:mb-2 text-sm md:text-base">Measurable ROI</h4>
                       <p className="text-xs md:text-sm text-slate-500">Track performance metrics in Kina through our BITC dashboard.</p>
                     </div>
-                    <div className="p-5 md:p-6 rounded-2xl bg-white/3 border border-white/5 hover:border-blue-500/20 transition-all group/card">
-                      <Lock className="w-6 h-6 md:w-8 md:h-8 text-blue-400 mb-3 md:mb-4 group-hover/card:scale-110 transition-transform" />
+                    <div className="p-5 md:p-6 rounded-2xl bg-white/3 border border-white/5 hover:border-amber-500/20 transition-all group/card">
+                      <Lock className="w-6 h-6 md:w-8 md:h-8 text-amber-400 mb-3 md:mb-4 group-hover/card:scale-110 transition-transform" />
                       <h4 className="font-bold text-white mb-1 md:mb-2 text-sm md:text-base">Cyber Resilience</h4>
                       <p className="text-xs md:text-sm text-slate-500">Outcomes secured by advanced cloud-native protection.</p>
                     </div>
@@ -189,7 +189,7 @@ const Solutions: React.FC = () => {
                     <a 
                       href="#solutions" 
                       onClick={(e) => handleSmoothScroll(e, '#solutions')}
-                      className="inline-flex items-center justify-center gap-2 text-teal-400 hover:text-white transition-colors text-xs md:text-sm font-bold active-click px-5 py-2.5 rounded-xl glass border border-white/5 btn-secondary-cta group/back"
+                      className="inline-flex items-center justify-center gap-2 text-green-400 hover:text-white transition-colors text-xs md:text-sm font-bold active-click px-5 py-2.5 rounded-xl glass border border-white/5 btn-secondary-cta group/back"
                     >
                       <ArrowUp className="w-3.5 h-3.5 md:w-4 md:h-4 transition-transform group-hover/back:-translate-y-1" />
                       Back to Overview
@@ -197,7 +197,7 @@ const Solutions: React.FC = () => {
                     <a 
                       href="#advanced-solutions" 
                       onClick={(e) => handleSmoothScroll(e, '#advanced-solutions')}
-                      className="inline-flex items-center justify-center gap-2 text-white bg-teal-600 hover:bg-teal-500 transition-all text-xs md:text-sm font-bold btn-cta-pulse active-click px-6 py-3 rounded-xl shadow-lg shadow-teal-500/10 group/advanced"
+                      className="inline-flex items-center justify-center gap-2 text-white bg-green-600 hover:bg-green-500 transition-all text-xs md:text-sm font-bold btn-cta-pulse active-click px-6 py-3 rounded-xl shadow-lg shadow-green-500/10 group/advanced"
                     >
                       View Advanced Suite
                       <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4 transition-transform group-hover/advanced:translate-x-1" />
@@ -210,11 +210,11 @@ const Solutions: React.FC = () => {
                     <div className="absolute inset-0 quantum-gradient opacity-5"></div>
                     <div className="text-center z-10 flex flex-col items-center">
                        <div className="mb-4 md:mb-6 relative">
-                          <div className={`absolute inset-0 bg-teal-500/10 rounded-full blur-2xl`}></div>
-                          {sol.icon("w-16 h-16 md:w-24 md:h-24 text-teal-400 relative z-10")}
+                          <div className={`absolute inset-0 bg-green-500/10 rounded-full blur-2xl`}></div>
+                          {sol.icon("w-16 h-16 md:w-24 md:h-24 text-green-400 relative z-10")}
                        </div>
                        <div className="h-1.5 md:h-2 w-36 md:w-48 bg-slate-800 rounded-full overflow-hidden">
-                         <div className="h-full bg-teal-400 animate-[loading_2.5s_ease-in-out_infinite]"></div>
+                         <div className="h-full bg-green-400 animate-[loading_2.5s_ease-in-out_infinite]"></div>
                        </div>
                        <p className="text-[9px] md:text-xs text-slate-500 mt-4 md:mt-6 uppercase tracking-[0.3em] md:tracking-[0.4em] font-bold">BITC Optimization Active</p>
                     </div>
