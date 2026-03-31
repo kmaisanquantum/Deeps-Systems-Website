@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Send,
   Mail,
@@ -78,7 +78,6 @@ const Contact: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate all fields
     const newErrors: FormErrors = {};
     Object.keys(formData).forEach(key => {
       const error = validateField(key, formData[key as keyof FormData]);
@@ -95,7 +94,6 @@ const Contact: React.FC = () => {
     setLogs([]);
     addLog("Initializing BITC Secure Tunnel...");
     
-    // Simulate complex BITC dispatch process
     await new Promise(r => setTimeout(r, 800));
     addLog("Encrypting payload with AES-256...");
     await new Promise(r => setTimeout(r, 600));
@@ -104,6 +102,12 @@ const Contact: React.FC = () => {
     addLog("Validating quantum signatures...");
     await new Promise(r => setTimeout(r, 1000));
     addLog("Dispatch confirmed. Outcome secured.");
+
+    // Trigger email via mailto fallback or integrated backend if available.
+    // For now, the UI logic confirms the target is wokman@dspng.tech.
+    const mailtoUrl = `mailto:wokman@dspng.tech?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
+    window.location.href = mailtoUrl;
+
     setStatus('success');
   };
 
@@ -135,28 +139,32 @@ const Contact: React.FC = () => {
             </h2>
 
             <p className="text-xl text-slate-400 mb-12 leading-relaxed max-w-xl">
-              Initiate your quantum consultation. Every inquiry is analyzed by our <span className="text-green-400 font-bold">BITC Grid</span> and routed to our specialist team at <span className="text-green-400 font-mono underline">wokman@dspng.tech</span>, via WhatsApp <span className="text-green-400 font-mono underline">(+675 83009881)</span>, or by calling <span className="text-green-400 font-mono underline">+675 83009881</span>.
+              Initiate your quantum consultation. Every inquiry is analyzed by our <span className="text-green-400 font-bold">BITC Grid</span> and routed to our specialist team at <span className="text-green-400 font-mono underline text-sm md:text-base">wokman@dspng.tech</span>, via WhatsApp <span className="text-green-400 font-mono underline text-sm md:text-base">(+675 83009881)</span>, or by calling <span className="text-green-400 font-mono underline text-sm md:text-base">+675 83009881</span>.
             </p>
 
             <div className="space-y-8">
               <div className="flex items-center gap-6 group">
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 group-hover:border-green-500/30 transition-all">
-                  <Mail className="w-6 h-6 text-green-400" />
-                </div>
-                <div>
-                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Direct Protocol</p>
-                   <p className="text-white font-bold font-mono">wokman@dspng.tech</p>
-                </div>
+                <a href="mailto:wokman@dspng.tech" className="flex items-center gap-6 group">
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 group-hover:border-green-500/30 transition-all">
+                    <Mail className="w-6 h-6 text-green-400" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Direct Protocol</p>
+                    <p className="text-white font-bold font-mono">wokman@dspng.tech</p>
+                  </div>
+                </a>
               </div>
 
               <div className="flex items-center gap-6 group">
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 group-hover:border-green-500/30 transition-all">
-                  <MessageSquare className="w-6 h-6 text-green-400" />
-                </div>
-                <div>
-                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Instant Messaging</p>
-                   <p className="text-white font-bold font-mono">+675 83009881</p>
-                </div>
+                <a href="https://wa.me/67583009881" target="_blank" rel="noopener noreferrer" className="flex items-center gap-6 group">
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 group-hover:border-green-500/30 transition-all">
+                    <MessageSquare className="w-6 h-6 text-green-400" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Instant Messaging</p>
+                    <p className="text-white font-bold font-mono">+675 83009881</p>
+                  </div>
+                </a>
               </div>
             </div>
           </div>
