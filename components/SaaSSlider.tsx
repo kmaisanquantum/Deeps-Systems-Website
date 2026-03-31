@@ -15,7 +15,7 @@ import {
 const saasSystems = [
   {
     name: "PNG Property",
-    desc: "PNG'S FIRST Real Estate INTELLIGENCE PLATFORM. Aggregated listings from Hausples, Professionals, Ray White, Century 21 & Facebook.",
+    desc: "a data aggregation and market intelligence tool designed specifically for the Papua New Guinea (PNG) real estate market",
     url: "https://property.dspng.tech",
     icon: <Building2 className="w-6 h-6" />,
     color: "text-blue-600"
