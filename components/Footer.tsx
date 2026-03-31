@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
   const contactInfo = [
     { icon: <Mail className="w-5 h-5 text-green-400" />, text: 'wokman@dspng.tech', href: 'mailto:wokman@dspng.tech' },
     { icon: <Phone className="w-5 h-5 text-green-400" />, text: '+675 83009881', href: 'tel:83009881' },
-    { icon: <MessageSquare className="w-5 h-5 text-green-400" />, text: 'WhatsApp', href: 'https://wa.me/67583009881' },
+    { icon: <MessageSquare className="w-5 h-5 text-green-400" />, text: 'WhatsApp: +675 83009881', href: 'https://wa.me/67583009881' },
     { icon: <MapPin className="w-5 h-5 text-green-400" />, text: 'Port Moresby, PNG', href: '#' },
   ];
 
