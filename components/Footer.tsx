@@ -29,10 +29,10 @@ const Footer: React.FC = () => {
   ];
 
   const contactInfo = [
-    { icon: <Mail className="w-5 h-5 text-rose-600" />, text: 'wokman@dspng.tech', href: 'mailto:wokman@dspng.tech' },
-    { icon: <Phone className="w-5 h-5 text-rose-600" />, text: '+675 83009881', href: 'tel:83009881' },
-    { icon: <MessageSquare className="w-5 h-5 text-rose-600" />, text: 'WhatsApp: +675 83009881', href: 'https://wa.me/67583009881' },
-    { icon: <MapPin className="w-5 h-5 text-rose-600" />, text: 'Port Moresby, PNG', href: '#' },
+    { icon: <Mail className="w-5 h-5 text-emerald-600" />, text: 'wokman@dspng.tech', href: 'mailto:wokman@dspng.tech' },
+    { icon: <Phone className="w-5 h-5 text-emerald-600" />, text: '+675 83009881', href: 'tel:83009881' },
+    { icon: <MessageSquare className="w-5 h-5 text-emerald-600" />, text: 'WhatsApp: +675 83009881', href: 'https://wa.me/67583009881' },
+    { icon: <MapPin className="w-5 h-5 text-emerald-600" />, text: 'Port Moresby, PNG', href: '#' },
   ];
 
   return (
@@ -47,7 +47,7 @@ const Footer: React.FC = () => {
                 <Binary className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-montserrat font-extrabold tracking-tight text-gray-900 dark:text-white">
-                Deeps <span className="text-rose-600">Systems</span>
+                Deeps <span className="text-emerald-600">Systems</span>
               </span>
             </Link>
             <p className="text-gray-500 dark:text-slate-400 leading-relaxed text-sm">
@@ -64,9 +64,9 @@ const Footer: React.FC = () => {
                   <Link
                     to={link.href}
                     onClick={(e) => handleLinkClick(e, link.href)}
-                    className="text-gray-500 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 transition-colors text-sm flex items-center gap-2 group"
+                    className="text-gray-500 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-sm flex items-center gap-2 group"
                   >
-                    {link.icon && <span className="text-rose-600/50 group-hover:text-rose-600 transition-colors">{link.icon}</span>}
+                    {link.icon && <span className="text-emerald-600/50 group-hover:text-emerald-600 transition-colors">{link.icon}</span>}
                     {link.name}
                   </Link>
                 </li>
@@ -84,7 +84,7 @@ const Footer: React.FC = () => {
                     href={item.href}
                     className="flex items-center gap-4 text-gray-500 dark:text-slate-500 hover:text-gray-900 dark:hover:text-white transition-colors group"
                   >
-                    <div className="p-2 rounded-lg bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 group-hover:bg-rose-50 dark:group-hover:bg-rose-900/10 transition-colors shadow-sm">
+                    <div className="p-2 rounded-lg bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/10 transition-colors shadow-sm">
                       {item.icon}
                     </div>
                     <span className="text-sm">{item.text}</span>

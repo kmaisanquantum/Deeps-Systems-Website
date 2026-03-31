@@ -33,7 +33,7 @@ const ClientLogos: React.FC = () => {
               key={i} 
               className="flex items-center gap-4 group cursor-default opacity-40 hover:opacity-100 transition-all duration-700 grayscale hover:grayscale-0"
             >
-              <div className="p-3 rounded-xl bg-white dark:bg-slate-800/30 text-gray-400 dark:text-slate-400 group-hover:text-rose-600 group-hover:bg-rose-50 dark:group-hover:bg-rose-500/10 group-hover:scale-110 transition-all duration-500 shadow-sm">
+              <div className="p-3 rounded-xl bg-white dark:bg-slate-800/30 text-gray-400 dark:text-slate-400 group-hover:text-emerald-600 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-500/10 group-hover:scale-110 transition-all duration-500 shadow-sm">
                 {client.icon}
               </div>
               <div>

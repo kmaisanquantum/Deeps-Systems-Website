@@ -55,8 +55,8 @@ const QuantumAssistant: React.FC = () => {
              </div>
              <div>
                 <h3 className="font-bold text-sm text-gray-900 dark:text-white">Deeps Support</h3>
-                <span className="flex items-center gap-1.5 text-[10px] text-rose-600 font-bold uppercase tracking-widest">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></span>
+                <span className="flex items-center gap-1.5 text-[10px] text-emerald-600 font-bold uppercase tracking-widest">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
                   Online
                 </span>
              </div>
@@ -70,7 +70,7 @@ const QuantumAssistant: React.FC = () => {
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 duration-300`}>
                 <div className={`max-w-[85%] p-3 rounded-2xl text-sm transition-all duration-300 hover:brightness-105 ${
                   m.role === 'user' 
-                    ? 'bg-gray-900 dark:bg-rose-600 text-white rounded-br-none shadow-md'
+                    ? 'bg-blue-600 dark:bg-blue-700 text-white rounded-br-none shadow-md'
                     : 'bg-gray-100 dark:bg-slate-800/80 text-gray-700 dark:text-slate-200 rounded-bl-none border border-gray-200 dark:border-white/5 shadow-sm'
                 }`}>
                   {m.text}
@@ -80,7 +80,7 @@ const QuantumAssistant: React.FC = () => {
             {isLoading && (
               <div className="flex justify-start">
                 <div className="bg-gray-100 dark:bg-slate-800/80 p-3 rounded-2xl rounded-bl-none border border-gray-200 dark:border-white/5 flex items-center gap-2 shadow-sm">
-                  <Loader2 className="w-4 h-4 text-rose-600 animate-spin" />
+                  <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" />
                   <span className="text-xs text-gray-400 italic">Processing...</span>
                 </div>
               </div>
@@ -95,7 +95,7 @@ const QuantumAssistant: React.FC = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="How can we help?"
-              className="flex-grow bg-white dark:bg-slate-900/50 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-rose-500 transition-all duration-300 placeholder:text-gray-400 dark:placeholder:text-slate-600"
+              className="flex-grow bg-white dark:bg-slate-900/50 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-emerald-500 transition-all duration-300 placeholder:text-gray-400 dark:placeholder:text-slate-600"
             />
             <button 
               onClick={handleSend}
