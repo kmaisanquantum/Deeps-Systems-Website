@@ -4,36 +4,39 @@ import { Cloud, Zap, Smartphone, Combine } from 'lucide-react';
 const Advantages: React.FC = () => {
   const advantages = [
     {
-      icon: <Cloud className="w-8 h-8 text-green-400" />,
+      icon: <Cloud className="w-8 h-8 text-rose-600" />,
       title: "Zero Infrastructure",
-      description: "Eliminate the burden of physical servers and legacy maintenance. We run entirely in the cloud for maximum agility."
+      description: "Eliminate the burden of physical servers and legacy maintenance. We run entirely in the cloud for maximum agility and scalability."
     },
     {
-      icon: <Zap className="w-8 h-8 text-amber-400" />,
+      icon: <Zap className="w-8 h-8 text-rose-600" />,
       title: "Elastic Scalability",
-      description: "Scale your computational power up or down instantly based on demand. Pay only for what you actually use."
+      description: "Scale your computational power up or down instantly based on demand. High-performance architectures tailored for PNG's growth."
     },
     {
-      icon: <Smartphone className="w-8 h-8 text-purple-400" />,
-      title: "Mobile-First Resilience",
-      description: "Engineered specifically for the PNG market, ensuring critical data and tools are accessible even on low-bandwidth networks."
+      icon: <Smartphone className="w-8 h-8 text-rose-600" />,
+      title: "Resilient Access",
+      description: "Engineered specifically for the Pacific market, ensuring critical data and tools remain accessible on any network or device."
     },
     {
-      icon: <Combine className="w-8 h-8 text-orange-400" />,
-      title: "Hybrid Methodology",
-      description: "The best of both worlds. We blend robust classical business optimization with experimental quantum-inspired power."
+      icon: <Combine className="w-8 h-8 text-rose-600" />,
+      title: "Precision Methodology",
+      description: "Minimalist, robust digital architectures that bridge the gap between traditional operations and future-ready excellence."
     }
   ];
 
   return (
-    <section id="advantages" className="py-24 bg-slate-900/20">
+    <section id="advantages" className="py-24 bg-gray-50/50 dark:bg-slate-900/20">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16 reveal-on-scroll">
-          <h2 className="text-3xl md:text-4xl font-montserrat font-bold mb-4">
-            The <span className="text-green-400">BITC</span> Advantage
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 text-rose-600 text-[10px] font-bold uppercase tracking-widest mb-6 shadow-sm">
+            Performance Core
+          </div>
+          <h2 className="text-3xl md:text-5xl font-montserrat font-bold mb-4 text-gray-900 dark:text-white leading-tight">
+            The <span className="text-rose-600">BITC</span> Advantage
           </h2>
-          <p className="text-slate-400 max-w-xl mx-auto">
-            Born-in-the-Cloud means we don't fix old tech—we build the future using a dual-track strategy.
+          <p className="text-gray-500 dark:text-slate-400 max-w-xl mx-auto font-medium">
+            Born-in-the-Cloud means we don't just maintain tech—we architect high-performance outcomes for the modern economy.
           </p>
         </div>
 
@@ -41,13 +44,13 @@ const Advantages: React.FC = () => {
           {advantages.map((adv, idx) => (
             <div 
               key={idx} 
-              className="glass p-8 rounded-2xl border border-white/5 hover:border-green-500/30 transition-all duration-300 hover:-translate-y-2 group cursor-default hover:shadow-2xl hover:shadow-green-500/5"
+              className="bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 hover:border-rose-500/30 transition-all duration-300 hover:-translate-y-2 group cursor-default shadow-sm hover:shadow-xl"
             >
-              <div className="mb-6 inline-block p-4 rounded-xl bg-slate-900/50 group-hover:scale-110 group-hover:bg-slate-900 transition-all duration-300">
+              <div className="mb-6 inline-block p-4 rounded-2xl bg-gray-50 dark:bg-slate-900/50 group-hover:scale-110 group-hover:bg-rose-50 dark:group-hover:bg-rose-500/10 transition-all duration-300 shadow-inner">
                 {adv.icon}
               </div>
-              <h3 className="text-xl font-bold mb-4 group-hover:text-green-400 transition-colors duration-300">{adv.title}</h3>
-              <p className="text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors duration-300">
+              <h3 className="text-xl font-bold mb-4 group-hover:text-rose-600 transition-colors duration-300 text-gray-900 dark:text-white leading-tight">{adv.title}</h3>
+              <p className="text-gray-500 dark:text-slate-400 leading-relaxed group-hover:text-gray-700 dark:group-hover:text-slate-300 transition-colors duration-300 text-sm font-medium">
                 {adv.description}
               </p>
             </div>

@@ -22,7 +22,6 @@ const QuantumAssistant: React.FC = () => {
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setIsLoading(true);
 
-    // Simulated general assistance response
     setTimeout(() => {
       setMessages(prev => [...prev, {
         role: 'assistant',
@@ -49,30 +48,30 @@ const QuantumAssistant: React.FC = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-[350px] md:w-[400px] h-[500px] glass rounded-2xl shadow-2xl flex flex-col z-[60] border border-white/10 animate-in fade-in slide-in-from-bottom-4 duration-300 overflow-hidden">
-          <div className="p-4 border-b border-white/10 flex items-center gap-3 bg-white/5">
+        <div className="fixed bottom-24 right-6 w-[350px] md:w-[400px] h-[500px] bg-white dark:bg-[#0a0a0a] rounded-2xl shadow-2xl flex flex-col z-[60] border border-gray-100 dark:border-white/10 animate-in fade-in slide-in-from-bottom-4 duration-300 overflow-hidden">
+          <div className="p-4 border-b border-gray-100 dark:border-white/10 flex items-center gap-3 bg-gray-50 dark:bg-white/5">
              <div className="w-8 h-8 rounded-lg quantum-gradient flex items-center justify-center shadow-lg">
                 <MessageSquare className="w-4 h-4 text-white" />
              </div>
              <div>
-                <h3 className="font-bold text-sm">Deeps Support</h3>
-                <span className="flex items-center gap-1.5 text-[10px] text-green-400 font-bold uppercase tracking-widest">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                <h3 className="font-bold text-sm text-gray-900 dark:text-white">Deeps Support</h3>
+                <span className="flex items-center gap-1.5 text-[10px] text-rose-600 font-bold uppercase tracking-widest">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></span>
                   Online
                 </span>
              </div>
-             <button onClick={() => setIsOpen(false)} className="ml-auto text-slate-400 hover:text-white hover:scale-110 active:scale-90 transition-all">
+             <button onClick={() => setIsOpen(false)} className="ml-auto text-gray-400 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:scale-110 active:scale-90 transition-all">
                 <X className="w-4 h-4" />
              </button>
           </div>
 
-          <div className="flex-grow overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+          <div className="flex-grow overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-white/10 scrollbar-track-transparent">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 duration-300`}>
                 <div className={`max-w-[85%] p-3 rounded-2xl text-sm transition-all duration-300 hover:brightness-105 ${
                   m.role === 'user' 
-                    ? 'bg-amber-600 text-white rounded-br-none shadow-md shadow-amber-500/10'
-                    : 'bg-slate-800/80 text-slate-200 rounded-bl-none border border-white/5 shadow-md shadow-black/20'
+                    ? 'bg-gray-900 dark:bg-rose-600 text-white rounded-br-none shadow-md'
+                    : 'bg-gray-100 dark:bg-slate-800/80 text-gray-700 dark:text-slate-200 rounded-bl-none border border-gray-200 dark:border-white/5 shadow-sm'
                 }`}>
                   {m.text}
                 </div>
@@ -80,23 +79,23 @@ const QuantumAssistant: React.FC = () => {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-slate-800/80 p-3 rounded-2xl rounded-bl-none border border-white/5 flex items-center gap-2 shadow-md">
-                  <Loader2 className="w-4 h-4 text-green-400 animate-spin" />
-                  <span className="text-xs text-slate-400 italic">Processing...</span>
+                <div className="bg-gray-100 dark:bg-slate-800/80 p-3 rounded-2xl rounded-bl-none border border-gray-200 dark:border-white/5 flex items-center gap-2 shadow-sm">
+                  <Loader2 className="w-4 h-4 text-rose-600 animate-spin" />
+                  <span className="text-xs text-gray-400 italic">Processing...</span>
                 </div>
               </div>
             )}
             <div ref={chatEndRef} />
           </div>
 
-          <div className="p-4 border-t border-white/10 flex gap-2 bg-white/5">
+          <div className="p-4 border-t border-gray-100 dark:border-white/10 flex gap-2 bg-gray-50 dark:bg-white/5">
             <input 
               type="text" 
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="How can we help?"
-              className="flex-grow bg-slate-900/50 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-green-500 transition-all duration-300 placeholder:text-slate-600 focus:shadow-[0_0_15px_rgba(34,197,94,0.15)]"
+              className="flex-grow bg-white dark:bg-slate-900/50 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-rose-500 transition-all duration-300 placeholder:text-gray-400 dark:placeholder:text-slate-600"
             />
             <button 
               onClick={handleSend}
