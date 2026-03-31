@@ -1,13 +1,11 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, Send, X, MessageSquare, Loader2 } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
+import { Send, X, MessageSquare, Loader2, Sparkles } from 'lucide-react';
 
 const QuantumAssistant: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<{role: 'user' | 'assistant', text: string}[]>([
-    { role: 'assistant', text: "Welcome to Deeps Systems. I am your Quantum Optimization Assistant. How can I help you transform your business with Born-in-the-Cloud technology today?" }
+    { role: 'assistant', text: "Welcome to Deeps Systems. How can we help you today?" }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -24,32 +22,14 @@ const QuantumAssistant: React.FC = () => {
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setIsLoading(true);
 
-    try {
-      /* Initialization following guidelines: const ai = new GoogleGenAI({apiKey: process.env.API_KEY}); */
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: userMsg,
-        config: {
-          systemInstruction: `You are the Deeps Systems AI Assistant. 
-          Company Name: Deeps Systems. 
-          Domain: dspng.tech. 
-          Core focus: Born-in-the-Cloud (BITC), Quantum-Inspired Optimization. 
-          Target: PNG SMEs, Financial Institutions, Energy/Logistics. 
-          Values: Agile, Cloud-native, Outcome-driven, High-tech. 
-          Keep your answers professional, forward-thinking, and helpful. 
-          Highlight that we bring global muscle to local PNG problems.`
-        }
-      });
-
-      const aiText = response.text || "I apologize, I'm having trouble connecting to the quantum grid. Please try again later.";
-      setMessages(prev => [...prev, { role: 'assistant', text: aiText }]);
-    } catch (error) {
-      console.error("AI Error:", error);
-      setMessages(prev => [...prev, { role: 'assistant', text: "Connection interruption. Please check your network or try again." }]);
-    } finally {
+    // Simulated general assistance response
+    setTimeout(() => {
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        text: "Thank you for your message. A member of our support team will get back to you shortly. For immediate assistance, please use the contact form or email us at wokman@dspng.tech."
+      }]);
       setIsLoading(false);
-    }
+    }, 1000);
   };
 
   return (
@@ -72,10 +52,10 @@ const QuantumAssistant: React.FC = () => {
         <div className="fixed bottom-24 right-6 w-[350px] md:w-[400px] h-[500px] glass rounded-2xl shadow-2xl flex flex-col z-[60] border border-white/10 animate-in fade-in slide-in-from-bottom-4 duration-300 overflow-hidden">
           <div className="p-4 border-b border-white/10 flex items-center gap-3 bg-white/5">
              <div className="w-8 h-8 rounded-lg quantum-gradient flex items-center justify-center shadow-lg">
-                <Sparkles className="w-4 h-4 text-white" />
+                <MessageSquare className="w-4 h-4 text-white" />
              </div>
              <div>
-                <h3 className="font-bold text-sm">Quantum Assistant</h3>
+                <h3 className="font-bold text-sm">Deeps Support</h3>
                 <span className="flex items-center gap-1.5 text-[10px] text-green-400 font-bold uppercase tracking-widest">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
                   Online
@@ -115,7 +95,7 @@ const QuantumAssistant: React.FC = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Ask about BITC..."
+              placeholder="How can we help?"
               className="flex-grow bg-slate-900/50 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-green-500 transition-all duration-300 placeholder:text-slate-600 focus:shadow-[0_0_15px_rgba(34,197,94,0.15)]"
             />
             <button 
