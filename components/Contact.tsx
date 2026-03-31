@@ -164,7 +164,7 @@ const Contact: React.FC = () => {
               Ready to <span className="quantum-text-gradient">Optimize?</span>
             </h2>
             <p className="text-slate-400 text-lg mb-8 leading-relaxed max-w-lg">
-              Initiate your quantum consultation. Every inquiry is analyzed by our <span className="text-green-400 font-bold">BITC Grid</span> and routed to our specialist team at <span className="text-green-400 font-mono underline">wokman@dspng.tech</span>.
+              Initiate your quantum consultation. Every inquiry is analyzed by our <span className="text-green-400 font-bold">BITC Grid</span> and routed to our specialist team at <span className="text-green-400 font-mono underline">wokman@dspng.tech</span>, via WhatsApp, or by calling <span className="text-green-400 font-mono underline">+675 83009881</span>.
             </p>
             
             <div className="space-y-6">

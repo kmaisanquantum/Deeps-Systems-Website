@@ -16,10 +16,10 @@ async def main():
 
         # Check for phone number text
         content = await page.content()
-        if "+675 79452732" in content:
-            print("FAILURE: Phone number still present on page!")
+        if "83009881" not in content:
+            print("FAILURE: Phone number not found on page!")
         else:
-            print("SUCCESS: Phone number not found on page.")
+            print("SUCCESS: Phone number found on page.")
 
         # Take screenshot of footer
         footer = page.locator("footer")
