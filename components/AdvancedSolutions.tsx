@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, FileJson, LineChart, Monitor, Download, Lock, CheckCircle2, Zap, Coins, Clock, AlertTriangle, ShieldAlert, Cpu, Shield, Activity, Eye, EyeOff, Terminal, Fingerprint, Search, RefreshCw, BarChart, Loader2 } from 'lucide-react';
+import { ShieldCheck, FileJson, LineChart, Monitor, Download, Lock, Zap, Cpu, Shield, Activity, Eye, EyeOff, Terminal, Fingerprint, Search, RefreshCw, BarChart, Loader2, ArrowUpRight, Scale, Clock } from 'lucide-react';
 
 const AdvancedSolutions: React.FC = () => {
   // Global states
@@ -107,22 +107,14 @@ const AdvancedSolutions: React.FC = () => {
     setLoginStep(1);
   };
 
-  const getStatusText = (progress: number) => {
-    if (progress < 15) return "Handshake...";
-    if (progress < 40) return "Token Exchange...";
-    if (progress < 65) return "Tunneling...";
-    if (progress < 90) return "Syncing Environment...";
-    return "Bound";
-  };
-
   return (
     <section id="advanced-solutions" className="py-24 relative bg-white dark:bg-[#0a0a0a] overflow-hidden">
       {/* Background radial glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(225,29,72,0.03)_0%,transparent_70%)] pointer-events-none"></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(22,163,74,0.03)_0%,transparent_70%)] pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="mb-16 reveal-on-scroll">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 text-rose-600 text-[10px] font-bold uppercase tracking-widest mb-6 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-emerald-600 text-[10px] font-bold uppercase tracking-widest mb-6 shadow-sm">
             <Cpu className="w-3.5 h-3.5" />
             The New Standard for PNG
           </div>
@@ -130,7 +122,7 @@ const AdvancedSolutions: React.FC = () => {
             Advanced <span className="quantum-text-gradient">Outcome Suite</span>
           </h2>
           <p className="text-gray-500 dark:text-slate-400 max-w-2xl text-lg leading-relaxed font-medium">
-            While traditional providers focus on managing physical infrastructure, Deeps Systems delivers instant, high-performance digital architectures. Zero hardware, zero limitations.
+            While traditional providers focus on managing physical infrastructure, Deeps Systems delivers instant, high-performance digital architectures.
           </p>
         </div>
 
@@ -138,87 +130,78 @@ const AdvancedSolutions: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-32">
           
           {/* Module 1: SEC-aaS (Managed MXDR) */}
-          <div className="bg-white dark:bg-white/2 rounded-[2.5rem] p-8 md:p-10 border border-gray-100 dark:border-white/5 group hover:border-rose-500/30 transition-all duration-500 shadow-sm hover:shadow-xl reveal-on-scroll">
+          <div className="bg-white dark:bg-white/2 rounded-[2.5rem] p-8 md:p-10 border border-gray-100 dark:border-white/5 group hover:border-emerald-500/30 transition-all duration-500 shadow-sm hover:shadow-xl reveal-on-scroll">
             <div className="flex items-start justify-between mb-8">
-              <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 group-hover:bg-rose-500/20 transition-colors">
+              <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 group-hover:bg-emerald-500/20 transition-colors">
                 <ShieldCheck className="w-8 h-8 group-hover:scale-110 transition-transform" />
               </div>
               <div className="text-right">
                 <div className="flex items-center gap-2 justify-end mb-1">
-                   <div className="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></div>
-                   <span className="text-[10px] font-bold text-rose-600 uppercase tracking-widest">Live Monitor</span>
+                   <div className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></div>
+                   <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Live Monitor</span>
                 </div>
                 <span className="text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">Status: active</span>
               </div>
             </div>
             <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">SEC-aaS (Managed MXDR)</h3>
             <p className="text-gray-500 dark:text-slate-400 mb-8 text-sm leading-relaxed font-medium">
-              24/7 Managed Extended Detection & Response. We provide a total security posture with zero hardware overhead.
+              24/7 Managed Extended Detection & Response. Total security posture with zero hardware overhead.
             </p>
             
             <div className="bg-gray-50 dark:bg-black/60 rounded-2xl p-6 border border-gray-100 dark:border-white/10 relative overflow-hidden group/widget min-h-[220px] flex flex-col shadow-inner">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-[10px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-widest">Security Console</span>
-                <ShieldAlert className={`w-4 h-4 text-rose-600 ${isScanning ? 'animate-spin' : 'animate-pulse'}`} />
+                <Loader2 className={`w-4 h-4 text-emerald-600 ${isScanning ? 'animate-spin' : 'animate-pulse'}`} />
               </div>
               
               {!isScanning && scanResults.length === 0 ? (
                 <div className="flex-grow flex flex-col justify-center items-center text-center">
-                  <p className="text-xs text-gray-400 dark:text-slate-500 mb-6 font-medium italic">No active scan in progress. Verify cloud perimeter?</p>
                   <button 
                     onClick={handleScanInfrastructure}
-                    className="px-6 py-3 rounded-xl bg-white dark:bg-rose-500/10 border border-gray-200 dark:border-rose-500/20 text-rose-600 text-xs font-bold uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all btn-cta-pulse active-click flex items-center gap-2 shadow-sm"
+                    className="px-6 py-3 rounded-xl bg-white dark:bg-emerald-500/10 border border-gray-200 dark:border-emerald-500/20 text-emerald-600 text-xs font-bold uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition-all btn-cta-pulse active-click flex items-center gap-2 shadow-sm"
                   >
                     <Search className="w-3.5 h-3.5" />
-                    Scan Infrastructure
+                    Scan Nodes
                   </button>
                 </div>
               ) : (
                 <div className="flex-grow space-y-2 font-mono text-[10px] overflow-hidden">
                    {scanResults.map((log, i) => (
-                     <div key={i} className="text-rose-600 dark:text-rose-400/80 animate-in fade-in slide-in-from-left-2 duration-300">
-                       <span className="text-rose-600 mr-2">√</span> {log}
+                     <div key={i} className="text-emerald-600 dark:text-emerald-400/80 animate-in fade-in slide-in-from-left-2 duration-300">
+                       <span className="text-emerald-600 mr-2">√</span> {log}
                      </div>
                    ))}
                    {isScanning && (
-                     <div className="text-gray-500 dark:text-orange-400 animate-pulse flex items-center gap-2">
+                     <div className="text-gray-500 dark:text-amber-400 animate-pulse flex items-center gap-2">
                         <Loader2 className="w-2.5 h-2.5 animate-spin" />
-                        Analyzing Nodes... {scanProgress}%
+                        Analyzing... {scanProgress}%
                      </div>
                    )}
                 </div>
               )}
               
               {isScanning && (
-                <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-100 dark:bg-rose-900">
-                  <div className="h-full bg-rose-600 transition-all duration-100 shadow-[0_0_8px_rgba(225,29,72,0.8)]" style={{ width: `${scanProgress}%` }}></div>
+                <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-100 dark:bg-emerald-900">
+                  <div className="h-full bg-emerald-600 transition-all duration-100 shadow-[0_0_8px_rgba(22,163,74,0.8)]" style={{ width: `${scanProgress}%` }}></div>
                 </div>
               )}
             </div>
           </div>
 
           {/* Module 2: Compliance Logic Engine */}
-          <div className="bg-white dark:bg-white/2 rounded-[2.5rem] p-8 md:p-10 border border-gray-100 dark:border-white/5 group hover:border-gray-900 dark:hover:border-rose-500/30 transition-all duration-500 shadow-sm hover:shadow-xl reveal-on-scroll">
+          <div className="bg-white dark:bg-white/2 rounded-[2.5rem] p-8 md:p-10 border border-gray-100 dark:border-white/5 group hover:border-gray-900 dark:hover:border-emerald-500/30 transition-all duration-500 shadow-sm hover:shadow-xl reveal-on-scroll">
             <div className="p-4 rounded-2xl bg-gray-50 dark:bg-white/10 text-gray-900 dark:text-white w-fit mb-8 group-hover:bg-gray-100 dark:group-hover:bg-white/20 transition-colors">
               <FileJson className="w-8 h-8 group-hover:scale-110 transition-transform" />
             </div>
             <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Compliance Logic Engine</h3>
             <p className="text-gray-500 dark:text-slate-400 mb-8 text-sm leading-relaxed font-medium">
-              Automated PNG IRC/GST tax engine and Nasfund reporting. built specifically for local Pacific regulatory frameworks.
+              Automated PNG tax engine and Nasfund reporting. Built for Pacific regulatory frameworks.
             </p>
             
             <div className="bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/10 p-6 text-center shadow-inner">
-              <div className="mb-6">
-                 <div className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-2">Compliance Status</div>
-                 <div className="flex justify-center gap-2">
-                    <span className="px-2 py-0.5 rounded-md bg-white dark:bg-white/10 text-gray-600 dark:text-white text-[9px] font-bold border border-gray-100 dark:border-white/10 shadow-sm">GST</span>
-                    <span className="px-2 py-0.5 rounded-md bg-white dark:bg-white/10 text-gray-600 dark:text-white text-[9px] font-bold border border-gray-100 dark:border-white/10 shadow-sm">Nasfund</span>
-                    <span className="px-2 py-0.5 rounded-md bg-white dark:bg-white/10 text-gray-600 dark:text-white text-[9px] font-bold border border-gray-100 dark:border-white/10 shadow-sm">PAYE</span>
-                 </div>
-              </div>
               <button 
                 onClick={handleGenerateReport}
-                className="w-full py-4 rounded-xl bg-gray-900 dark:bg-rose-600 hover:bg-gray-800 dark:hover:bg-rose-500 text-white font-bold text-sm flex items-center justify-center gap-3 btn-cta-pulse active-click shadow-lg"
+                className="w-full py-4 rounded-xl bg-gray-900 dark:bg-blue-600 hover:bg-gray-800 dark:hover:bg-blue-500 text-white font-bold text-sm flex items-center justify-center gap-3 btn-cta-pulse active-click shadow-lg"
               >
                 {isGenerating ? (
                   <>
@@ -228,7 +211,7 @@ const AdvancedSolutions: React.FC = () => {
                 ) : (
                   <>
                     <Download className="w-4 h-4" />
-                    One-Click IRC Report
+                    One-Click Report
                   </>
                 )}
               </button>
@@ -236,33 +219,30 @@ const AdvancedSolutions: React.FC = () => {
           </div>
 
           {/* Module 3: Adaptive Inventory Logic */}
-          <div className="bg-white dark:bg-white/2 rounded-[2.5rem] p-8 md:p-10 border border-gray-100 dark:border-white/5 group hover:border-rose-500/30 transition-all duration-500 shadow-sm hover:shadow-xl reveal-on-scroll">
-            <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 w-fit mb-8 group-hover:bg-rose-500/20 transition-colors">
+          <div className="bg-white dark:bg-white/2 rounded-[2.5rem] p-8 md:p-10 border border-gray-100 dark:border-white/5 group hover:border-emerald-500/30 transition-all duration-500 shadow-sm hover:shadow-xl reveal-on-scroll">
+            <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 w-fit mb-8 group-hover:bg-emerald-500/20 transition-colors">
               <LineChart className="w-8 h-8 group-hover:scale-110 transition-transform" />
             </div>
             <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Adaptive Inventory Logic</h3>
             <p className="text-gray-500 dark:text-slate-400 mb-8 text-sm leading-relaxed font-medium">
-              Precision supply chain logic to reduce waste. Designed specifically for the unique terrain and logistics of PNG.
+              Precision supply chain logic to reduce waste. Designed for unique Pacific logistics.
             </p>
             
             <div className="bg-gray-50 dark:bg-black/40 rounded-[2rem] border border-gray-100 dark:border-white/5 p-6 flex flex-col relative overflow-hidden shadow-inner min-h-[220px]">
               {inventoryLoading && (
                 <div className="absolute inset-0 bg-white/40 dark:bg-black/40 backdrop-blur-[2px] z-20 flex items-center justify-center">
-                   <div className="flex flex-col items-center gap-3">
-                      <RefreshCw className="w-8 h-8 text-rose-600 animate-spin" />
-                   </div>
+                   <RefreshCw className="w-8 h-8 text-emerald-600 animate-spin" />
                 </div>
               )}
               
               <div className="flex justify-between items-center mb-6">
-                <span className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">Inventory Analytics</span>
-                <span className="text-rose-600 text-[10px] font-bold animate-pulse">{optimizationMetric}% Precision Gain</span>
+                <span className="text-emerald-600 text-[10px] font-bold animate-pulse">{optimizationMetric}% Precision Gain</span>
               </div>
               
               <div className="flex items-end gap-2 h-24 mb-6 px-2">
                 {inventoryData.map((h, i) => (
                   <div key={i} className="flex-grow flex flex-col justify-end gap-1">
-                    <div className="w-full bg-rose-200 dark:bg-rose-500/40 rounded-t-sm transition-all duration-700 group-hover/card:bg-rose-500" style={{ height: `${h}%` }}></div>
+                    <div className="w-full bg-emerald-200 dark:bg-emerald-500/40 rounded-t-sm transition-all duration-700 group-hover/card:bg-emerald-500" style={{ height: `${h}%` }}></div>
                   </div>
                 ))}
               </div>
@@ -270,43 +250,37 @@ const AdvancedSolutions: React.FC = () => {
               <button 
                 onClick={runOptimization}
                 disabled={inventoryLoading}
-                className="w-full py-3 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-white text-[10px] font-bold uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all shadow-sm active-click"
+                className="w-full py-3 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-white text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition-all shadow-sm active-click"
               >
-                Recalculate Scenarios
+                Recalculate
               </button>
             </div>
           </div>
 
           {/* Module 4: Secure Virtual Workspace */}
-          <div className="bg-white dark:bg-white/2 rounded-[2.5rem] p-8 md:p-10 border border-gray-100 dark:border-white/5 group hover:border-gray-900 dark:hover:border-rose-500/30 transition-all duration-500 shadow-sm hover:shadow-xl reveal-on-scroll">
+          <div className="bg-white dark:bg-white/2 rounded-[2.5rem] p-8 md:p-10 border border-gray-100 dark:border-white/5 group hover:border-gray-900 dark:hover:border-emerald-500/30 transition-all duration-500 shadow-sm hover:shadow-xl reveal-on-scroll">
             <div className="p-4 rounded-2xl bg-gray-50 dark:bg-white/10 text-gray-900 dark:text-white w-fit mb-8 group-hover:bg-gray-100 dark:group-hover:bg-white/20 transition-colors">
               <Monitor className="w-8 h-8 group-hover:scale-110 transition-transform" />
             </div>
             <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Secure Virtual Workspace</h3>
             <p className="text-gray-500 dark:text-slate-400 mb-8 text-sm leading-relaxed font-medium">
-              Cloud-based VDI for remote Pacific workforces. High performance, isolated environments with zero local data footprint.
+              Cloud-based VDI for remote Pacific workforces. Isolated environments with zero local data footprint.
             </p>
             
             <div className="bg-gray-900 rounded-[2rem] border border-gray-800 p-6 flex flex-col items-center text-center relative overflow-hidden h-[220px] justify-center shadow-2xl">
-              <div className="relative z-10 flex flex-col items-center w-full max-w-[200px]">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-700 ${loginStep !== 0 ? 'bg-rose-600/20 text-rose-500 rotate-[360deg]' : 'bg-gray-800 text-gray-600'}`}>
-                  {loginStep === 1 ? <Activity className="w-6 h-6 animate-pulse" /> : <Lock className="w-6 h-6" />}
-                </div>
-                
-                <button 
-                  onClick={handleVDILogin}
-                  disabled={loginStep !== 0}
-                  className={`w-full py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all ${
-                    loginStep === 0 
-                      ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-500/20 active-click'
-                      : 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  {loginStep === 0 && "Access Secure Hub"}
-                  {loginStep === 1 && "Authenticating..."}
-                  {loginStep === 2 && "Connected"}
-                </button>
-              </div>
+              <button
+                onClick={handleVDILogin}
+                disabled={loginStep !== 0}
+                className={`w-full py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all ${
+                  loginStep === 0
+                    ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20 active-click'
+                    : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                {loginStep === 0 && "Access Secure Hub"}
+                {loginStep === 1 && "Authenticating..."}
+                {loginStep === 2 && "Connected"}
+              </button>
             </div>
           </div>
         </div>
@@ -314,31 +288,21 @@ const AdvancedSolutions: React.FC = () => {
         {/* Why We Win */}
         <div className="relative mt-16 reveal-on-scroll">
           <div className="bg-gray-50 dark:bg-white/2 rounded-[3rem] p-10 md:p-16 border border-gray-100 dark:border-white/10 shadow-sm relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/[0.02] dark:bg-rose-500/5 rounded-full blur-[100px] -z-10"></div>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/[0.02] dark:bg-emerald-500/5 rounded-full blur-[100px] -z-10"></div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div>
                 <h3 className="text-4xl md:text-5xl font-montserrat font-extrabold mb-10 leading-tight text-gray-900 dark:text-white">
-                  Why We <span className="text-rose-600 italic">Win</span>
+                  Why We <span className="text-emerald-600 italic">Win</span>
                 </h3>
                 <div className="space-y-10">
                   <div className="flex items-start gap-6 group">
-                    <div className="p-4 rounded-2xl bg-white dark:bg-rose-500/10 text-rose-600 group-hover:scale-110 transition-transform shadow-sm">
-                      <Coins className="w-7 h-7" />
-                    </div>
-                    <div>
-                      <h4 className="text-xl font-bold mb-2 group-hover:text-rose-600 transition-colors text-gray-900 dark:text-white">Zero CAPEX Infrastructure</h4>
-                      <p className="text-gray-500 dark:text-slate-400 leading-relaxed text-sm font-medium">Eliminate heavy upfront hardware costs. Deploy high-performance digital environments instantly with OPEX-based flexibility.</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-6 group">
-                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-800/10 text-gray-600 dark:text-gray-300 group-hover:scale-110 transition-transform shadow-sm">
+                    <div className="p-4 rounded-2xl bg-white dark:bg-emerald-500/10 text-emerald-600 group-hover:scale-110 transition-transform shadow-sm">
                       <Zap className="w-7 h-7" />
                     </div>
                     <div>
-                      <h4 className="text-xl font-bold mb-2 group-hover:text-gray-900 dark:group-hover:text-white transition-colors text-gray-900 dark:text-white">Speed to Market</h4>
-                      <p className="text-gray-500 dark:text-slate-400 leading-relaxed text-sm font-medium">What takes legacy providers months, we deploy in minutes. Radical agility for the modern economy.</p>
+                      <h4 className="text-xl font-bold mb-2 group-hover:text-emerald-600 transition-colors text-gray-900 dark:text-white">Zero CAPEX Infrastructure</h4>
+                      <p className="text-gray-500 dark:text-slate-400 leading-relaxed text-sm font-medium">Deploy high-performance digital environments instantly with OPEX-based flexibility.</p>
                     </div>
                   </div>
                 </div>
@@ -347,16 +311,16 @@ const AdvancedSolutions: React.FC = () => {
               <div className="relative">
                 <div className="relative bg-white dark:bg-black/20 border border-gray-100 dark:border-white/10 rounded-[3rem] p-8 md:p-12 text-center shadow-sm">
                    <div className="mb-10">
-                      <h5 className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[0.5em] mb-10">Value Proposition Ratio</h5>
+                      <h5 className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[0.5em] mb-10">Proposition Ratio</h5>
                       <div className="flex items-end justify-center gap-8 h-56">
                          <div className="flex flex-col items-center gap-4">
                             <div className="w-20 bg-gray-100 dark:bg-slate-800 rounded-t-2xl h-16 border-t border-gray-200 dark:border-slate-700"></div>
-                            <span className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-2">Legacy Tech</span>
+                            <span className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-2">Legacy</span>
                          </div>
                          <div className="flex flex-col items-center gap-4">
-                            <div className="p-2 rounded-lg quantum-gradient mb-2 animate-bounce shadow-lg shadow-rose-500/20"><Zap className="w-4 h-4 text-white" /></div>
-                            <div className="w-20 quantum-gradient rounded-t-2xl h-44 shadow-xl shadow-rose-500/20"></div>
-                            <span className="text-[10px] text-rose-600 font-bold uppercase tracking-widest mt-2">DEEPS BITC</span>
+                            <div className="p-2 rounded-lg quantum-gradient mb-2 animate-bounce shadow-lg shadow-emerald-500/20"><Zap className="w-4 h-4 text-white" /></div>
+                            <div className="w-20 quantum-gradient rounded-t-2xl h-44 shadow-xl shadow-emerald-500/20"></div>
+                            <span className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mt-2">DEEPS BITC</span>
                          </div>
                       </div>
                    </div>
@@ -366,10 +330,6 @@ const AdvancedSolutions: React.FC = () => {
           </div>
         </div>
       </div>
-      
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes loading { 0% { width: 0%; transform: translateX(-100%); } 100% { width: 100%; transform: translateX(100%); } }
-      `}} />
     </section>
   );
 };

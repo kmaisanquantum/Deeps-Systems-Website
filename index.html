@@ -24,9 +24,10 @@
         --text-main: #111827;
         --glass-bg: rgba(255, 255, 255, 0.7);
         --glass-border: rgba(0, 0, 0, 0.08);
-        --card-glow: rgba(225, 29, 72, 0.02);
-        --accent-primary: #e11d48;
-        --accent-secondary: #f43f5e;
+        --card-glow: rgba(22, 163, 74, 0.02);
+        --accent-primary: #16a34a;
+        --accent-secondary: #2563eb;
+        --accent-gold: #d97706;
       }
 
       .dark {
@@ -34,7 +35,7 @@
         --text-main: #f8fafc;
         --glass-bg: rgba(255, 255, 255, 0.03);
         --glass-border: rgba(255, 255, 255, 0.1);
-        --card-glow: rgba(225, 29, 72, 0.05);
+        --card-glow: rgba(22, 163, 74, 0.05);
       }
 
       body {
@@ -60,8 +61,8 @@
       }
       
       @keyframes target-pulse {
-        0%, 100% { border-color: rgba(225, 29, 72, 0.2); box-shadow: 0 0 20px rgba(0, 0, 0, 0); }
-        50% { border-color: rgba(225, 29, 72, 0.8); box-shadow: 0 0 40px rgba(225, 29, 72, 0.2); transform: scale(1.005); }
+        0%, 100% { border-color: rgba(22, 163, 74, 0.2); box-shadow: 0 0 20px rgba(0, 0, 0, 0); }
+        50% { border-color: rgba(22, 163, 74, 0.8); box-shadow: 0 0 40px rgba(22, 163, 74, 0.2); transform: scale(1.005); }
       }
 
       section:target, div:target {
@@ -70,10 +71,10 @@
       }
 
       .quantum-gradient {
-        background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
+        background: linear-gradient(135deg, #16a34a 0%, #2563eb 100%);
       }
       .quantum-text-gradient {
-        background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
+        background: linear-gradient(135deg, #16a34a 0%, #2563eb 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
@@ -155,12 +156,12 @@
 
       /* SECTOR ICON ANIMATIONS */
       @keyframes icon-pulse-quantum {
-        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(225, 29, 72, 0)); }
-        50% { transform: scale(1.12); filter: drop-shadow(0 0 10px rgba(225, 29, 72, 0.6)); }
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(22, 163, 74, 0)); }
+        50% { transform: scale(1.12); filter: drop-shadow(0 0 10px rgba(22, 163, 74, 0.6)); }
       }
       @keyframes icon-float-quantum {
-        0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 2px rgba(225, 29, 72, 0.2)); }
-        50% { transform: translateY(-12px); filter: drop-shadow(0 0 15px rgba(225, 29, 72, 0.5)); }
+        0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 2px rgba(22, 163, 74, 0.2)); }
+        50% { transform: translateY(-12px); filter: drop-shadow(0 0 15px rgba(22, 163, 74, 0.5)); }
       }
 
       .animate-icon-pulse { will-change: transform, filter; }
@@ -182,12 +183,12 @@
       /* HEADLINE GLOW */
       @keyframes headline-glow {
         0%, 100% { 
-          filter: drop-shadow(0 0 0px rgba(225, 29, 72, 0));
-          text-shadow: 0 0 8px rgba(225, 29, 72, 0.05);
+          filter: drop-shadow(0 0 0px rgba(22, 163, 74, 0));
+          text-shadow: 0 0 8px rgba(22, 163, 74, 0.05);
         }
         50% { 
-          filter: drop-shadow(0 0 15px rgba(225, 29, 72, 0.15));
-          text-shadow: 0 0 12px rgba(225, 29, 72, 0.2);
+          filter: drop-shadow(0 0 15px rgba(22, 163, 74, 0.15));
+          text-shadow: 0 0 12px rgba(22, 163, 74, 0.2);
         }
       }
       .headline-glow-active { animation: headline-glow 5s ease-in-out infinite; }
@@ -236,7 +237,7 @@
 
       .btn-cta-pulse:hover {
         box-shadow: 
-          0 0 40px rgba(225, 29, 72, 0.4),
+          0 0 40px rgba(22, 163, 74, 0.4),
           0 20px 40px -15px rgba(0, 0, 0, 0.2);
         filter: brightness(1.1);
         transform: translateY(-2px);
@@ -264,7 +265,7 @@
       ::-webkit-scrollbar { width: 6px; }
       ::-webkit-scrollbar-track { background: var(--bg-main); }
       ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 4px; }
-      ::-webkit-scrollbar-thumb:hover { background: rgba(225, 29, 72, 0.4); }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(22, 163, 74, 0.4); }
 
       .dark ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); }
 
@@ -275,6 +276,10 @@
       .dark .glass {
         background: rgba(255, 255, 255, 0.03) !important;
         border-color: rgba(255, 255, 255, 0.1);
+      }
+
+      ::selection {
+        background: rgba(22, 163, 74, 0.3);
       }
     </style>
   <script type="importmap">

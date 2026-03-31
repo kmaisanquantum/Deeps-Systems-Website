@@ -11,7 +11,7 @@ const Comparison: React.FC = () => {
   ];
 
   return (
-    <section id="gap" className="py-16 md:py-24 bg-rose-50/50 dark:bg-rose-900/5">
+    <section id="gap" className="py-16 md:py-24 bg-emerald-50/50 dark:bg-emerald-900/5">
       <div className="max-w-7xl mx-auto px-5 md:px-6">
         <div className="text-center mb-12 md:mb-16 reveal-on-scroll">
           <h2 className="text-3xl md:text-4xl font-montserrat font-bold mb-4 text-gray-900 dark:text-white leading-tight">The Competitive Gap</h2>
@@ -21,15 +21,15 @@ const Comparison: React.FC = () => {
         <div className="bg-white dark:bg-white/2 rounded-2xl md:rounded-[2.5rem] overflow-hidden border border-gray-100 dark:border-white/10 shadow-sm hover:shadow-xl max-w-4xl mx-auto transition-all duration-500">
           <div className="grid grid-cols-3 bg-gray-900 p-4 md:p-8 font-bold text-xs md:text-lg border-b border-gray-800 uppercase tracking-widest md:normal-case">
             <div className="text-gray-400">Capability</div>
-            <div className="text-rose-500">Deeps</div>
+            <div className="text-emerald-500">Deeps</div>
             <div className="text-gray-600">Legacy</div>
           </div>
           <div className="divide-y divide-gray-50 dark:divide-white/5">
             {comparisons.map((row, idx) => (
-              <div key={idx} className="grid grid-cols-3 p-4 md:p-8 items-center group hover:bg-rose-50 dark:hover:bg-rose-500/5 transition-all duration-300 cursor-default">
+              <div key={idx} className="grid grid-cols-3 p-4 md:p-8 items-center group hover:bg-emerald-50 dark:hover:bg-emerald-500/5 transition-all duration-300 cursor-default">
                 <div className="text-gray-600 dark:text-slate-300 font-medium text-[10px] sm:text-sm md:text-base pr-2">{row.feature}</div>
                 <div className="flex items-center gap-1.5 md:gap-2 text-gray-900 dark:text-white font-semibold text-[10px] sm:text-sm md:text-base">
-                  <CheckCircle2 className="shrink-0 w-3.5 h-3.5 md:w-5 md:h-5 text-rose-600" />
+                  <CheckCircle2 className="shrink-0 w-3.5 h-3.5 md:w-5 md:h-5 text-emerald-600" />
                   <span className="truncate">{row.deeps}</span>
                 </div>
                 <div className="flex items-center gap-1.5 md:gap-2 text-gray-400 dark:text-slate-500 italic text-[10px] sm:text-sm md:text-base">
