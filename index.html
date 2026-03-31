@@ -1,35 +1,40 @@
 <!DOCTYPE html>
-<html lang="en" style="scroll-behavior: smooth;">
+<html lang="en" style="scroll-behavior: smooth;" class="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-    <meta name="description" content="Deeps Systems: Born-in-the-Cloud (BITC) quantum-inspired optimization for PNG SMEs, finance, and logistics. High-performance SaaS outcomes." />
-    <title>Deeps Systems | Quantum-Inspired Optimization</title>
+    <meta name="description" content="Deeps Systems: Born-in-the-Cloud (BITC) optimization for PNG SMEs, finance, and logistics. High-performance digital outcomes." />
+    <title>Deeps Systems | Digital Transformation & Optimization</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
     <script>
-      // Initialize theme early to prevent flash of unstyled content
-      if (localStorage.getItem('theme') === 'light') {
+      // Initialize theme: Default to light
+      if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+      } else {
         document.documentElement.classList.add('light');
       }
     </script>
     <style>
       :root {
+        --bg-main: #ffffff;
+        --text-main: #111827;
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(0, 0, 0, 0.08);
+        --card-glow: rgba(225, 29, 72, 0.02);
+        --accent-primary: #e11d48;
+        --accent-secondary: #f43f5e;
+      }
+
+      .dark {
         --bg-main: #0a0a0a;
         --text-main: #f8fafc;
         --glass-bg: rgba(255, 255, 255, 0.03);
         --glass-border: rgba(255, 255, 255, 0.1);
-        --card-glow: rgba(34, 197, 94, 0.05);
-      }
-
-      .light {
-        --bg-main: #f8fafc;
-        --text-main: #0f172a;
-        --glass-bg: rgba(15, 23, 42, 0.03);
-        --glass-border: rgba(15, 23, 42, 0.1);
-        --card-glow: rgba(34, 197, 94, 0.02);
+        --card-glow: rgba(225, 29, 72, 0.05);
       }
 
       body {
@@ -55,8 +60,8 @@
       }
       
       @keyframes target-pulse {
-        0%, 100% { border-color: rgba(34, 197, 94, 0.2); box-shadow: 0 0 20px rgba(0, 0, 0, 0); }
-        50% { border-color: rgba(34, 197, 94, 0.8); box-shadow: 0 0 40px rgba(34, 197, 94, 0.2); transform: scale(1.005); }
+        0%, 100% { border-color: rgba(225, 29, 72, 0.2); box-shadow: 0 0 20px rgba(0, 0, 0, 0); }
+        50% { border-color: rgba(225, 29, 72, 0.8); box-shadow: 0 0 40px rgba(225, 29, 72, 0.2); transform: scale(1.005); }
       }
 
       section:target, div:target {
@@ -65,10 +70,10 @@
       }
 
       .quantum-gradient {
-        background: linear-gradient(135deg, #22c55e 0%, #fbbf24 100%);
+        background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
       }
       .quantum-text-gradient {
-        background: linear-gradient(135deg, #22c55e 0%, #fbbf24 100%);
+        background: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
@@ -96,12 +101,13 @@
         border-radius: 50%;
         pointer-events: none;
         will-change: transform, opacity;
-        mix-blend-mode: screen;
-      }
-
-      .light .quantum-particle {
         mix-blend-mode: multiply;
         opacity: 0.05 !important;
+      }
+
+      .dark .quantum-particle {
+        mix-blend-mode: screen;
+        opacity: 0.1 !important;
       }
 
       /* ENHANCED WORD REVEAL ANIMATION */
@@ -147,34 +153,21 @@
         animation: reveal-fade-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }
 
-      /* SECTOR ICON ANIMATIONS - CONTINUOUS & DISTINCT */
+      /* SECTOR ICON ANIMATIONS */
       @keyframes icon-pulse-quantum {
-        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(34, 197, 94, 0)); }
-        50% { transform: scale(1.12); filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.6)); }
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(225, 29, 72, 0)); }
+        50% { transform: scale(1.12); filter: drop-shadow(0 0 10px rgba(225, 29, 72, 0.6)); }
       }
       @keyframes icon-float-quantum {
-        0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 2px rgba(34, 197, 94, 0.2)); }
-        50% { transform: translateY(-12px); filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.5)); }
-      }
-      @keyframes icon-sway-quantum {
-        0%, 100% { transform: rotate(-8deg); }
-        50% { transform: rotate(8deg); }
-      }
-      @keyframes icon-spin-slow-quantum {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
+        0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 2px rgba(225, 29, 72, 0.2)); }
+        50% { transform: translateY(-12px); filter: drop-shadow(0 0 15px rgba(225, 29, 72, 0.5)); }
       }
 
       .animate-icon-pulse { will-change: transform, filter; }
       .animate-icon-float { will-change: transform, filter; }
-      .animate-icon-sway { will-change: transform; }
-      .animate-icon-spin-slow { will-change: transform; }
 
-      /* Apply animations only when parent reveal-active is present */
       .reveal-active .animate-icon-pulse { animation: icon-pulse-quantum 3s ease-in-out infinite; transform-origin: center; }
       .reveal-active .animate-icon-float { animation: icon-float-quantum 4s ease-in-out infinite; transform-origin: center; }
-      .reveal-active .animate-icon-sway { animation: icon-sway-quantum 3.5s ease-in-out infinite; transform-origin: center; }
-      .reveal-active .animate-icon-spin-slow { animation: icon-spin-slow-quantum 12s linear infinite; transform-origin: center; }
 
       /* BUTTON ARROW ANIMATION */
       @keyframes arrow-scroll-down {
@@ -186,29 +179,23 @@
         animation: arrow-scroll-down 1s ease-in-out infinite;
       }
 
-      /* REFINED VOLUMETRIC QUANTUM GLOW */
+      /* HEADLINE GLOW */
       @keyframes headline-glow {
         0%, 100% { 
-          filter: drop-shadow(0 0 0px rgba(34, 197, 94, 0));
-          text-shadow: 0 0 8px rgba(34, 197, 94, 0.1);
+          filter: drop-shadow(0 0 0px rgba(225, 29, 72, 0));
+          text-shadow: 0 0 8px rgba(225, 29, 72, 0.05);
         }
         50% { 
-          filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.2));
-          text-shadow: 0 0 12px rgba(34, 197, 94, 0.4), 0 0 25px rgba(251, 191, 36, 0.3);
+          filter: drop-shadow(0 0 15px rgba(225, 29, 72, 0.15));
+          text-shadow: 0 0 12px rgba(225, 29, 72, 0.2);
         }
       }
       .headline-glow-active { animation: headline-glow 5s ease-in-out infinite; }
 
-      /* ULTRA REFINED GLOBAL CTA STYLES */
+      /* CTA STYLES */
       @keyframes btn-pulse-breathing {
         0%, 100% { transform: scale(1); }
         50% { transform: scale(1.015); }
-      }
-
-      @keyframes btn-hover-heartbeat {
-        0% { transform: translateY(-10px) scale(1.06); }
-        50% { transform: translateY(-12px) scale(1.09); }
-        100% { transform: translateY(-10px) scale(1.06); }
       }
 
       @keyframes btn-shine {
@@ -223,7 +210,7 @@
         position: relative;
         z-index: 1;
         overflow: hidden;
-        box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.1);
       }
 
       .btn-cta-pulse::after {
@@ -236,7 +223,7 @@
         background: linear-gradient(
           to right,
           transparent,
-          rgba(255, 255, 255, 0.15),
+          rgba(255, 255, 255, 0.2),
           transparent
         );
         transform: translateX(-100%) skewX(-45deg);
@@ -249,88 +236,45 @@
 
       .btn-cta-pulse:hover {
         box-shadow: 
-          0 0 60px rgba(34, 197, 94, 0.8),
-          0 0 120px rgba(251, 191, 36, 0.6),
-          0 35px 70px -15px rgba(0, 0, 0, 0.8);
-        filter: brightness(1.3);
-        animation: btn-hover-heartbeat 2s ease-in-out infinite;
-        outline: 2px solid rgba(255, 255, 255, 0.3);
-        outline-offset: 4px;
-        z-index: 2;
+          0 0 40px rgba(225, 29, 72, 0.4),
+          0 20px 40px -15px rgba(0, 0, 0, 0.2);
+        filter: brightness(1.1);
+        transform: translateY(-2px);
       }
 
-      /* Tactile secondary CTA */
       .btn-secondary-cta {
         transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         will-change: transform, box-shadow;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       }
       
       .btn-secondary-cta:hover {
-        transform: translateY(-6px) scale(1.05);
-        box-shadow: 
-          0 25px 50px -12px rgba(0, 0, 0, 0.6), 
-          0 0 40px rgba(34, 197, 94, 0.35);
-        filter: brightness(1.2);
-        border-color: rgba(34, 197, 94, 0.6);
-        background: rgba(255, 255, 255, 0.05);
-        animation: btn-pulse-breathing 3s ease-in-out infinite;
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+        background: rgba(0, 0, 0, 0.02);
       }
 
-      /* Snappy active state for all clickable elements */
+      /* Snappy active state */
       .active-click:active {
-        transform: scale(0.9) translateY(4px) !important;
-        filter: brightness(0.6) contrast(1.2) !important;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0,0,0,0.4) !important;
+        transform: scale(0.95) translateY(2px) !important;
         transition: transform 0.08s cubic-bezier(0.1, 0.7, 0.1, 1);
       }
       
       ::-webkit-scrollbar { width: 6px; }
-      ::-webkit-scrollbar-track { background: var(--bg-main); transition: background 0.8s ease; }
-      ::-webkit-scrollbar-thumb { background: rgba(120, 120, 120, 0.2); border-radius: 4px; }
-      ::-webkit-scrollbar-thumb:hover { background: rgba(34, 197, 94, 0.4); }
+      ::-webkit-scrollbar-track { background: var(--bg-main); }
+      ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(225, 29, 72, 0.4); }
 
-      /* Mobile text balance */
-      .text-balance {
-        text-wrap: balance;
-      }
+      .dark ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); }
 
-      /* Light Mode Overrides for Hardcoded Backgrounds */
-      .light .bg-[#0a0a0a],
-      .light section,
-      .light footer {
-        background-color: var(--bg-main) !important;
-      }
+      /* Dark Mode Overrides for Hardcoded Backgrounds */
+      .dark .bg-white\/2 { background-color: rgba(255, 255, 255, 0.02) !important; }
+      .dark .border-white\/5, .dark .border-white\/10 { border-color: rgba(255, 255, 255, 0.1) !important; }
       
-      .light .bg-slate-900\/20,
-      .light .bg-slate-900\/50,
-      .light .bg-black\/20,
-      .light .bg-green-900\/5 {
-        background-color: rgba(15, 23, 42, 0.02) !important;
-      }
-
-      .light .text-slate-400,
-      .light .text-slate-500 {
-        color: #64748b !important;
-      }
-
-      .light h1, .light h2, .light h3, .light h4, .light h5, .light h6, .light .text-white {
-        color: var(--text-main) !important;
-      }
-
-      .light .bg-white\/2 { background-color: rgba(15, 23, 42, 0.02) !important; }
-      .light .border-white\/5, .light .border-white\/10 { border-color: rgba(15, 23, 42, 0.08) !important; }
-      
-      .light .glass {
-        background: rgba(255, 255, 255, 0.7) !important;
-        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
-        border-color: rgba(0, 0, 0, 0.05);
-      }
-
-      .light .quantum-gradient {
-        background: linear-gradient(135deg, #16a34a 0%, #d97706 100%);
+      .dark .glass {
+        background: rgba(255, 255, 255, 0.03) !important;
+        border-color: rgba(255, 255, 255, 0.1);
       }
     </style>
   <script type="importmap">

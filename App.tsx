@@ -14,7 +14,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <ScrollToTop />
-      <div className="min-h-screen selection:bg-green-500/30">
+      <div className="min-h-screen selection:bg-rose-500/30">
         <Navbar />
         <main>
           <Routes>
