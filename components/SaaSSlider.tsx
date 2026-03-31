@@ -74,7 +74,7 @@ const saasSystems = [
     desc: "A reserve business monitoring tool to help SMEs and business in PNG.",
     url: "https://rbm.dspng.tech",
     icon: <Monitor className="w-6 h-6" />,
-    color: "text-cyan-600"
+    color: "text-blue-600"
   }
 ];
 
