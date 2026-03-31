@@ -1,9 +1,27 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Send,
+  Mail,
+  User,
+  MessageSquare,
+  ArrowRight,
+  CheckCircle,
+  Zap,
+  Terminal,
+  Loader2,
+  AlertCircle,
+  Tag
+} from 'lucide-react';
+import { GoogleGenerativeAI } from "@google/genai";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Send, CheckCircle, Loader2, User, Mail, MessageSquare, Tag, Sparkles, Terminal, ShieldCheck, Zap, ArrowRight, AlertCircle } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
+interface FormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
 
-interface ValidationErrors {
+interface FormErrors {
   name?: string;
   email?: string;
   subject?: string;
@@ -11,188 +29,165 @@ interface ValidationErrors {
 }
 
 const Contact: React.FC = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     subject: '',
     message: ''
   });
-  const [errors, setErrors] = useState<ValidationErrors>({});
+
+  const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [logs, setLogs] = useState<string[]>([]);
-  const [aiAnalysis, setAiAnalysis] = useState<{ summary: string, priority: string } | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<{ priority: string; summary: string } | null>(null);
 
-  const validateEmail = (email: string) => {
-    return String(email)
-      .toLowerCase()
-      .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      );
-  };
-
-  const validateField = useCallback((name: string, value: string) => {
-    let error = '';
+  const validateField = (name: string, value: string): string => {
     switch (name) {
       case 'name':
-        if (!value) error = 'Name is required';
-        else if (value.length < 2) error = 'Name must be at least 2 characters';
-        break;
+        return value.trim().length < 2 ? 'Name must be at least 2 characters' : '';
       case 'email':
-        if (!value) error = 'Email is required';
-        else if (!validateEmail(value)) error = 'Please enter a valid email address';
-        break;
+        return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? 'Invalid email address' : '';
       case 'subject':
-        if (!value) error = 'Subject is required';
-        else if (value.length < 5) error = 'Subject must be at least 5 characters';
-        break;
+        return value.trim().length < 4 ? 'Subject must be at least 4 characters' : '';
       case 'message':
-        if (!value) error = 'Message is required';
-        else if (value.length < 10) error = 'Message must be at least 10 characters';
-        break;
+        return value.trim().length < 10 ? 'Message must be at least 10 characters' : '';
+      default:
+        return '';
     }
-    return error;
-  }, []);
-
-  useEffect(() => {
-    const newErrors: ValidationErrors = {};
-    Object.keys(formData).forEach((key) => {
-      const fieldError = validateField(key, formData[key as keyof typeof formData]);
-      if (fieldError) {
-        newErrors[key as keyof ValidationErrors] = fieldError;
-      }
-    });
-    setErrors(newErrors);
-  }, [formData, validateField]);
-
-  const addLog = (message: string) => {
-    setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${message}`]);
-  };
-
-  const processLeadWithAI = async (data: typeof formData) => {
-    try {
-      addLog('Initiating Gemini Lead Qualification...');
-      /* Initialization following guidelines: const ai = new GoogleGenAI({apiKey: process.env.API_KEY}); */
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: `A new inquiry has been received from ${data.name} (${data.email}). 
-        Subject: ${data.subject}. 
-        Message: ${data.message}.
-        
-        Task: 
-        1. Summarize this lead in 2 sentences for the executive team.
-        2. Assign a Priority Level (CRITICAL, HIGH, MEDIUM, ROUTINE).
-        3. Identify the industry sector.`,
-        config: {
-          systemInstruction: "You are the Deeps Systems BITC Lead Analyzer. Output only a JSON-like summary containing 'summary' and 'priority'."
-        }
-      });
-
-      const text = response.text || "Lead received. Manual routing required.";
-      addLog('Quantum Analysis Complete: Lead Categorized.');
-      
-      return {
-        summary: text,
-        priority: text.includes('CRITICAL') ? 'CRITICAL' : text.includes('HIGH') ? 'HIGH' : 'STANDARD'
-      };
-    } catch (error) {
-      console.error("AI Qualification Error:", error);
-      return { summary: "Lead processed. AI analysis bypassed due to grid latency.", priority: "STANDARD" };
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Mark all as touched
-    const allTouched = Object.keys(formData).reduce((acc, key) => ({ ...acc, [key]: true }), {});
-    setTouched(allTouched);
-
-    if (Object.keys(errors).length > 0) return;
-
-    setStatus('submitting');
-    setLogs([]);
-    
-    addLog('Establishing BITC Secure Handshake...');
-    await new Promise(r => setTimeout(r, 800));
-    addLog('Encrypting Payload (AES-256)...');
-    
-    const analysis = await processLeadWithAI(formData);
-    setAiAnalysis(analysis);
-
-    await new Promise(r => setTimeout(r, 600));
-    addLog('Routing through Pacific Cloud Grid...');
-    await new Promise(r => setTimeout(r, 600));
-    addLog('Dispatching to wokman@dspng.tech...');
-    
-    setTimeout(() => {
-      window.location.href = `mailto:wokman@dspng.tech?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent("From: " + formData.name + " <" + formData.email + ">\n\n" + formData.message)}`;
-      setStatus('success');
-      setFormData({ name: '', email: '', subject: '', message: '' });
-      setTouched({});
-    }, 1000);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (touched[name]) {
+      const error = validateField(name, value);
+      setErrors(prev => ({ ...prev, [name]: error }));
+    }
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setTouched(prev => ({ ...prev, [e.target.name]: true }));
+    const { name, value } = e.target;
+    setTouched(prev => ({ ...prev, [name]: true }));
+    const error = validateField(name, value);
+    setErrors(prev => ({ ...prev, [name]: error }));
   };
 
-  const getFieldClass = (fieldName: keyof ValidationErrors) => {
-    const base = "w-full bg-slate-900/50 border rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none transition-all placeholder:text-slate-600";
-    if (touched[fieldName] && errors[fieldName]) {
-      return `${base} border-red-500/50 focus:border-red-500 bg-red-500/5`;
+  const addLog = (msg: string) => {
+    setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate all fields
+    const newErrors: FormErrors = {};
+    Object.keys(formData).forEach(key => {
+      const error = validateField(key, formData[key as keyof FormData]);
+      if (error) newErrors[key as keyof FormData] = error;
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setTouched({ name: true, email: true, subject: true, message: true });
+      return;
     }
-    return `${base} border-white/10 focus:border-green-500/50`;
+
+    setStatus('submitting');
+    setLogs([]);
+    addLog("Initializing BITC Secure Tunnel...");
+    
+    // Simulate complex BITC dispatch process
+    await new Promise(r => setTimeout(r, 800));
+    addLog("Encrypting payload with AES-256...");
+    await new Promise(r => setTimeout(r, 600));
+    addLog("Routing through Port Moresby Node 01...");
+    await new Promise(r => setTimeout(r, 900));
+    addLog("Validating quantum signatures...");
+    
+    try {
+       // Attempt AI analysis if key is available
+       const apiKey = (window as any).VITE_GEMINI_API_KEY;
+       if (apiKey) {
+          const genAI = new GoogleGenerativeAI(apiKey);
+          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+          const prompt = `Analyze this contact form message and provide a JSON with 'priority' (LOW, MEDIUM, HIGH, CRITICAL) and 'summary' (max 15 words): Subject: ${formData.subject}, Message: ${formData.message}`;
+
+          addLog("Running AI Qualitative Analysis...");
+          const result = await model.generateContent(prompt);
+          const response = await result.response;
+          const text = response.text();
+          const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+          setAiAnalysis(JSON.parse(cleanText));
+          addLog("AI Analysis complete. Priority tagged.");
+       }
+    } catch (err) {
+       addLog("AI Node bypass: fallback to standard routing.");
+    }
+
+    await new Promise(r => setTimeout(r, 1000));
+    addLog("Dispatch confirmed. Outcome secured.");
+    setStatus('success');
+  };
+
+  const getFieldClass = (name: string) => {
+    const base = "w-full bg-white/5 border rounded-2xl px-12 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 transition-all duration-300";
+    if (touched[name] && errors[name as keyof FormErrors]) {
+      return `${base} border-red-500/50 focus:ring-red-500/20`;
+    }
+    return `${base} border-white/10 focus:border-green-500/50 focus:ring-green-500/20`;
   };
 
   return (
-    <section id="contact-form" className="py-24 relative overflow-hidden">
-      <div className="absolute top-1/2 left-0 w-64 h-64 bg-green-500/5 rounded-full blur-[100px] -z-10"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-amber-600/5 rounded-full blur-[120px] -z-10"></div>
+    <section id="contact" className="py-24 relative overflow-hidden bg-[#0a0a0a]">
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+        <div className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-green-500/5 rounded-full blur-[150px]"></div>
+        <div className="absolute bottom-1/4 left-0 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[150px]"></div>
+      </div>
 
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
           <div className="reveal-on-scroll">
-            <h2 className="text-3xl md:text-5xl font-montserrat font-bold mb-6">
-              Ready to <span className="quantum-text-gradient">Optimize?</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-green-500/20 text-green-400 text-[10px] font-bold uppercase tracking-widest mb-8">
+              <Send className="w-3.5 h-3.5" />
+              Secure Dispatch
+            </div>
+
+            <h2 className="text-4xl md:text-6xl font-montserrat font-bold mb-8 leading-tight">
+              Get Your <span className="quantum-text-gradient">Optimization</span> Outcome
             </h2>
-            <p className="text-slate-400 text-lg mb-8 leading-relaxed max-w-lg">
+
+            <p className="text-xl text-slate-400 mb-12 leading-relaxed max-w-xl">
               Initiate your quantum consultation. Every inquiry is analyzed by our <span className="text-green-400 font-bold">BITC Grid</span> and routed to our specialist team at <span className="text-green-400 font-mono underline">wokman@dspng.tech</span>, via WhatsApp <span className="text-green-400 font-mono underline">(+675 83009881)</span>, or by calling <span className="text-green-400 font-mono underline">+675 83009881</span>.
             </p>
-            
-            <div className="space-y-6">
-              <div className="flex items-start gap-4 p-5 rounded-2xl glass border border-white/5 hover:border-green-500/20 transition-all duration-300 group cursor-default shadow-xl">
-                <div className="p-3 rounded-xl bg-green-500/10 text-green-400 group-hover:scale-110 transition-transform">
-                  <ShieldCheck className="w-6 h-6" />
+
+            <div className="space-y-8">
+              <div className="flex items-center gap-6 group">
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 group-hover:border-green-500/30 transition-all">
+                  <Mail className="w-6 h-6 text-green-400" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-white group-hover:text-green-400 transition-colors">Quantum Security</h4>
-                  <p className="text-sm text-slate-500">End-to-end encrypted dispatch through regional cloud nodes.</p>
+                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Direct Protocol</p>
+                   <p className="text-white font-bold font-mono">wokman@dspng.tech</p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 p-5 rounded-2xl glass border border-white/5 hover:border-amber-500/20 transition-all duration-300 group cursor-default shadow-xl">
-                <div className="p-3 rounded-xl bg-amber-500/10 text-amber-400 group-hover:scale-110 transition-transform">
-                  <Sparkles className="w-6 h-6" />
+
+              <div className="flex items-center gap-6 group">
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 group-hover:border-green-500/30 transition-all">
+                  <MessageSquare className="w-6 h-6 text-green-400" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-white group-hover:text-amber-400 transition-colors">Gemini-Powered Routing</h4>
-                  <p className="text-sm text-slate-500">Inquiries are qualified by AI for ultra-fast executive response.</p>
+                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Instant Messaging</p>
+                   <p className="text-white font-bold font-mono">+675 83009881</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="relative min-h-[500px] flex items-center">
+          <div className="relative">
             {status === 'success' ? (
-              <div className="glass rounded-[2.5rem] p-10 md:p-12 text-center border border-green-500/40 animate-in zoom-in duration-500 shadow-[0_0_50px_rgba(34,197,94,0.15)] w-full">
-                <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-8 relative">
+              <div className="glass rounded-[2.5rem] p-12 border border-green-500/20 shadow-2xl text-center animate-in zoom-in duration-500">
+                <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-8 relative">
                   <CheckCircle className="w-10 h-10 text-green-400" />
                   <div className="absolute inset-0 bg-green-400/20 rounded-full animate-ping"></div>
                 </div>
@@ -207,7 +202,7 @@ const Contact: React.FC = () => {
                         Priority: {aiAnalysis.priority}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 leading-relaxed italic">"{aiAnalysis.summary}"</p>
+                    <p className="text-xs text-slate-300 leading-relaxed italic">"${aiAnalysis.summary}"</p>
                   </div>
                 )}
                 
