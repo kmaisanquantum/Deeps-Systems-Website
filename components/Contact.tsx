@@ -12,7 +12,6 @@ import {
   AlertCircle,
   Tag
 } from 'lucide-react';
-import { GoogleGenerativeAI } from "@google/genai";
 
 interface FormData {
   name: string;
@@ -40,7 +39,6 @@ const Contact: React.FC = () => {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [logs, setLogs] = useState<string[]>([]);
-  const [aiAnalysis, setAiAnalysis] = useState<{ priority: string; summary: string } | null>(null);
 
   const validateField = (name: string, value: string): string => {
     switch (name) {
@@ -104,27 +102,6 @@ const Contact: React.FC = () => {
     addLog("Routing through Port Moresby Node 01...");
     await new Promise(r => setTimeout(r, 900));
     addLog("Validating quantum signatures...");
-    
-    try {
-       // Attempt AI analysis if key is available
-       const apiKey = (window as any).VITE_GEMINI_API_KEY;
-       if (apiKey) {
-          const genAI = new GoogleGenerativeAI(apiKey);
-          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-          const prompt = `Analyze this contact form message and provide a JSON with 'priority' (LOW, MEDIUM, HIGH, CRITICAL) and 'summary' (max 15 words): Subject: ${formData.subject}, Message: ${formData.message}`;
-
-          addLog("Running AI Qualitative Analysis...");
-          const result = await model.generateContent(prompt);
-          const response = await result.response;
-          const text = response.text();
-          const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-          setAiAnalysis(JSON.parse(cleanText));
-          addLog("AI Analysis complete. Priority tagged.");
-       }
-    } catch (err) {
-       addLog("AI Node bypass: fallback to standard routing.");
-    }
-
     await new Promise(r => setTimeout(r, 1000));
     addLog("Dispatch confirmed. Outcome secured.");
     setStatus('success');
@@ -193,18 +170,6 @@ const Contact: React.FC = () => {
                 </div>
                 <h3 className="text-3xl font-bold mb-4 font-montserrat">Dispatch Confirmed</h3>
                 <p className="text-slate-400 mb-8">Payload successfully routed to <span className="text-green-400 font-mono">wokman@dspng.tech</span>.</p>
-                
-                {aiAnalysis && (
-                  <div className="bg-black/40 rounded-2xl p-6 border border-white/10 text-left mb-8 animate-in slide-in-from-bottom-4 duration-700 delay-300">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-[10px] font-bold text-green-400 uppercase tracking-widest">AI Qualitative Summary</span>
-                      <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest ${aiAnalysis.priority === 'CRITICAL' || aiAnalysis.priority === 'HIGH' ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
-                        Priority: {aiAnalysis.priority}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-300 leading-relaxed italic">"${aiAnalysis.summary}"</p>
-                  </div>
-                )}
                 
                 <button 
                   onClick={() => setStatus('idle')}
