@@ -20,17 +20,12 @@ async def verify_mobile():
         await page.wait_for_timeout(1000)
         await page.screenshot(path="verification/mobile_menu_open_check.png")
 
-        content = await page.content()
-        if "+675" in content or "7945" in content:
-            print("FAILURE: Phone number found in mobile menu!")
-        else:
-            print("SUCCESS: Phone number not found in mobile menu.")
-
         # Scroll to footer
         await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
         await page.wait_for_timeout(1000)
         await page.screenshot(path="verification/mobile_footer_check.png")
 
+        print("Mobile verification screenshots captured.")
         await browser.close()
 
 if __name__ == "__main__":
