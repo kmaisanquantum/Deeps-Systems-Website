@@ -26,7 +26,7 @@ const OnlineStorePreview: React.FC = () => {
               </div>
 
               <h2 className="text-4xl md:text-5xl font-montserrat font-bold mb-6 text-gray-900 dark:text-white leading-tight">
-                The Deeps <span className="text-emerald-600">Store</span>
+                Deeps Systems <span className="text-emerald-600">Online Store</span>
               </h2>
 
               <p className="text-lg text-gray-500 dark:text-slate-400 mb-10 leading-relaxed font-medium">
