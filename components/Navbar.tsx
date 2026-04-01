@@ -169,7 +169,7 @@ const Navbar: React.FC = () => {
         {/* Mobile Menu Toggle */}
         <div className="flex items-center gap-3 md:hidden">
           <button 
-            className="text-gray-900 dark:text-white p-2 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/10"
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"} className="text-gray-900 dark:text-white p-2 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/10"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

@@ -225,7 +225,7 @@ const Contact: React.FC = () => {
                         value={formData.name}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        placeholder="John Doe"
+                        aria-label="Full Name" placeholder="John Doe"
                         className={getFieldClass('name')}
                       />
                     </div>
@@ -246,7 +246,7 @@ const Contact: React.FC = () => {
                         value={formData.email}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        placeholder="john@example.com"
+                        aria-label="Email Address" placeholder="john@example.com"
                         className={getFieldClass('email')}
                       />
                     </div>
@@ -269,7 +269,7 @@ const Contact: React.FC = () => {
                       value={formData.subject}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      placeholder="Transformation Query"
+                      aria-label="Subject" placeholder="Transformation Query"
                       className={getFieldClass('subject')}
                     />
                   </div>
@@ -291,7 +291,7 @@ const Contact: React.FC = () => {
                       value={formData.message}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      placeholder="Tell us about your needs..."
+                      aria-label="Message" placeholder="Tell us about your needs..."
                       className={`${getFieldClass('message')} pl-12 pt-4 resize-none`}
                     ></textarea>
                   </div>

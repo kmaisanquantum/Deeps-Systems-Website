@@ -35,7 +35,7 @@ const QuantumAssistant: React.FC = () => {
     <>
       {/* Floating Toggle Button */}
       <button 
-        onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? "Close support chat" : "Open support chat"} onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-6 right-6 w-14 h-14 rounded-full quantum-gradient shadow-2xl flex items-center justify-center text-white z-[60] btn-cta-pulse active-click transition-all duration-300 group"
       >
         {isOpen ? <X className="w-6 h-6" /> : (
@@ -60,7 +60,7 @@ const QuantumAssistant: React.FC = () => {
                   Online
                 </span>
              </div>
-             <button onClick={() => setIsOpen(false)} className="ml-auto text-gray-400 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:scale-110 active:scale-90 transition-all">
+             <button aria-label="Close chat" onClick={() => setIsOpen(false)} className="ml-auto text-gray-400 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:scale-110 active:scale-90 transition-all">
                 <X className="w-4 h-4" />
              </button>
           </div>
@@ -94,11 +94,11 @@ const QuantumAssistant: React.FC = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="How can we help?"
+              aria-label="Message for support" placeholder="How can we help?"
               className="flex-grow bg-white dark:bg-slate-900/50 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-emerald-500 transition-all duration-300 placeholder:text-gray-400 dark:placeholder:text-slate-600"
             />
             <button 
-              onClick={handleSend}
+              aria-label="Send message" onClick={handleSend}
               disabled={isLoading || !input.trim()}
               className="p-2 rounded-xl quantum-gradient text-white btn-cta-pulse active-click transition-all duration-300 disabled:opacity-50 disabled:grayscale disabled:scale-100 group shadow-md"
             >
