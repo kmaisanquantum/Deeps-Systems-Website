@@ -121,7 +121,7 @@ const AdvancedSolutions: React.FC = () => {
           <h2 className="text-4xl md:text-6xl font-montserrat font-bold mb-6 tracking-tight text-gray-900 dark:text-white">
             Advanced <span className="quantum-text-gradient">Outcome Suite</span>
           </h2>
-          <p className="text-gray-500 dark:text-slate-400 max-w-2xl text-lg leading-relaxed font-medium">
+          <p className="text-gray-600 dark:text-slate-300 max-w-2xl text-lg leading-relaxed font-medium">
             While traditional providers focus on managing physical infrastructure, Deeps Systems delivers instant, high-performance digital architectures.
           </p>
         </div>
@@ -140,17 +140,17 @@ const AdvancedSolutions: React.FC = () => {
                    <div className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></div>
                    <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Live Monitor</span>
                 </div>
-                <span className="text-[9px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">Status: active</span>
+                <span className="text-[9px] font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest">Status: active</span>
               </div>
             </div>
             <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">SEC-aaS (Managed MXDR)</h3>
-            <p className="text-gray-500 dark:text-slate-400 mb-8 text-sm leading-relaxed font-medium">
+            <p className="text-gray-600 dark:text-slate-300 mb-8 text-sm leading-relaxed font-medium">
               24/7 Managed Extended Detection & Response. Total security posture with zero hardware overhead.
             </p>
             
             <div className="bg-gray-50 dark:bg-black/60 rounded-2xl p-6 border border-gray-100 dark:border-white/10 relative overflow-hidden group/widget min-h-[220px] flex flex-col shadow-inner">
               <div className="flex justify-between items-center mb-6">
-                <span className="text-[10px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-widest">Security Console</span>
+                <span className="text-[10px] font-bold text-gray-600 dark:text-slate-300 uppercase tracking-widest">Security Console</span>
                 <Loader2 className={`w-4 h-4 text-emerald-600 ${isScanning ? 'animate-spin' : 'animate-pulse'}`} />
               </div>
               
@@ -172,7 +172,7 @@ const AdvancedSolutions: React.FC = () => {
                      </div>
                    ))}
                    {isScanning && (
-                     <div className="text-gray-500 dark:text-amber-400 animate-pulse flex items-center gap-2">
+                     <div className="text-gray-600 dark:text-amber-400 animate-pulse flex items-center gap-2">
                         <Loader2 className="w-2.5 h-2.5 animate-spin" />
                         Analyzing... {scanProgress}%
                      </div>
@@ -194,7 +194,7 @@ const AdvancedSolutions: React.FC = () => {
               <FileJson className="w-8 h-8 group-hover:scale-110 transition-transform" />
             </div>
             <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Compliance Logic Engine</h3>
-            <p className="text-gray-500 dark:text-slate-400 mb-8 text-sm leading-relaxed font-medium">
+            <p className="text-gray-600 dark:text-slate-300 mb-8 text-sm leading-relaxed font-medium">
               Automated PNG tax engine and Nasfund reporting. Built for Pacific regulatory frameworks.
             </p>
             
@@ -224,7 +224,7 @@ const AdvancedSolutions: React.FC = () => {
               <LineChart className="w-8 h-8 group-hover:scale-110 transition-transform" />
             </div>
             <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Adaptive Inventory Logic</h3>
-            <p className="text-gray-500 dark:text-slate-400 mb-8 text-sm leading-relaxed font-medium">
+            <p className="text-gray-600 dark:text-slate-300 mb-8 text-sm leading-relaxed font-medium">
               Precision supply chain logic to reduce waste. Designed for unique Pacific logistics.
             </p>
             
@@ -263,7 +263,7 @@ const AdvancedSolutions: React.FC = () => {
               <Monitor className="w-8 h-8 group-hover:scale-110 transition-transform" />
             </div>
             <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Secure Virtual Workspace</h3>
-            <p className="text-gray-500 dark:text-slate-400 mb-8 text-sm leading-relaxed font-medium">
+            <p className="text-gray-600 dark:text-slate-300 mb-8 text-sm leading-relaxed font-medium">
               Cloud-based VDI for remote Pacific workforces. Isolated environments with zero local data footprint.
             </p>
             
@@ -274,7 +274,7 @@ const AdvancedSolutions: React.FC = () => {
                 className={`w-full py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all ${
                   loginStep === 0
                     ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20 active-click'
-                    : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                    : 'bg-gray-800 text-gray-600 cursor-not-allowed'
                 }`}
               >
                 {loginStep === 0 && "Access Secure Hub"}
@@ -302,7 +302,7 @@ const AdvancedSolutions: React.FC = () => {
                     </div>
                     <div>
                       <h4 className="text-xl font-bold mb-2 group-hover:text-emerald-600 transition-colors text-gray-900 dark:text-white">Zero CAPEX Infrastructure</h4>
-                      <p className="text-gray-500 dark:text-slate-400 leading-relaxed text-sm font-medium">Deploy high-performance digital environments instantly with OPEX-based flexibility.</p>
+                      <p className="text-gray-600 dark:text-slate-300 leading-relaxed text-sm font-medium">Deploy high-performance digital environments instantly with OPEX-based flexibility.</p>
                     </div>
                   </div>
                 </div>
@@ -311,11 +311,11 @@ const AdvancedSolutions: React.FC = () => {
               <div className="relative">
                 <div className="relative bg-white dark:bg-black/20 border border-gray-100 dark:border-white/10 rounded-[3rem] p-8 md:p-12 text-center shadow-sm">
                    <div className="mb-10">
-                      <h5 className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-[0.5em] mb-10">Proposition Ratio</h5>
+                      <h5 className="text-[10px] font-bold text-gray-600 dark:text-slate-400 uppercase tracking-[0.5em] mb-10">Proposition Ratio</h5>
                       <div className="flex items-end justify-center gap-8 h-56">
                          <div className="flex flex-col items-center gap-4">
                             <div className="w-20 bg-gray-100 dark:bg-slate-800 rounded-t-2xl h-16 border-t border-gray-200 dark:border-slate-700"></div>
-                            <span className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-2">Legacy</span>
+                            <span className="text-[8px] text-gray-600 font-bold uppercase tracking-widest mt-2">Legacy</span>
                          </div>
                          <div className="flex flex-col items-center gap-4">
                             <div className="p-2 rounded-lg quantum-gradient mb-2 animate-bounce shadow-lg shadow-emerald-500/20"><Zap className="w-4 h-4 text-white" /></div>

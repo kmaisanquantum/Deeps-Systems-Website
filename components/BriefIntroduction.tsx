@@ -37,7 +37,7 @@ const BriefIntroduction: React.FC = () => {
           PNG's <span className="quantum-text-gradient">BITC</span> Transformation Partner
         </h2>
 
-        <p className="text-xl md:text-2xl text-gray-500 dark:text-slate-400 leading-relaxed mb-16 max-w-4xl mx-auto font-medium">
+        <p className="text-xl md:text-2xl text-gray-600 dark:text-slate-300 leading-relaxed mb-16 max-w-4xl mx-auto font-medium">
           Deeps Systems bridges the gap between traditional operations and digital-first excellence.
           We provide high-impact solutions that eliminate physical burdens with zero-infrastructure cloud scalability.
         </p>
@@ -49,7 +49,7 @@ const BriefIntroduction: React.FC = () => {
                 {sector.icon}
               </div>
               <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">{sector.name}</h3>
-              <p className="text-sm text-gray-500 dark:text-slate-500 leading-relaxed">
+              <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">
                 {sector.desc}
               </p>
             </div>

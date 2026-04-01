@@ -8,7 +8,7 @@ const Partnerships: React.FC = () => {
       logo: (
         <svg viewBox="0 0 24 24" className="w-12 h-12 fill-none stroke-current">
           <circle cx="12" cy="12" r="9" strokeWidth="1.5" className="text-emerald-500/30" />
-          <path d="M12 3v18M3 12h18" strokeWidth="1.5" className="text-gray-400 dark:text-slate-500" strokeLinecap="round" />
+          <path d="M12 3v18M3 12h18" strokeWidth="1.5" className="text-gray-600 dark:text-slate-400" strokeLinecap="round" />
           <circle cx="12" cy="12" r="3" fill="currentColor" className="text-emerald-600" />
         </svg>
       )
@@ -18,7 +18,7 @@ const Partnerships: React.FC = () => {
       logo: (
         <svg viewBox="0 0 24 24" className="w-12 h-12 fill-none stroke-current">
           <path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" strokeWidth="1.5" className="text-blue-600" />
-          <path d="M12 22V12m0 0l9-5m-9 5L3 7" strokeWidth="1.5" className="text-gray-400 dark:text-slate-500" />
+          <path d="M12 22V12m0 0l9-5m-9 5L3 7" strokeWidth="1.5" className="text-gray-600 dark:text-slate-400" />
           <circle cx="12" cy="12" r="2" fill="currentColor" className="text-amber-500" />
         </svg>
       )
@@ -56,7 +56,7 @@ const Partnerships: React.FC = () => {
         </div>
         <div className="reveal-on-scroll">
           <h2 className="text-3xl md:text-4xl font-montserrat font-bold mb-6 text-gray-900 dark:text-white">Global Partnership. <span className="quantum-text-gradient">Local Muscle.</span></h2>
-          <p className="text-gray-500 dark:text-slate-400 max-w-2xl mx-auto mb-16 text-lg font-medium">
+          <p className="text-gray-600 dark:text-slate-300 max-w-2xl mx-auto mb-16 text-lg font-medium">
             We bridge the gap by bringing international technology partnerships and world-class digital logic to solve localized challenges in the Pacific.
           </p>
         </div>
@@ -70,7 +70,7 @@ const Partnerships: React.FC = () => {
               <div className="mb-4 transform group-hover:rotate-12 transition-transform duration-500">
                 {partner.logo}
               </div>
-              <span className="font-bold text-[10px] tracking-[0.2em] uppercase text-gray-400 dark:text-slate-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+              <span className="font-bold text-[10px] tracking-[0.2em] uppercase text-gray-600 dark:text-slate-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
                 {partner.name}
               </span>
             </div>

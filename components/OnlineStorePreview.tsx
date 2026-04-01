@@ -29,7 +29,7 @@ const OnlineStorePreview: React.FC = () => {
                 Deeps Systems <span className="text-emerald-600">Online Store</span>
               </h2>
 
-              <p className="text-lg text-gray-500 dark:text-slate-400 mb-10 leading-relaxed font-medium">
+              <p className="text-lg text-gray-600 dark:text-slate-300 mb-10 leading-relaxed font-medium">
                 Direct access to the hardware and digital assets that power our BITC outcomes.
                 Sourced for reliability, configured for performance.
               </p>
@@ -62,20 +62,20 @@ const OnlineStorePreview: React.FC = () => {
                         <Zap className="w-8 h-8" />
                       </div>
                       <div className="text-right">
-                         <p className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1">Price</p>
+                         <p className="text-[10px] font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest mb-1">Price</p>
                          <p className="text-2xl font-bold text-gray-900 dark:text-white">K 1,299</p>
                       </div>
                    </div>
                    <div className="space-y-2">
                       <h4 className="text-xl font-bold text-gray-900 dark:text-white">BITC Access Hub</h4>
-                      <p className="text-xs text-gray-500 dark:text-slate-500 font-medium leading-relaxed">
+                      <p className="text-xs text-gray-600 dark:text-slate-400 font-medium leading-relaxed">
                         Pre-configured enterprise gateway for secure SME cloud connectivity.
                       </p>
                    </div>
                    <div className="pt-4 border-t border-gray-100 dark:border-white/5 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                          <ShieldCheck className="w-4 h-4 text-blue-600" />
-                         <span className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest">In Stock</span>
+                         <span className="text-[10px] font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest">In Stock</span>
                       </div>
                       <div className="px-4 py-2 rounded-xl bg-gray-50 dark:bg-white/5 text-[10px] font-bold text-emerald-600 uppercase tracking-widest border border-gray-100 dark:border-white/10">
                         View Item
