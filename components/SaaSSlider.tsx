@@ -83,7 +83,8 @@ const SaaSSlider: React.FC = () => {
   const extendedSystems = [...saasSystems, ...saasSystems, ...saasSystems];
 
   return (
-    <section className="py-12 bg-gray-50/50 dark:bg-black/40 border-y border-gray-100 dark:border-white/5 overflow-hidden">
+    <section className="py-12 bg-gray-50/50 dark:bg-black/40 border-y border-gray-100 dark:border-white/5 overflow-hidden reveal-active relative">
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/[0.02] dark:bg-emerald-500/5 rounded-full blur-[120px] -z-10"></div>
       <div className="max-w-7xl mx-auto px-6 mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
          <div>
             <h3 className="text-[10px] font-bold text-emerald-600 uppercase tracking-[0.4em] mb-2">Ecosystem</h3>
@@ -102,17 +103,17 @@ const SaaSSlider: React.FC = () => {
               href={system.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex flex-col w-72 md:w-80 mx-4 p-6 bg-white dark:bg-[#0a0a0a] rounded-[2rem] border border-gray-100 dark:border-white/5 hover:border-emerald-500/30 transition-all duration-500 group/card active-click whitespace-normal shadow-sm hover:shadow-md"
+              className="inline-flex flex-col w-72 md:w-80 mx-4 p-6 bg-white dark:bg-[#0a0a0a] rounded-[2rem] border border-gray-100 dark:border-white/5 hover:border-emerald-500/30 transition-all duration-500 group/card active-click whitespace-normal shadow-sm hover:shadow-md hover:scale-[1.03] hover:shadow-xl hover:-translate-y-1"
             >
               <div className="flex items-center justify-between mb-6">
-                <div className={`p-4 rounded-2xl bg-gray-50 dark:bg-white/5 ${system.color} group-hover/card:scale-110 group-hover/card:bg-gray-100 dark:group-hover/card:bg-white/10 transition-all duration-500`}>
+                <div className={`p-4 rounded-2xl bg-gray-50 dark:bg-white/5 ${system.color} group-hover/card:scale-110 group-hover/card:bg-gray-100 dark:group-hover/card:bg-white/10 transition-all animate-icon-float animate-icon-pulse duration-500`}>
                   {system.icon}
                 </div>
                 <div className="p-2 rounded-lg bg-gray-50 dark:bg-white/5 group-hover/card:bg-emerald-50 dark:group-hover/card:bg-emerald-500/10 transition-colors">
                   <ExternalLink className="w-4 h-4 text-gray-600 dark:text-slate-600 group-hover/card:text-emerald-600 transition-colors" />
                 </div>
               </div>
-              <h4 className="text-gray-900 dark:text-white font-bold text-base mb-2 group-hover/card:text-emerald-600 transition-colors">{system.name}</h4>
+              <h4 className="text-gray-900 dark:text-white font-bold text-base mb-2 group-hover/card:text-emerald-600 transition-colors"><span className="inline-flex items-center gap-1.5"><span className="flex h-2 w-2 relative"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>{system.name}</span></h4>
               <p className="text-gray-600 dark:text-slate-400 text-xs font-medium leading-relaxed">
                 {system.desc}
               </p>
@@ -130,7 +131,7 @@ const SaaSSlider: React.FC = () => {
           animation: scroll 40s linear infinite;
         }
         .animate-scroll:hover {
-          animation-play-state: paused;
+          animation-duration: 180s;
         }
         @media (max-width: 768px) {
           .animate-scroll {
