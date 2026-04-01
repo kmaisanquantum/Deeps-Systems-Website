@@ -33,7 +33,7 @@ const Testimonials: React.FC = () => {
           <h2 className="text-3xl md:text-4xl font-montserrat font-bold mb-4 text-gray-900 dark:text-white">
             What Our <span className="quantum-text-gradient">Clients Say</span>
           </h2>
-          <p className="text-gray-500 dark:text-slate-400 max-w-xl mx-auto font-medium">
+          <p className="text-gray-600 dark:text-slate-300 max-w-xl mx-auto font-medium">
             Proven outcomes from PNG's leading institutions powered by Deeps Systems.
           </p>
         </div>
@@ -61,7 +61,7 @@ const Testimonials: React.FC = () => {
                   <h4 className="font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors">
                     {t.author}
                   </h4>
-                  <p className="text-xs text-gray-400 dark:text-slate-500 font-bold uppercase tracking-widest">
+                  <p className="text-xs text-gray-600 dark:text-slate-400 font-bold uppercase tracking-widest">
                     {t.position} @ <span className="text-emerald-600">{t.company}</span>
                   </p>
                 </div>

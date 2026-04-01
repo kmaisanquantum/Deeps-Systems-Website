@@ -92,7 +92,7 @@ const Solutions: React.FC = () => {
           <h2 className="text-3xl md:text-5xl font-montserrat font-bold mb-4 text-gray-900 dark:text-white">
             Industrial-Grade <span className="quantum-text-gradient">Solutions</span>
           </h2>
-          <p className="text-gray-500 dark:text-slate-400 max-w-2xl text-sm md:text-base font-medium">
+          <p className="text-gray-600 dark:text-slate-300 max-w-2xl text-sm md:text-base font-medium">
             Bridging robust digital frameworks with high-performance architectures to deliver BITC outcomes across PNG.
           </p>
         </div>
@@ -158,16 +158,16 @@ const Solutions: React.FC = () => {
                       <ArrowUpRight className="w-3 h-3" />
                       BITC Outcome
                     </div>
-                    <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 text-[9px] md:text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-widest shadow-sm">
+                    <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 text-[9px] md:text-[10px] font-bold text-gray-600 dark:text-slate-300 uppercase tracking-widest shadow-sm">
                       <Scale className="w-3 h-3" />
                       Industrial Scale
                     </div>
                   </div>
 
                   <h3 className="text-3xl md:text-5xl font-montserrat font-bold mb-4 md:mb-6 leading-tight text-gray-900 dark:text-white">
-                    {sol.sector} <span className="text-gray-400 dark:text-slate-500">Excellence</span>
+                    {sol.sector} <span className="text-gray-600 dark:text-slate-400">Excellence</span>
                   </h3>
-                  <p className="text-gray-500 dark:text-slate-400 text-base md:text-xl leading-relaxed mb-8 font-medium">
+                  <p className="text-gray-600 dark:text-slate-300 text-base md:text-xl leading-relaxed mb-8 font-medium">
                     {sol.details}
                   </p>
                   
@@ -175,12 +175,12 @@ const Solutions: React.FC = () => {
                     <div className="p-5 md:p-6 rounded-2xl bg-gray-50 dark:bg-white/3 border border-gray-100 dark:border-white/5 hover:border-emerald-500/20 transition-all group/card shadow-sm">
                       <BarChart3 className="w-6 h-6 md:w-8 md:h-8 text-emerald-600 mb-3 md:mb-4 group-hover/card:scale-110 transition-transform" />
                       <h4 className="font-bold text-gray-900 dark:text-white mb-1 md:mb-2 text-sm md:text-base">Measurable ROI</h4>
-                      <p className="text-xs md:text-sm text-gray-500 dark:text-slate-500 font-medium">Track performance metrics through our BITC dashboard.</p>
+                      <p className="text-xs md:text-sm text-gray-600 dark:text-slate-400 font-medium">Track performance metrics through our BITC dashboard.</p>
                     </div>
                     <div className="p-5 md:p-6 rounded-2xl bg-gray-50 dark:bg-white/3 border border-gray-100 dark:border-white/5 hover:border-emerald-500/20 transition-all group/card shadow-sm">
                       <Lock className="w-6 h-6 md:w-8 md:h-8 text-emerald-600 mb-3 md:mb-4 group-hover/card:scale-110 transition-transform" />
                       <h4 className="font-bold text-gray-900 dark:text-white mb-1 md:mb-2 text-sm md:text-base">Cyber Resilience</h4>
-                      <p className="text-xs md:text-sm text-gray-500 dark:text-slate-500 font-medium">Outcomes secured by advanced cloud-native protection.</p>
+                      <p className="text-xs md:text-sm text-gray-600 dark:text-slate-400 font-medium">Outcomes secured by advanced cloud-native protection.</p>
                     </div>
                   </div>
 
@@ -216,7 +216,7 @@ const Solutions: React.FC = () => {
                        <div className="h-1.5 md:h-2 w-36 md:w-48 bg-gray-200 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner">
                          <div className="h-full bg-emerald-600 animate-[loading_2.5s_ease-in-out_infinite] shadow-[0_0_10px_rgba(22,163,74,0.8)]"></div>
                        </div>
-                       <p className="text-[9px] md:text-xs text-gray-400 dark:text-slate-500 mt-4 md:mt-6 uppercase tracking-[0.3em] md:tracking-[0.4em] font-bold">BITC Optimization Active</p>
+                       <p className="text-[9px] md:text-xs text-gray-600 dark:text-slate-400 mt-4 md:mt-6 uppercase tracking-[0.3em] md:tracking-[0.4em] font-bold">BITC Optimization Active</p>
                     </div>
                   </div>
                 </div>

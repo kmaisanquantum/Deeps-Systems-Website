@@ -50,7 +50,7 @@ const Footer: React.FC = () => {
                 Deeps <span className="text-emerald-600">Systems</span>
               </span>
             </Link>
-            <p className="text-gray-500 dark:text-slate-400 leading-relaxed text-sm">
+            <p className="text-gray-600 dark:text-slate-300 leading-relaxed text-sm">
               Empowering PNG enterprises with high-performance digital architectures and minimalist cloud solutions since 2014.
             </p>
           </div>
@@ -64,7 +64,7 @@ const Footer: React.FC = () => {
                   <Link
                     to={link.href}
                     onClick={(e) => handleLinkClick(e, link.href)}
-                    className="text-gray-500 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-sm flex items-center gap-2 group"
+                    className="text-gray-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-sm flex items-center gap-2 group"
                   >
                     {link.icon && <span className="text-emerald-600/50 group-hover:text-emerald-600 transition-colors">{link.icon}</span>}
                     {link.name}
@@ -82,7 +82,7 @@ const Footer: React.FC = () => {
                 <li key={idx}>
                   <a
                     href={item.href}
-                    className="flex items-center gap-4 text-gray-500 dark:text-slate-500 hover:text-gray-900 dark:hover:text-white transition-colors group"
+                    className="flex items-center gap-4 text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
                   >
                     <div className="p-2 rounded-lg bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/10 transition-colors shadow-sm">
                       {item.icon}
@@ -99,15 +99,15 @@ const Footer: React.FC = () => {
             <h4 className="text-gray-900 dark:text-white font-bold mb-6">Credentials</h4>
             <div className="bg-white dark:bg-white/2 p-6 rounded-2xl border border-gray-100 dark:border-white/5 space-y-4 shadow-sm">
               <div className="flex justify-between items-center text-[10px] tracking-widest uppercase font-bold">
-                <span className="text-gray-400 dark:text-slate-500">IPA REG:</span>
+                <span className="text-gray-600 dark:text-slate-400">IPA REG:</span>
                 <span className="text-gray-900 dark:text-white">6-165201</span>
               </div>
               <div className="flex justify-between items-center text-[10px] tracking-widest uppercase font-bold">
-                <span className="text-gray-400 dark:text-slate-500">TIN (IRC):</span>
+                <span className="text-gray-600 dark:text-slate-400">TIN (IRC):</span>
                 <span className="text-gray-900 dark:text-white">500286059</span>
               </div>
               <div className="flex justify-between items-center text-[10px] tracking-widest uppercase font-bold">
-                <span className="text-gray-400 dark:text-slate-500">EST:</span>
+                <span className="text-gray-600 dark:text-slate-400">EST:</span>
                 <span className="text-gray-900 dark:text-white">2014</span>
               </div>
             </div>
@@ -116,12 +116,12 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="pt-10 border-t border-gray-100 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
-          <p className="text-gray-400 dark:text-slate-600 text-xs text-center md:text-left">
+          <p className="text-gray-600 dark:text-slate-600 text-xs text-center md:text-left">
             © {currentYear} Deeps Systems. All rights reserved.
           </p>
           <div className="flex gap-8">
-            <a href="#" className="text-gray-400 dark:text-slate-600 hover:text-gray-900 dark:hover:text-white transition-colors text-xs">Privacy Policy</a>
-            <a href="#" className="text-gray-400 dark:text-slate-600 hover:text-gray-900 dark:hover:text-white transition-colors text-xs">Terms of Service</a>
+            <a href="#" className="text-gray-600 dark:text-slate-600 hover:text-gray-900 dark:hover:text-white transition-colors text-xs">Privacy Policy</a>
+            <a href="#" className="text-gray-600 dark:text-slate-600 hover:text-gray-900 dark:hover:text-white transition-colors text-xs">Terms of Service</a>
           </div>
         </div>
       </div>

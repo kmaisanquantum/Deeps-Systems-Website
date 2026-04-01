@@ -60,7 +60,7 @@ const QuantumAssistant: React.FC = () => {
                   Online
                 </span>
              </div>
-             <button aria-label="Close chat" onClick={() => setIsOpen(false)} className="ml-auto text-gray-400 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:scale-110 active:scale-90 transition-all">
+             <button aria-label="Close chat" onClick={() => setIsOpen(false)} className="ml-auto text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:scale-110 active:scale-90 transition-all">
                 <X className="w-4 h-4" />
              </button>
           </div>
@@ -81,7 +81,7 @@ const QuantumAssistant: React.FC = () => {
               <div className="flex justify-start">
                 <div className="bg-gray-100 dark:bg-slate-800/80 p-3 rounded-2xl rounded-bl-none border border-gray-200 dark:border-white/5 flex items-center gap-2 shadow-sm">
                   <Loader2 className="w-4 h-4 text-emerald-600 animate-spin" />
-                  <span className="text-xs text-gray-400 italic">Processing...</span>
+                  <span className="text-xs text-gray-600 italic">Processing...</span>
                 </div>
               </div>
             )}
@@ -95,7 +95,7 @@ const QuantumAssistant: React.FC = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               aria-label="Message for support" placeholder="How can we help?"
-              className="flex-grow bg-white dark:bg-slate-900/50 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-emerald-500 transition-all duration-300 placeholder:text-gray-400 dark:placeholder:text-slate-600"
+              className="flex-grow bg-white dark:bg-slate-900/50 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-emerald-500 transition-all duration-300 placeholder:text-gray-600 dark:placeholder:text-slate-600"
             />
             <button 
               aria-label="Send message" onClick={handleSend}

@@ -103,13 +103,11 @@ section:target, div:target {
     opacity: 0;
     transform: translateY(40px) scale(0.9) rotateX(-45deg);
     filter: blur(20px) brightness(1.8);
-    letter-spacing: 0.2em;
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1) rotateX(0deg);
     filter: blur(0) brightness(1);
-    letter-spacing: normal;
   }
 }
 

@@ -89,7 +89,7 @@ const SaaSSlider: React.FC = () => {
             <h3 className="text-[10px] font-bold text-emerald-600 uppercase tracking-[0.4em] mb-2">Ecosystem</h3>
             <h2 className="text-2xl md:text-3xl font-montserrat font-bold text-gray-900 dark:text-white leading-tight">Live <span className="quantum-text-gradient">BITC</span> Platforms</h2>
          </div>
-         <p className="text-gray-500 dark:text-slate-500 text-xs font-medium max-w-xs">
+         <p className="text-gray-600 dark:text-slate-400 text-xs font-medium max-w-xs">
             Deploying high-performance SaaS outcomes across PNG's real estate, finance, and SME sectors.
          </p>
       </div>
@@ -109,11 +109,11 @@ const SaaSSlider: React.FC = () => {
                   {system.icon}
                 </div>
                 <div className="p-2 rounded-lg bg-gray-50 dark:bg-white/5 group-hover/card:bg-emerald-50 dark:group-hover/card:bg-emerald-500/10 transition-colors">
-                  <ExternalLink className="w-4 h-4 text-gray-400 dark:text-slate-600 group-hover/card:text-emerald-600 transition-colors" />
+                  <ExternalLink className="w-4 h-4 text-gray-600 dark:text-slate-600 group-hover/card:text-emerald-600 transition-colors" />
                 </div>
               </div>
               <h4 className="text-gray-900 dark:text-white font-bold text-base mb-2 group-hover/card:text-emerald-600 transition-colors">{system.name}</h4>
-              <p className="text-gray-500 dark:text-slate-500 text-xs font-medium leading-relaxed">
+              <p className="text-gray-600 dark:text-slate-400 text-xs font-medium leading-relaxed">
                 {system.desc}
               </p>
             </a>

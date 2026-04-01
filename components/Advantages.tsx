@@ -35,7 +35,7 @@ const Advantages: React.FC = () => {
           <h2 className="text-3xl md:text-5xl font-montserrat font-bold mb-4 text-gray-900 dark:text-white leading-tight">
             The <span className="text-emerald-600">BITC</span> Advantage
           </h2>
-          <p className="text-gray-500 dark:text-slate-400 max-w-xl mx-auto font-medium">
+          <p className="text-gray-600 dark:text-slate-300 max-w-xl mx-auto font-medium">
             Born-in-the-Cloud means we don't just maintain tech—we architect high-performance outcomes for the modern economy.
           </p>
         </div>
@@ -50,7 +50,7 @@ const Advantages: React.FC = () => {
                 {adv.icon}
               </div>
               <h3 className="text-xl font-bold mb-4 group-hover:text-emerald-600 transition-colors duration-300 text-gray-900 dark:text-white leading-tight">{adv.title}</h3>
-              <p className="text-gray-500 dark:text-slate-400 leading-relaxed group-hover:text-gray-700 dark:group-hover:text-slate-300 transition-colors duration-300 text-sm font-medium">
+              <p className="text-gray-600 dark:text-slate-300 leading-relaxed group-hover:text-gray-700 dark:group-hover:text-slate-300 transition-colors duration-300 text-sm font-medium">
                 {adv.description}
               </p>
             </div>

@@ -36,7 +36,7 @@ const News: React.FC = () => {
           <h2 className="text-3xl md:text-5xl font-montserrat font-bold mb-4 text-gray-900 dark:text-white leading-tight">
             Digital <span className="quantum-text-gradient">Insights</span>
           </h2>
-          <p className="text-gray-500 dark:text-slate-400 font-medium">The latest developments in BITC technology and high-performance digital architectures.</p>
+          <p className="text-gray-600 dark:text-slate-300 font-medium">The latest developments in BITC technology and high-performance digital architectures.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -57,7 +57,7 @@ const News: React.FC = () => {
               </div>
 
               <div className="p-8 flex-grow flex flex-col">
-                <div className="flex items-center gap-4 text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-4">
+                <div className="flex items-center gap-4 text-[10px] font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest mb-4">
                   <div className="flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5" />
                     {article.date}
@@ -72,7 +72,7 @@ const News: React.FC = () => {
                   {article.title}
                 </h3>
                 
-                <p className="text-gray-500 dark:text-slate-400 text-sm mb-8 line-clamp-2 font-medium">
+                <p className="text-gray-600 dark:text-slate-300 text-sm mb-8 line-clamp-2 font-medium">
                   {article.summary}
                 </p>
 
@@ -84,7 +84,7 @@ const News: React.FC = () => {
                   
                   <button 
                     onClick={() => setActiveShare(article)}
-                    className="p-2.5 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 text-gray-400 dark:text-slate-400 hover:text-emerald-600 active-click transition-all group/share shadow-sm"
+                    className="p-2.5 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 text-gray-600 dark:text-slate-300 hover:text-emerald-600 active-click transition-all group/share shadow-sm"
                     aria-label="Share article"
                   >
                     <Share2 className="w-4 h-4 group-hover/share:scale-110 transition-transform" />
@@ -102,12 +102,12 @@ const News: React.FC = () => {
           <div className="bg-white dark:bg-[#0a0a0a] w-full max-w-sm rounded-[2.5rem] p-8 border border-gray-100 dark:border-white/10 shadow-2xl relative animate-in zoom-in slide-in-from-bottom-4 duration-300">
             <button 
               onClick={() => setActiveShare(null)}
-              className="absolute top-6 right-6 p-2 rounded-full hover:bg-gray-50 dark:hover:bg-white/10 text-gray-400 transition-all active-click"
+              className="absolute top-6 right-6 p-2 rounded-full hover:bg-gray-50 dark:hover:bg-white/10 text-gray-600 transition-all active-click"
             >
               <X className="w-5 h-5" />
             </button>
             <h3 className="text-2xl font-montserrat font-bold mb-2 text-gray-900 dark:text-white">Share Insight</h3>
-            <p className="text-gray-500 dark:text-slate-400 text-sm mb-8 font-medium">Spread knowledge with your network.</p>
+            <p className="text-gray-600 dark:text-slate-300 text-sm mb-8 font-medium">Spread knowledge with your network.</p>
             
             <div className="space-y-4">
               {shareLinks(activeShare).map((link) => (

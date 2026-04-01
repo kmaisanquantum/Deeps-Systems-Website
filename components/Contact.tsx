@@ -110,7 +110,7 @@ const Contact: React.FC = () => {
   };
 
   const getFieldClass = (name: string) => {
-    const base = "w-full bg-white dark:bg-white/5 border rounded-2xl px-12 py-4 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 transition-all duration-300";
+    const base = "w-full bg-white dark:bg-white/5 border rounded-2xl px-12 py-4 text-gray-900 dark:text-white placeholder:text-gray-600 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 transition-all duration-300";
     if (touched[name] && errors[name as keyof FormErrors]) {
       return `${base} border-emerald-500/50 focus:ring-emerald-500/20`;
     }
@@ -136,7 +136,7 @@ const Contact: React.FC = () => {
               Get Your <span className="quantum-text-gradient">Digital</span> Outcome
             </h2>
 
-            <p className="text-xl text-gray-500 dark:text-slate-400 mb-12 leading-relaxed max-w-xl font-medium">
+            <p className="text-xl text-gray-600 dark:text-slate-300 mb-12 leading-relaxed max-w-xl font-medium">
               Initiate your digital transformation consultation. Every inquiry is analyzed and routed to our specialist team.
             </p>
 
@@ -147,7 +147,7 @@ const Contact: React.FC = () => {
                     <Mail className="w-6 h-6 text-emerald-600" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1">Direct Protocol</p>
+                    <p className="text-[10px] font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest mb-1">Direct Protocol</p>
                     <p className="text-gray-900 dark:text-white font-bold font-mono">wokman@dspng.tech</p>
                   </div>
                 </a>
@@ -159,7 +159,7 @@ const Contact: React.FC = () => {
                     <MessageSquare className="w-6 h-6 text-emerald-600" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1">Instant Messaging</p>
+                    <p className="text-[10px] font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest mb-1">Instant Messaging</p>
                     <p className="text-gray-900 dark:text-white font-bold font-mono">+675 83009881</p>
                   </div>
                 </a>
@@ -175,7 +175,7 @@ const Contact: React.FC = () => {
                   <div className="absolute inset-0 bg-emerald-400/20 rounded-full animate-ping"></div>
                 </div>
                 <h3 className="text-3xl font-bold mb-4 font-montserrat text-gray-900 dark:text-white">Dispatch Confirmed</h3>
-                <p className="text-gray-500 dark:text-slate-400 mb-8">Payload successfully routed to <span className="text-emerald-600 font-mono">wokman@dspng.tech</span>.</p>
+                <p className="text-gray-600 dark:text-slate-300 mb-8">Payload successfully routed to <span className="text-emerald-600 font-mono">wokman@dspng.tech</span>.</p>
                 
                 <button 
                   onClick={() => setStatus('idle')}
@@ -192,7 +192,7 @@ const Contact: React.FC = () => {
                  
                  <div className="flex items-center gap-3 mb-6">
                     <Terminal className="w-5 h-5 text-emerald-600" />
-                    <span className="text-[10px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-widest">Digital Dispatch Log</span>
+                    <span className="text-[10px] font-bold text-gray-600 dark:text-slate-300 uppercase tracking-widest">Digital Dispatch Log</span>
                  </div>
                  
                  <div className="flex-grow font-mono text-[11px] md:text-xs text-emerald-600/80 space-y-2 overflow-y-auto max-h-[250px] scrollbar-none">
@@ -209,7 +209,7 @@ const Contact: React.FC = () => {
                  </div>
 
                  <div className="mt-8 pt-6 border-t border-gray-100 dark:border-white/5 text-center">
-                    <p className="text-[9px] text-gray-400 dark:text-slate-500 uppercase tracking-[0.3em] font-bold">Cloud Grid Active • Region: Port Moresby</p>
+                    <p className="text-[9px] text-gray-600 dark:text-slate-400 uppercase tracking-[0.3em] font-bold">Cloud Grid Active • Region: Port Moresby</p>
                  </div>
               </div>
             ) : (
@@ -218,7 +218,7 @@ const Contact: React.FC = () => {
                   <div className="space-y-1">
                     <label className="text-xs font-bold uppercase tracking-widest text-emerald-600 ml-1">Full Name</label>
                     <div className="relative group">
-                      <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${touched.name && errors.name ? 'text-emerald-500' : 'text-gray-400 dark:text-slate-500 group-focus-within:text-emerald-600'}`} />
+                      <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${touched.name && errors.name ? 'text-emerald-500' : 'text-gray-600 dark:text-slate-400 group-focus-within:text-emerald-600'}`} />
                       <input 
                         type="text" 
                         name="name"
@@ -239,7 +239,7 @@ const Contact: React.FC = () => {
                   <div className="space-y-1">
                     <label className="text-xs font-bold uppercase tracking-widest text-emerald-600 ml-1">Email Address</label>
                     <div className="relative group">
-                      <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${touched.email && errors.email ? 'text-emerald-500' : 'text-gray-400 dark:text-slate-500 group-focus-within:text-emerald-600'}`} />
+                      <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${touched.email && errors.email ? 'text-emerald-500' : 'text-gray-600 dark:text-slate-400 group-focus-within:text-emerald-600'}`} />
                       <input 
                         type="email" 
                         name="email"
@@ -262,7 +262,7 @@ const Contact: React.FC = () => {
                 <div className="space-y-1">
                   <label className="text-xs font-bold uppercase tracking-widest text-emerald-600 ml-1">Subject</label>
                   <div className="relative group">
-                    <Tag className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${touched.subject && errors.subject ? 'text-emerald-500' : 'text-gray-400 dark:text-slate-500 group-focus-within:text-emerald-600'}`} />
+                    <Tag className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${touched.subject && errors.subject ? 'text-emerald-500' : 'text-gray-600 dark:text-slate-400 group-focus-within:text-emerald-600'}`} />
                     <input 
                       type="text" 
                       name="subject"
@@ -284,7 +284,7 @@ const Contact: React.FC = () => {
                 <div className="space-y-1">
                   <label className="text-xs font-bold uppercase tracking-widest text-emerald-600 ml-1">Message</label>
                   <div className="relative group">
-                    <MessageSquare className={`absolute left-4 top-4 w-4 h-4 transition-colors ${touched.message && errors.message ? 'text-emerald-500' : 'text-gray-400 dark:text-slate-500 group-focus-within:text-emerald-600'}`} />
+                    <MessageSquare className={`absolute left-4 top-4 w-4 h-4 transition-colors ${touched.message && errors.message ? 'text-emerald-500' : 'text-gray-600 dark:text-slate-400 group-focus-within:text-emerald-600'}`} />
                     <textarea 
                       name="message"
                       rows={4}

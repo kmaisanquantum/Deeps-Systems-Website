@@ -61,7 +61,7 @@ const Navbar: React.FC = () => {
 
         {/* Logo */}
         <Link
-          to="/"
+          to="/" aria-current={location.pathname === "/" ? "page" : undefined}
           className="flex items-center gap-2 group relative z-[60]"
           onClick={(e) => handleLinkClick(e, '/')}
         >
@@ -92,7 +92,7 @@ const Navbar: React.FC = () => {
                   {advantageItems.map((item) => (
                     <Link
                       key={item.name}
-                      to={item.href}
+                      to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
                       onClick={(e) => handleLinkClick(e, item.href)}
                       className="flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
                     >
@@ -101,7 +101,7 @@ const Navbar: React.FC = () => {
                       </div>
                       <div>
                         <div className="text-xs font-bold text-gray-900 dark:text-white mb-0.5 group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
-                        <div className="text-[10px] text-gray-500 dark:text-slate-400 leading-tight">{item.desc}</div>
+                        <div className="text-[10px] text-gray-600 dark:text-slate-300 leading-tight">{item.desc}</div>
                       </div>
                     </Link>
                   ))}
@@ -127,7 +127,7 @@ const Navbar: React.FC = () => {
                   {servicesItems.map((item) => (
                     <Link
                       key={item.name}
-                      to={item.href}
+                      to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
                       onClick={(e) => handleLinkClick(e, item.href)}
                       className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
                     >
@@ -136,7 +136,7 @@ const Navbar: React.FC = () => {
                       </div>
                       <div>
                         <div className="text-sm font-bold text-gray-900 dark:text-white group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
-                        <div className="text-[11px] text-gray-500 dark:text-slate-500 leading-tight">{item.desc}</div>
+                        <div className="text-[11px] text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
                       </div>
                     </Link>
                   ))}
@@ -145,10 +145,10 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
-          <Link to="/insights" className="px-3 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white transition-all">Insights</Link>
+          <Link to="/insights" aria-current={location.pathname === "/insights" ? "page" : undefined} className="px-3 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white transition-all">Insights</Link>
           
           <Link
-            to={storeItem.href}
+            to={storeItem.href} aria-current={location.pathname === storeItem.href.split("#")[0] ? "page" : undefined}
             onClick={(e) => handleLinkClick(e, storeItem.href)}
             className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-all group"
           >
@@ -158,7 +158,7 @@ const Navbar: React.FC = () => {
 
           <div className="ml-2 pl-4 border-l border-gray-100 dark:border-white/10 flex items-center gap-4">
             <Link
-              to="/contact"
+              to="/contact" aria-current={location.pathname === "/contact" ? "page" : undefined}
               className="px-5 py-2.5 rounded-full quantum-gradient text-white text-sm font-bold btn-cta-pulse active-click shadow-lg"
             >
               Contact Us
@@ -183,7 +183,7 @@ const Navbar: React.FC = () => {
           <div className="flex-grow overflow-y-auto px-6 py-8 space-y-4">
             
             <Link
-              to={storeItem.href}
+              to={storeItem.href} aria-current={location.pathname === storeItem.href.split("#")[0] ? "page" : undefined}
               onClick={(e) => handleLinkClick(e, storeItem.href)}
               className="w-full flex items-center gap-3 p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-emerald-600 active:bg-gray-100 dark:active:bg-white/10 transition-all border border-gray-100 dark:border-white/10"
             >
@@ -208,14 +208,14 @@ const Navbar: React.FC = () => {
                   {advantageItems.map(item => (
                     <Link
                       key={item.name} 
-                      to={item.href}
+                      to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
                       onClick={(e) => handleLinkClick(e, item.href)}
                       className="flex items-center gap-4 p-4 bg-white dark:bg-white/2 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
                     >
                       <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">{item.icon}</div>
                       <div className="flex flex-col">
                         <span className="font-bold text-sm">{item.name}</span>
-                        <span className="text-[10px] text-gray-500 dark:text-slate-500">{item.desc}</span>
+                        <span className="text-[10px] text-gray-600 dark:text-slate-400">{item.desc}</span>
                       </div>
                     </Link>
                   ))}
@@ -240,14 +240,14 @@ const Navbar: React.FC = () => {
                   {servicesItems.map(item => (
                     <Link
                       key={item.name} 
-                      to={item.href}
+                      to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
                       onClick={(e) => handleLinkClick(e, item.href)}
                       className="flex items-center gap-4 p-4 bg-white dark:bg-white/2 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
                     >
                       <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">{item.icon}</div>
                       <div className="flex flex-col">
                         <span className="font-bold text-sm">{item.name}</span>
-                        <span className="text-[10px] text-gray-500 dark:text-slate-500">{item.desc}</span>
+                        <span className="text-[10px] text-gray-600 dark:text-slate-400">{item.desc}</span>
                       </div>
                     </Link>
                   ))}
@@ -255,11 +255,11 @@ const Navbar: React.FC = () => {
               )}
             </div>
 
-            <Link to="/insights" className="block w-full p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-900 dark:text-white font-bold text-sm uppercase tracking-widest border border-gray-100 dark:border-white/10">Insights</Link>
+            <Link to="/insights" aria-current={location.pathname === "/insights" ? "page" : undefined} className="block w-full p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-900 dark:text-white font-bold text-sm uppercase tracking-widest border border-gray-100 dark:border-white/10">Insights</Link>
 
             <div className="pt-8">
               <Link
-                to="/contact"
+                to="/contact" aria-current={location.pathname === "/contact" ? "page" : undefined}
                 className="block w-full text-center py-4 rounded-2xl quantum-gradient text-white font-bold text-lg shadow-xl shadow-emerald-500/20"
               >
                 Start Consultation
