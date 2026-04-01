@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Menu, X, ChevronDown, Rocket, Zap,
-  Binary, Moon, Sun, Cloud, ShoppingBag
+  Binary, Cloud, ShoppingBag
 } from 'lucide-react';
 import { servicesItems, advantageItems, storeItem } from './navbarData';
 
@@ -11,7 +11,6 @@ const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileActiveSubmenu, setMobileActiveSubmenu] = useState<string | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>(localStorage.getItem('theme') as 'light' | 'dark' || 'light');
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -26,12 +25,8 @@ const Navbar: React.FC = () => {
     setActiveDropdown(null);
   }, [location]);
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    document.documentElement.classList.toggle('light');
-    document.documentElement.classList.toggle('dark');
+  const toggleMobileSubmenu = (menu: string) => {
+    setMobileActiveSubmenu(mobileActiveSubmenu === menu ? null : menu);
   };
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -162,12 +157,6 @@ const Navbar: React.FC = () => {
           </Link>
 
           <div className="ml-2 pl-4 border-l border-gray-100 dark:border-white/10 flex items-center gap-4">
-            <button
-              onClick={toggleTheme}
-              className="p-2 bg-gray-50 dark:bg-white/5 rounded-lg text-emerald-600 hover:scale-110 transition-transform border border-gray-100 dark:border-white/10"
-            >
-              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
             <Link
               to="/contact"
               className="px-5 py-2.5 rounded-full quantum-gradient text-white text-sm font-bold btn-cta-pulse active-click shadow-lg"
@@ -193,15 +182,6 @@ const Navbar: React.FC = () => {
         <div className="md:hidden fixed inset-0 top-0 pt-[72px] bg-white dark:bg-[#0a0a0a] backdrop-blur-3xl z-[45] flex flex-col animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex-grow overflow-y-auto px-6 py-8 space-y-4">
             
-            <div className="flex justify-center pb-4">
-              <button
-                onClick={toggleTheme}
-                className="flex items-center gap-3 px-6 py-3 bg-gray-50 dark:bg-white/5 rounded-2xl text-emerald-600 font-bold text-sm uppercase tracking-widest border border-gray-100 dark:border-white/10"
-              >
-                {theme === 'dark' ? <><Sun className="w-5 h-5" /> Light Mode</> : <><Moon className="w-5 h-5" /> Dark Mode</>}
-              </button>
-            </div>
-
             <Link
               to={storeItem.href}
               onClick={(e) => handleLinkClick(e, storeItem.href)}
