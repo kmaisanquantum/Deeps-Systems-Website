@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Building2,
   ShoppingBag,
@@ -9,7 +9,9 @@ import {
   ShieldCheck,
   Wallet,
   Monitor,
-  ExternalLink
+  ExternalLink,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 const saasSystems = [
@@ -79,24 +81,99 @@ const saasSystems = [
 ];
 
 const SaaSSlider: React.FC = () => {
-  // Triple the list for an infinite feeling scroll
-  const extendedSystems = [...saasSystems, ...saasSystems, ...saasSystems];
+  const [isPaused, setIsPaused] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Double the list for seamless infinite feeling scroll
+  const extendedSystems = [...saasSystems, ...saasSystems];
+
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+
+    let animationFrameId: number;
+    let lastTimestamp = 0;
+    const speed = 0.05; // Pixels per millisecond
+
+    const scroll = (timestamp: number) => {
+      if (!isPaused && scrollContainer) {
+        if (lastTimestamp !== 0) {
+          const deltaTime = timestamp - lastTimestamp;
+          scrollContainer.scrollLeft += speed * deltaTime;
+
+          // Infinite loop reset
+          if (scrollContainer.scrollLeft >= scrollContainer.scrollWidth / 2) {
+            scrollContainer.scrollLeft = 0;
+          }
+        }
+        lastTimestamp = timestamp;
+      } else {
+        lastTimestamp = 0;
+      }
+      animationFrameId = requestAnimationFrame(scroll);
+    };
+
+    animationFrameId = requestAnimationFrame(scroll);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [isPaused]);
+
+  const handleManualScroll = (direction: 'left' | 'right') => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+
+    const scrollAmount = 320; // Width of one card including margins
+    const targetScroll = direction === 'left'
+      ? scrollContainer.scrollLeft - scrollAmount
+      : scrollContainer.scrollLeft + scrollAmount;
+
+    scrollContainer.scrollTo({
+      left: targetScroll,
+      behavior: 'smooth'
+    });
+  };
 
   return (
-    <section className="py-12 bg-gray-50/50 dark:bg-black/40 border-y border-gray-100 dark:border-white/5 overflow-hidden reveal-active relative">
+    <section
+      className="py-12 bg-gray-50/50 dark:bg-black/40 border-y border-gray-100 dark:border-white/5 overflow-hidden reveal-active relative"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/[0.02] dark:bg-emerald-500/5 rounded-full blur-[120px] -z-10"></div>
+
       <div className="max-w-7xl mx-auto px-6 mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-         <div>
+         <div className="flex-1">
             <h3 className="text-[10px] font-bold text-emerald-600 uppercase tracking-[0.4em] mb-2">Ecosystem</h3>
             <h2 className="text-2xl md:text-3xl font-montserrat font-bold text-gray-900 dark:text-white leading-tight">Live <span className="quantum-text-gradient">BITC</span> Platforms</h2>
          </div>
-         <p className="text-gray-600 dark:text-slate-400 text-xs font-medium max-w-xs">
-            Deploying high-performance SaaS outcomes across PNG's real estate, finance, and SME sectors.
-         </p>
+
+         <div className="flex items-center gap-6">
+            <p className="hidden md:block text-gray-600 dark:text-slate-400 text-xs font-medium max-w-xs text-right">
+                Deploying high-performance SaaS outcomes across PNG's real estate, finance, and SME sectors.
+            </p>
+            <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleManualScroll('left')}
+                  className="p-3 rounded-xl glass hover:bg-emerald-500/10 hover:border-emerald-500/30 text-gray-600 dark:text-slate-400 hover:text-emerald-600 transition-all active:scale-95"
+                  aria-label="Scroll Backwards"
+                >
+                    <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => handleManualScroll('right')}
+                  className="p-3 rounded-xl glass hover:bg-emerald-500/10 hover:border-emerald-500/30 text-gray-600 dark:text-slate-400 hover:text-emerald-600 transition-all active:scale-95"
+                  aria-label="Scroll Forwards"
+                >
+                    <ChevronRight className="w-5 h-5" />
+                </button>
+            </div>
+         </div>
       </div>
 
-      <div className="relative flex overflow-x-hidden group">
-        <div className="flex animate-scroll whitespace-nowrap py-4">
+      <div
+        ref={scrollRef}
+        className="relative flex overflow-x-auto no-scrollbar group cursor-grab active:cursor-grabbing"
+      >
+        <div className="flex whitespace-nowrap py-4">
           {extendedSystems.map((system, idx) => (
             <a
               key={idx}
@@ -123,20 +200,12 @@ const SaaSSlider: React.FC = () => {
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-33.3333%); }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
         }
-        .animate-scroll {
-          animation: scroll 40s linear infinite;
-        }
-        .animate-scroll:hover {
-          animation-duration: 180s;
-        }
-        @media (max-width: 768px) {
-          .animate-scroll {
-            animation: scroll 25s linear infinite;
-          }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}} />
     </section>
