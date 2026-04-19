@@ -1,8 +1,60 @@
 import React, { useCallback } from 'react';
-import { Truck, Sprout, Landmark, ChevronDown, BarChart3, ArrowUpRight, ArrowUp, Zap, Lock, Globe, Settings, Scale, ArrowRight } from 'lucide-react';
+import { Truck, Sprout, Landmark, ChevronDown, BarChart3, ArrowUpRight, ArrowUp, Zap, Lock, Globe, Settings, Scale, ArrowRight, ShieldCheck, Cpu, Headset, FileSearch } from 'lucide-react';
 
 const Solutions: React.FC = () => {
   const solutions = [
+    {
+      sector: "Managed IT Support",
+      id: "details-managed-it",
+      icon: (className: string) => <Headset className={`${className} animate-icon-float`} />,
+      items: [
+        "Proactive 24/7 Monitoring",
+        "Rapid Response Incident Management",
+        "Operational Uptime Optimization",
+        "Infrastructure Health Audits"
+      ],
+      buttonText: "Learn More: IT Support",
+      details: "Your reliable partnership for continuous operations. We emphasize proactive maintenance and rapid response to ensure maximum operational uptime, allowing you to focus on core business growth while we handle the digital backbone."
+    },
+    {
+      sector: "Digital Compliance",
+      id: "details-compliance",
+      icon: (className: string) => <ShieldCheck className={`${className} animate-icon-pulse`} />,
+      items: [
+        "Data Protection Frameworks",
+        "Regulatory Alignment Strategy",
+        "Secure Information Governance",
+        "Continuous Compliance Auditing"
+      ],
+      buttonText: "Learn More: Compliance",
+      details: "Securing your business information with integrity. Our focus on data protection and regulatory alignment ensures your digital assets remain secure and compliant with local and international standards."
+    },
+    {
+      sector: "Cloud & Automation",
+      id: "details-automation",
+      icon: (className: string) => <Cpu className={`${className} animate-icon-spin-slow`} />,
+      items: [
+        "Streamlined Workflow Automation",
+        "Operational Cost Optimization",
+        "Cloud-Native Transformation",
+        "Intelligent Process Integration"
+      ],
+      buttonText: "Learn More: Automation",
+      details: "Driving business efficiency through digital transformation. We focus on streamlining workflows and optimizing operational costs by leveraging advanced cloud-native automation technologies tailored for PNG's unique market."
+    },
+    {
+      sector: "ICT Advisory",
+      id: "details-advisory",
+      icon: (className: string) => <FileSearch className={`${className} animate-icon-sway`} />,
+      items: [
+        "Strategic Technology Planning",
+        "Tailored Digital Roadmaps",
+        "Local Growth Alignment",
+        "Architecture Modernization Consulting"
+      ],
+      buttonText: "Learn More: Advisory",
+      details: "Strategic planning for sustainable local growth. Our advisory services provide tailored technology roadmaps that align your digital strategy with long-term business objectives and regional opportunities."
+    },
     {
       sector: "Digital Optimization",
       id: "details-classical",

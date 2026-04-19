@@ -1,7 +1,11 @@
 import React from 'react';
-import { Landmark, Truck, Sprout, Rocket, Cloud, Zap, Smartphone, ShoppingBag } from 'lucide-react';
+import { Landmark, Truck, Sprout, Rocket, Cloud, Zap, Smartphone, ShoppingBag, ShieldCheck, Cpu, Headset, FileSearch } from 'lucide-react';
 
 export const servicesItems = [
+  { name: 'Managed IT Support', icon: React.createElement(Headset, { className: "w-5 h-5" }), href: '/solutions#details-managed-it', desc: 'Proactive operational uptime.' },
+  { name: 'Digital Compliance', icon: React.createElement(ShieldCheck, { className: "w-5 h-5" }), href: '/solutions#details-compliance', desc: 'Secure data protection.' },
+  { name: 'Cloud & Automation', icon: React.createElement(Cpu, { className: "w-5 h-5" }), href: '/solutions#details-automation', desc: 'Streamlined digital workflows.' },
+  { name: 'ICT Advisory', icon: React.createElement(FileSearch, { className: "w-5 h-5" }), href: '/solutions#details-advisory', desc: 'Strategic technology roadmaps.' },
   { name: 'Financial Institutions', icon: React.createElement(Landmark, { className: "w-5 h-5" }), href: '/solutions#details-financial', desc: 'SME-in-a-Box SaaS solutions.' },
   { name: 'Energy & Logistics', icon: React.createElement(Truck, { className: "w-5 h-5" }), href: '/solutions#details-logistics', desc: 'Quantum-inspired pathfinding.' },
   { name: 'Agribusiness', icon: React.createElement(Sprout, { className: "w-5 h-5" }), href: '/solutions#details-agribusiness', desc: 'Traceability-as-a-Service.' },
