@@ -139,13 +139,22 @@ const SaaSSlider: React.FC = () => {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
+      {/* Fireworks Display Container */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="firework"></div>
+        <div className="firework"></div>
+        <div className="firework"></div>
+        <div className="firework"></div>
+        <div className="firework"></div>
+      </div>
+
       {/* Dynamic Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20 z-10">
          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]"></div>
          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px]"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 relative z-20">
         {/* Breaking News Style Header */}
         <div className="flex flex-col md:flex-row items-center gap-6 mb-12">
            <div className="flex items-center gap-3 shrink-0">
@@ -193,7 +202,7 @@ const SaaSSlider: React.FC = () => {
 
       <div
         ref={scrollRef}
-        className="relative flex overflow-x-auto no-scrollbar group cursor-grab active:cursor-grabbing pb-8"
+        className="relative flex overflow-x-auto no-scrollbar group cursor-grab active:cursor-grabbing pb-8 z-20"
       >
         <div className="flex whitespace-nowrap">
           {extendedSystems.map((system, idx) => (
@@ -202,7 +211,7 @@ const SaaSSlider: React.FC = () => {
               href={system.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex flex-col w-72 md:w-80 mx-4 p-8 bg-white/5 backdrop-blur-sm rounded-[2.5rem] border border-white/10 hover:border-emerald-500/50 transition-all duration-500 group/card active-click whitespace-normal shadow-2xl hover:bg-white/[0.08] hover:scale-[1.02]"
+              className="inline-flex flex-col w-72 md:w-80 mx-4 p-8 bg-white/5 backdrop-blur-md rounded-[2.5rem] border border-white/10 hover:border-emerald-500/50 transition-all duration-500 group/card active-click whitespace-normal shadow-2xl hover:bg-white/[0.08] hover:scale-[1.02]"
             >
               <div className="flex items-center justify-between mb-8">
                 <div className={`p-5 rounded-2xl bg-white/5 ${system.color} group-hover/card:scale-110 group-hover/card:bg-emerald-500/10 transition-all duration-500 shadow-inner`}>
@@ -246,6 +255,136 @@ const SaaSSlider: React.FC = () => {
         .no-scrollbar {
           -ms-overflow-style: none;
           scrollbar-width: none;
+        }
+
+        @keyframes firework {
+          0% { transform: translate(var(--x), var(--initialY)); width: var(--initialSize); opacity: 1; }
+          50% { width: var(--initialSize); opacity: 1; }
+          100% { width: var(--finalSize); opacity: 0; }
+        }
+
+        .firework,
+        .firework::before,
+        .firework::after {
+          --initialSize: 0.5vmin;
+          --finalSize: 45vmin;
+          --particleSize: 0.2vmin;
+          --color1: #10b981;
+          --color2: #3b82f6;
+          --color3: #ffffff;
+          --color4: #f59e0b;
+          --color5: #ec4899;
+          --color6: #8b5cf6;
+          --y: -30vmin;
+          --x: -50%;
+          --initialY: 60vmin;
+          content: "";
+          animation: firework 2s infinite;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, var(--y));
+          width: var(--initialSize);
+          aspect-ratio: 1;
+          background:
+            radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 0% 0%,
+            radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 100% 0%,
+            radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 100% 100%,
+            radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 0% 100%,
+
+            radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 50% 0%,
+            radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 100% 50%,
+            radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 50% 100%,
+            radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 0% 50%,
+
+            radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 33% 33%,
+            radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 66% 33%,
+            radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 66% 66%,
+            radial-gradient(circle, var(--color1) var(--particleSize), #0000 0) 33% 66%
+            ;
+          background-size: var(--initialSize) var(--initialSize);
+          background-repeat: no-repeat;
+        }
+
+        .firework::before {
+          --x: -50%;
+          --y: -50%;
+          --initialY: -50%;
+          transform: translate(-50%, -50%) rotate(40deg) scale(1.3) rotateY(40deg);
+        }
+
+        .firework::after {
+          --x: -50%;
+          --y: -50%;
+          --initialY: -50%;
+          transform: translate(-50%, -50%) rotate(-40deg) scale(0.9) rotateY(-40deg);
+        }
+
+        .firework:nth-child(2) {
+          --x: 30vmin;
+        }
+
+        .firework:nth-child(2),
+        .firework:nth-child(2)::before,
+        .firework:nth-child(2)::after {
+          --color1: #3b82f6;
+          --color2: #10b981;
+          --color3: #f59e0b;
+          --finalSize: 40vmin;
+          left: 30%;
+          top: 60%;
+          animation-delay: -0.25s;
+        }
+
+        .firework:nth-child(3) {
+          --x: -30vmin;
+          --y: -50vmin;
+        }
+
+        .firework:nth-child(3),
+        .firework:nth-child(3)::before,
+        .firework:nth-child(3)::after {
+          --color1: #f59e0b;
+          --color2: #ffffff;
+          --color3: #3b82f6;
+          --finalSize: 35vmin;
+          left: 70%;
+          top: 40%;
+          animation-delay: -0.4s;
+        }
+
+        .firework:nth-child(4) {
+          --x: 10vmin;
+          --y: -40vmin;
+        }
+
+        .firework:nth-child(4),
+        .firework:nth-child(4)::before,
+        .firework:nth-child(4)::after {
+          --color1: #ec4899;
+          --color2: #8b5cf6;
+          --color3: #10b981;
+          --finalSize: 50vmin;
+          left: 20%;
+          top: 30%;
+          animation-delay: -0.8s;
+        }
+
+        .firework:nth-child(5) {
+          --x: -10vmin;
+          --y: -35vmin;
+        }
+
+        .firework:nth-child(5),
+        .firework:nth-child(5)::before,
+        .firework:nth-child(5)::after {
+          --color1: #8b5cf6;
+          --color2: #3b82f6;
+          --color3: #ec4899;
+          --finalSize: 45vmin;
+          left: 85%;
+          top: 55%;
+          animation-delay: -1.2s;
         }
       `}} />
     </section>
