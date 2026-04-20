@@ -202,7 +202,7 @@ const ShopServices: React.FC = () => {
              </form>
 
              <p className="text-center mt-10 text-slate-500 text-xs font-medium">
-                Alternatively, email us directly at <a href="mailto:support@dspng.tech" className="text-emerald-500 hover:underline">support@dspng.tech</a>
+                Alternatively, email us directly at <a href="mailto:wokman@dspng.tech" className="text-emerald-500 hover:underline">wokman@dspng.tech</a>
              </p>
           </div>
         </div>
