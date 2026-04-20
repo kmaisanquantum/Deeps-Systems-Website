@@ -65,8 +65,8 @@ const Navbar: React.FC = () => {
           className="flex items-center gap-2 group relative z-[60]"
           onClick={(e) => handleLinkClick(e, '/')}
         >
-          <div className="p-2 rounded-xl quantum-gradient group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-emerald-500/20">
-            <Binary className="w-6 h-6 text-white" />
+          <div className="w-10 h-10 rounded-xl overflow-hidden bg-white group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-emerald-500/20">
+            <img src="/assets/logo.jpg" alt="Deeps Systems Logo" className="w-full h-full object-contain" />
           </div>
           <span className="text-xl md:text-2xl font-montserrat font-extrabold tracking-tight text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors">
             Deeps <span className="text-emerald-600 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">Systems</span>

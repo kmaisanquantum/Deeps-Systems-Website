@@ -43,8 +43,8 @@ const Footer: React.FC = () => {
           {/* Brand Column */}
           <div className="space-y-6">
             <Link to="/" className="flex items-center gap-2 group">
-              <div className="p-2 rounded-lg quantum-gradient">
-                <Binary className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 rounded-lg overflow-hidden bg-white shadow-lg">
+                <img src="/assets/logo.jpg" alt="Deeps Systems Logo" className="w-full h-full object-contain" />
               </div>
               <span className="text-2xl font-montserrat font-extrabold tracking-tight text-gray-900 dark:text-white">
                 Deeps <span className="text-emerald-600">Systems</span>
