@@ -1,5 +1,20 @@
 import React from 'react';
-import { Landmark, Truck, Sprout, Rocket, Cloud, Zap, Smartphone, ShoppingBag, ShieldCheck, Cpu, Headset, FileSearch } from 'lucide-react';
+import {
+  Landmark,
+  Truck,
+  Sprout,
+  Rocket,
+  Cloud,
+  Zap,
+  Smartphone,
+  ShoppingBag,
+  ShieldCheck,
+  Cpu,
+  Headset,
+  FileSearch,
+  Shield,
+  Lightbulb
+} from 'lucide-react';
 
 export const servicesItems = [
   { name: 'Managed IT Support', icon: React.createElement(Headset, { className: "w-5 h-5" }), href: '/solutions#details-managed-it', desc: 'Proactive operational uptime.' },
@@ -12,6 +27,13 @@ export const servicesItems = [
   { name: 'Advanced Suite', icon: React.createElement(Rocket, { className: "w-5 h-5" }), href: '/solutions#advanced-solutions', desc: 'Disruptive BITC SaaS outcomes.' },
 ];
 
+export const shopItems = [
+  { name: 'Infrastructure & Security', icon: React.createElement(Shield, { className: "w-5 h-5" }), href: '/shop', desc: 'Secure Office, Cloud Audits.' },
+  { name: 'Cloud Platforms/SaaS', icon: React.createElement(Cloud, { className: "w-5 h-5" }), href: '/shop', desc: 'Finance, Property, Agri-Trace.' },
+  { name: 'Workflow Automation', icon: React.createElement(Zap, { className: "w-5 h-5" }), href: '/shop', desc: 'Forms, Legal, Financial Recon.' },
+  { name: 'Strategic Advisory', icon: React.createElement(Lightbulb, { className: "w-5 h-5" }), href: '/shop', desc: 'Strategy, Roadmaps, Quantum.' },
+];
+
 export const advantageItems = [
   { name: 'Infrastructure', icon: React.createElement(Cloud, { className: "w-5 h-5" }), href: '/advantage#advantages', desc: 'Zero legacy physical burden.' },
   { name: 'Scalability', icon: React.createElement(Zap, { className: "w-5 h-5" }), href: '/advantage#advantages', desc: 'Elastic cloud power.' },
@@ -21,6 +43,6 @@ export const advantageItems = [
 export const storeItem = {
   name: 'Our Online Store',
   icon: React.createElement(ShoppingBag, { className: "w-5 h-5" }),
-  href: '/#online-store',
-  desc: 'Shop for BITC optimization tools and hardware.'
+  href: '/shop',
+  desc: 'Shop for BITC optimization tools and sachet services.'
 };
