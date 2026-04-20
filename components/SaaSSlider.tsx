@@ -11,7 +11,8 @@ import {
   Monitor,
   ExternalLink,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Radio
 } from 'lucide-react';
 
 const saasSystems = [
@@ -134,66 +135,105 @@ const SaaSSlider: React.FC = () => {
 
   return (
     <section
-      className="py-12 bg-gray-50/50 dark:bg-black/40 border-y border-gray-100 dark:border-white/5 overflow-hidden reveal-active relative"
+      className="py-16 bg-gray-950 overflow-hidden relative border-y border-emerald-500/20"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/[0.02] dark:bg-emerald-500/5 rounded-full blur-[120px] -z-10"></div>
+      {/* Dynamic Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
+         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]"></div>
+         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px]"></div>
+      </div>
 
-      <div className="max-w-7xl mx-auto px-6 mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-         <div className="flex-1">
-            <h3 className="text-[10px] font-bold text-emerald-600 uppercase tracking-[0.4em] mb-2">Ecosystem</h3>
-            <h2 className="text-2xl md:text-3xl font-montserrat font-bold text-gray-900 dark:text-white leading-tight">Live <span className="quantum-text-gradient">BITC</span> Platforms</h2>
-         </div>
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        {/* Breaking News Style Header */}
+        <div className="flex flex-col md:flex-row items-center gap-6 mb-12">
+           <div className="flex items-center gap-3 shrink-0">
+              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-600 rounded-lg shadow-[0_0_15px_rgba(16,185,129,0.4)] animate-pulse">
+                 <Radio className="w-4 h-4 text-white" />
+                 <span className="text-white font-black text-xs uppercase tracking-tighter">Live Status Update</span>
+              </div>
+              <div className="h-8 w-px bg-white/10 hidden md:block"></div>
+           </div>
 
-         <div className="flex items-center gap-6">
-            <p className="hidden md:block text-gray-600 dark:text-slate-400 text-xs font-medium max-w-xs text-right">
-                Deploying high-performance SaaS outcomes across PNG's real estate, finance, and SME sectors.
-            </p>
-            <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleManualScroll('left')}
-                  className="p-3 rounded-xl glass hover:bg-emerald-500/10 hover:border-emerald-500/30 text-gray-600 dark:text-slate-400 hover:text-emerald-600 transition-all active:scale-95"
-                  aria-label="Scroll Backwards"
-                >
-                    <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => handleManualScroll('right')}
-                  className="p-3 rounded-xl glass hover:bg-emerald-500/10 hover:border-emerald-500/30 text-gray-600 dark:text-slate-400 hover:text-emerald-600 transition-all active:scale-95"
-                  aria-label="Scroll Forwards"
-                >
-                    <ChevronRight className="w-5 h-5" />
-                </button>
-            </div>
-         </div>
+           <div className="flex-grow text-center md:text-left">
+              <h2 className="text-2xl md:text-4xl font-montserrat font-black text-white leading-tight uppercase tracking-tight">
+                 Active <span className="text-emerald-500 underline decoration-emerald-500/30 decoration-4 underline-offset-8">BITC</span> Ecosystem Deployments
+              </h2>
+           </div>
+
+           <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleManualScroll('left')}
+                className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-emerald-500/20 hover:border-emerald-500/40 text-white transition-all active:scale-95 group"
+                aria-label="Scroll Backwards"
+              >
+                  <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+              </button>
+              <button
+                onClick={() => handleManualScroll('right')}
+                className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-emerald-500/20 hover:border-emerald-500/40 text-white transition-all active:scale-95 group"
+                aria-label="Scroll Forwards"
+              >
+                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+           </div>
+        </div>
+
+        {/* Floating Ticker Indicators */}
+        <div className="flex flex-wrap justify-center md:justify-start gap-4 mb-10 opacity-60">
+           {["Real Estate", "Fintech", "Agri-Tech", "Medical", "Logistics"].map(tag => (
+             <div key={tag} className="flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span className="text-[10px] font-bold text-white uppercase tracking-widest">{tag}</span>
+             </div>
+           ))}
+        </div>
       </div>
 
       <div
         ref={scrollRef}
-        className="relative flex overflow-x-auto no-scrollbar group cursor-grab active:cursor-grabbing"
+        className="relative flex overflow-x-auto no-scrollbar group cursor-grab active:cursor-grabbing pb-8"
       >
-        <div className="flex whitespace-nowrap py-4">
+        <div className="flex whitespace-nowrap">
           {extendedSystems.map((system, idx) => (
             <a
               key={idx}
               href={system.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex flex-col w-72 md:w-80 mx-4 p-6 bg-white dark:bg-[#0a0a0a] rounded-[2rem] border border-gray-100 dark:border-white/5 hover:border-emerald-500/30 transition-all duration-500 group/card active-click whitespace-normal shadow-sm hover:shadow-md hover:scale-[1.03] hover:shadow-xl hover:-translate-y-1"
+              className="inline-flex flex-col w-72 md:w-80 mx-4 p-8 bg-white/5 backdrop-blur-sm rounded-[2.5rem] border border-white/10 hover:border-emerald-500/50 transition-all duration-500 group/card active-click whitespace-normal shadow-2xl hover:bg-white/[0.08] hover:scale-[1.02]"
             >
-              <div className="flex items-center justify-between mb-6">
-                <div className={`p-4 rounded-2xl bg-gray-50 dark:bg-white/5 ${system.color} group-hover/card:scale-110 group-hover/card:bg-gray-100 dark:group-hover/card:bg-white/10 transition-all animate-icon-float animate-icon-pulse duration-500`}>
+              <div className="flex items-center justify-between mb-8">
+                <div className={`p-5 rounded-2xl bg-white/5 ${system.color} group-hover/card:scale-110 group-hover/card:bg-emerald-500/10 transition-all duration-500 shadow-inner`}>
                   {system.icon}
                 </div>
-                <div className="p-2 rounded-lg bg-gray-50 dark:bg-white/5 group-hover/card:bg-emerald-50 dark:group-hover/card:bg-emerald-500/10 transition-colors">
-                  <ExternalLink className="w-4 h-4 text-gray-600 dark:text-slate-600 group-hover/card:text-emerald-600 transition-colors" />
+                <div className="flex items-center gap-2">
+                   <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Active</span>
+                   <div className="p-2 rounded-xl bg-white/5 group-hover/card:bg-emerald-500/20 transition-colors border border-white/10">
+                     <ExternalLink className="w-4 h-4 text-white/40 group-hover/card:text-white transition-colors" />
+                   </div>
                 </div>
               </div>
-              <h4 className="text-gray-900 dark:text-white font-bold text-base mb-2 group-hover/card:text-emerald-600 transition-colors"><span className="inline-flex items-center gap-1.5"><span className="flex h-2 w-2 relative"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>{system.name}</span></h4>
-              <p className="text-gray-600 dark:text-slate-400 text-xs font-medium leading-relaxed">
+
+              <div className="mb-4">
+                 <h4 className="text-white font-black text-xl mb-2 group-hover/card:text-emerald-400 transition-colors flex items-center gap-2">
+                    {system.name}
+                 </h4>
+                 <div className="h-1 w-12 bg-emerald-500 rounded-full group-hover/card:w-full transition-all duration-700"></div>
+              </div>
+
+              <p className="text-slate-400 text-xs font-medium leading-relaxed mb-6 line-clamp-3">
                 {system.desc}
               </p>
+
+              <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between">
+                 <span className="text-[9px] font-bold text-slate-500 uppercase tracking-[0.2em]">Platform ID: {system.name.toLowerCase().replace(' ', '-')}.bitc</span>
+                 <div className="flex h-1.5 w-1.5 relative">
+                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                 </div>
+              </div>
             </a>
           ))}
         </div>
