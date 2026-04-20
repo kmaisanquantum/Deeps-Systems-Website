@@ -9,6 +9,7 @@ import SolutionsPage from './pages/SolutionsPage';
 import AdvantagePage from './pages/AdvantagePage';
 import InsightsPage from './pages/InsightsPage';
 import Contact from './components/Contact';
+import ShopPage from './pages/ShopPage';
 
 const App: React.FC = () => {
   return (
@@ -22,6 +23,7 @@ const App: React.FC = () => {
             <Route path="/solutions" element={<SolutionsPage />} />
             <Route path="/advantage" element={<AdvantagePage />} />
             <Route path="/insights" element={<InsightsPage />} />
+            <Route path="/shop" element={<ShopPage />} />
             <Route path="/contact" element={<div className="pt-20"><Contact /></div>} />
           </Routes>
         </main>

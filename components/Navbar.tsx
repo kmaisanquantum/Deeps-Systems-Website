@@ -1,62 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Menu, X, ChevronDown, Rocket, Zap,
-  Binary, Cloud, ShoppingBag
+  Menu,
+  X,
+  ChevronDown,
+  ShoppingBag,
+  Cloud,
+  Rocket,
+  ArrowRight,
+  Shield,
+  Zap,
+  Lightbulb
 } from 'lucide-react';
-import { servicesItems, advantageItems, storeItem } from './navbarData';
+import { servicesItems, advantageItems, storeItem, shopItems } from './navbarData';
 
 const Navbar: React.FC = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileActiveSubmenu, setMobileActiveSubmenu] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setMobileActiveSubmenu(null);
+  }, [location.pathname]);
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('/#') || href.startsWith('#')) {
+      const hash = href.includes('#') ? href.split('#')[1] : href.replace('#', '');
+      if (location.pathname === '/') {
+        e.preventDefault();
+        const element = document.getElementById(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+    setIsMobileMenuOpen(false);
     setActiveDropdown(null);
-  }, [location]);
+  };
 
   const toggleMobileSubmenu = (menu: string) => {
     setMobileActiveSubmenu(mobileActiveSubmenu === menu ? null : menu);
   };
 
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (href.startsWith('/#') || href.startsWith('#') || href.includes('#')) {
-      const [path, hash] = href.includes('#') ? href.split('#') : ['', href.replace('#', '')];
-      const targetPath = path === '/' || path === '' ? '/' : path;
-      const targetHash = hash.replace('#', '');
-
-      if (location.pathname === targetPath) {
-        e.preventDefault();
-        const element = document.getElementById(targetHash);
-        if (element) {
-          const offset = 80;
-          const bodyRect = document.body.getBoundingClientRect().top;
-          const elementRect = element.getBoundingClientRect().top;
-          const elementPosition = elementRect - bodyRect;
-          const offsetPosition = elementPosition - offset;
-
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-          });
-        }
-        setIsMobileMenuOpen(false);
-      }
-    }
-  };
-
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-[50] transition-all duration-500 ${isScrolled ? 'py-3 md:py-4 bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-gray-100 dark:border-white/5 shadow-sm' : 'py-6 md:py-8 bg-transparent'}`}>
+    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/5 py-3' : 'bg-transparent py-5'}`}>
       <div className="max-w-7xl mx-auto px-5 md:px-6 flex items-center justify-between">
 
         {/* Logo */}
@@ -89,12 +90,13 @@ const Navbar: React.FC = () => {
                 className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-white dark:bg-[#0a0a0a] backdrop-blur-2xl border border-gray-100 dark:border-white/10 rounded-2xl shadow-2xl p-4 animate-in fade-in slide-in-from-top-2 duration-300"
               >
                 <div className="space-y-1">
+                  <div className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest px-2 mb-2">Technical Advantage</div>
                   {advantageItems.map((item) => (
                     <Link
                       key={item.name}
                       to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
                       onClick={(e) => handleLinkClick(e, item.href)}
-                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
+                      className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
                     >
                       <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover/item:scale-110 transition-all">
                         {item.icon}
@@ -145,17 +147,55 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
+          {/* Shop Dropdown */}
+          <div className="relative">
+            <button
+              onMouseEnter={() => setActiveDropdown('shop')}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${activeDropdown === 'shop' ? 'text-emerald-600' : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300'}`}
+            >
+              <ShoppingBag className="w-4 h-4" />
+              <span>Online Shop</span>
+              <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'shop' ? 'rotate-180' : ''}`} />
+            </button>
+            {activeDropdown === 'shop' && (
+              <div
+                onMouseLeave={() => setActiveDropdown(null)}
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-80 bg-white dark:bg-[#0a0a0a] backdrop-blur-2xl border border-gray-100 dark:border-white/10 rounded-2xl shadow-2xl p-4 animate-in fade-in slide-in-from-top-2 duration-300"
+              >
+                <div className="space-y-1">
+                  <div className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest px-2 mb-2">Shop & Services</div>
+                  {shopItems.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
+                      onClick={(e) => handleLinkClick(e, item.href)}
+                      className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
+                    >
+                      <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover/item:scale-110 transition-all">
+                        {item.icon}
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-gray-900 dark:text-white group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
+                        <div className="text-[11px] text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
+                      </div>
+                    </Link>
+                  ))}
+                  <div className="pt-2 mt-2 border-t border-gray-100 dark:border-white/5">
+                    <Link
+                      to="/shop"
+                      className="flex items-center justify-between w-full p-3 rounded-xl bg-emerald-600 text-white font-bold text-xs group/all"
+                    >
+                      <span>Browse All Services</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover/all:translate-x-1 transition-transform" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           <Link to="/insights" aria-current={location.pathname === "/insights" ? "page" : undefined} className="px-3 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white transition-all">Insights</Link>
           
-          <Link
-            to={storeItem.href} aria-current={location.pathname === storeItem.href.split("#")[0] ? "page" : undefined}
-            onClick={(e) => handleLinkClick(e, storeItem.href)}
-            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-all group"
-          >
-            <ShoppingBag className="w-4 h-4" />
-            <span>Our Online Store</span>
-          </Link>
-
           <div className="ml-2 pl-4 border-l border-gray-100 dark:border-white/10 flex items-center gap-4">
             <Link
               to="/contact" aria-current={location.pathname === "/contact" ? "page" : undefined}
@@ -182,14 +222,43 @@ const Navbar: React.FC = () => {
         <div className="md:hidden fixed inset-0 top-0 pt-[72px] bg-white dark:bg-[#0a0a0a] backdrop-blur-3xl z-[45] flex flex-col animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex-grow overflow-y-auto px-6 py-8 space-y-4">
             
-            <Link
-              to={storeItem.href} aria-current={location.pathname === storeItem.href.split("#")[0] ? "page" : undefined}
-              onClick={(e) => handleLinkClick(e, storeItem.href)}
-              className="w-full flex items-center gap-3 p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-emerald-600 active:bg-gray-100 dark:active:bg-white/10 transition-all border border-gray-100 dark:border-white/10"
-            >
-              <ShoppingBag className="w-5 h-5" />
-              <span className="font-bold text-sm uppercase tracking-widest">{storeItem.name}</span>
-            </Link>
+            <div className="space-y-2">
+              <button
+                onClick={() => toggleMobileSubmenu('shop')}
+                className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-emerald-600 border border-gray-100 dark:border-white/10"
+              >
+                <div className="flex items-center gap-3">
+                   <ShoppingBag className="w-5 h-5 text-emerald-600" />
+                   <span className="font-bold text-sm uppercase tracking-widest">Online Shop</span>
+                </div>
+                <ChevronDown className={`w-5 h-5 transition-transform ${mobileActiveSubmenu === 'shop' ? 'rotate-180' : ''}`} />
+              </button>
+
+              {mobileActiveSubmenu === 'shop' && (
+                <div className="grid grid-cols-1 gap-2 pt-2 px-1">
+                  {shopItems.map(item => (
+                    <Link
+                      key={item.name}
+                      to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
+                      onClick={(e) => handleLinkClick(e, item.href)}
+                      className="flex items-center gap-4 p-4 bg-white dark:bg-white/2 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
+                    >
+                      <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">{item.icon}</div>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-sm">{item.name}</span>
+                        <span className="text-[10px] text-gray-600 dark:text-slate-400">{item.desc}</span>
+                      </div>
+                    </Link>
+                  ))}
+                  <Link
+                    to="/shop"
+                    className="flex items-center justify-center gap-2 p-4 bg-emerald-600 text-white rounded-xl font-bold text-sm uppercase tracking-widest"
+                  >
+                    Browse All Services <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              )}
+            </div>
 
             <div className="space-y-2">
               <button 
