@@ -4,21 +4,25 @@ import { Cloud, Zap, Smartphone, Combine } from 'lucide-react';
 const Advantages: React.FC = () => {
   const advantages = [
     {
+      id: "adv-infra",
       icon: <Cloud className="w-8 h-8 text-emerald-600" />,
       title: "Zero Infrastructure",
       description: "Eliminate the burden of physical servers and legacy maintenance. We run entirely in the cloud for maximum agility and scalability."
     },
     {
+      id: "adv-scale",
       icon: <Zap className="w-8 h-8 text-blue-600" />,
       title: "Elastic Scalability",
       description: "Scale your computational power up or down instantly based on demand. High-performance architectures tailored for PNG's growth."
     },
     {
+      id: "adv-resilience",
       icon: <Smartphone className="w-8 h-8 text-emerald-600" />,
       title: "Resilient Access",
       description: "Engineered specifically for the Pacific market, ensuring critical data and tools remain accessible on any network or device."
     },
     {
+      id: "adv-precision",
       icon: <Combine className="w-8 h-8 text-amber-600" />,
       title: "Precision Methodology",
       description: "Minimalist, robust digital architectures that bridge the gap between traditional operations and future-ready excellence."
@@ -44,7 +48,8 @@ const Advantages: React.FC = () => {
           {advantages.map((adv, idx) => (
             <div 
               key={idx} 
-              className="bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 hover:border-emerald-500/30 transition-all duration-300 hover:-translate-y-2 group cursor-default shadow-sm hover:shadow-xl"
+              id={adv.id}
+              className="scroll-mt-32 bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 hover:border-emerald-500/30 transition-all duration-300 hover:-translate-y-2 group cursor-default shadow-sm hover:shadow-xl outline-none"
             >
               <div className="mb-6 inline-block p-4 rounded-2xl bg-gray-50 dark:bg-slate-900/50 group-hover:scale-110 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-500/10 transition-all duration-300 shadow-inner">
                 {adv.icon}

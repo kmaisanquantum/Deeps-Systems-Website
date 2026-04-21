@@ -13,7 +13,13 @@ import {
   Headset,
   FileSearch,
   Shield,
-  Lightbulb
+  Lightbulb,
+  Building2,
+  Store,
+  CreditCard,
+  Activity,
+  Wallet,
+  Monitor
 } from 'lucide-react';
 
 export const servicesItems = [
@@ -28,16 +34,25 @@ export const servicesItems = [
 ];
 
 export const shopItems = [
-  { name: 'Infrastructure & Security', icon: React.createElement(Shield, { className: "w-5 h-5" }), href: '/shop', desc: 'Secure Office, Cloud Audits.' },
-  { name: 'Cloud Platforms/SaaS', icon: React.createElement(Cloud, { className: "w-5 h-5" }), href: '/shop', desc: 'Finance, Property, Agri-Trace.' },
-  { name: 'Workflow Automation', icon: React.createElement(Zap, { className: "w-5 h-5" }), href: '/shop', desc: 'Forms, Legal, Financial Recon.' },
-  { name: 'Strategic Advisory', icon: React.createElement(Lightbulb, { className: "w-5 h-5" }), href: '/shop', desc: 'Strategy, Roadmaps, Quantum.' },
+  { name: 'Infrastructure & Security', icon: React.createElement(Shield, { className: "w-5 h-5" }), href: '/shop#shop-infra', desc: 'Secure Office, Cloud Audits.' },
+  { name: 'Cloud Platforms/SaaS', icon: React.createElement(Cloud, { className: "w-5 h-5" }), href: '/shop#shop-saas', desc: 'Finance, Property, Agri-Trace.' },
+  { name: 'Workflow Automation', icon: React.createElement(Zap, { className: "w-5 h-5" }), href: '/shop#shop-automation', desc: 'Forms, Legal, Financial Recon.' },
+  { name: 'Strategic Advisory', icon: React.createElement(Lightbulb, { className: "w-5 h-5" }), href: '/shop#shop-advisory', desc: 'Strategy, Roadmaps, Quantum.' },
 ];
 
 export const advantageItems = [
-  { name: 'Infrastructure', icon: React.createElement(Cloud, { className: "w-5 h-5" }), href: '/advantage#advantages', desc: 'Zero legacy physical burden.' },
-  { name: 'Scalability', icon: React.createElement(Zap, { className: "w-5 h-5" }), href: '/advantage#advantages', desc: 'Elastic cloud power.' },
-  { name: 'Resilience', icon: React.createElement(Smartphone, { className: "w-5 h-5" }), href: '/advantage#advantages', desc: 'Mobile-first design.' },
+  { name: 'Infrastructure', icon: React.createElement(Cloud, { className: "w-5 h-5" }), href: '/advantage#adv-infra', desc: 'Zero legacy physical burden.' },
+  { name: 'Scalability', icon: React.createElement(Zap, { className: "w-5 h-5" }), href: '/advantage#adv-scale', desc: 'Elastic cloud power.' },
+  { name: 'Resilience', icon: React.createElement(Smartphone, { className: "w-5 h-5" }), href: '/advantage#adv-resilience', desc: 'Mobile-first design.' },
+];
+
+export const ecosystemItems = [
+  { name: 'PNG Property', icon: React.createElement(Building2, { className: "w-5 h-5 text-blue-600" }), href: 'https://property.dspng.tech', desc: 'Real estate market intelligence.' },
+  { name: 'Unity Mall', icon: React.createElement(ShoppingBag, { className: "w-5 h-5 text-emerald-600" }), href: 'https://unity.dspng.tech', desc: 'Digital SME marketplace.' },
+  { name: 'Garden City', icon: React.createElement(Store, { className: "w-5 h-5 text-emerald-600" }), href: 'https://gc.dspng.tech', desc: 'Local vendor center.' },
+  { name: 'Kingsmen Finance', icon: React.createElement(CreditCard, { className: "w-5 h-5 text-amber-600" }), href: 'https://kingsmen.dspng.tech', desc: 'Digital lending platform.' },
+  { name: 'Helt', icon: React.createElement(Activity, { className: "w-5 h-5 text-blue-600" }), href: 'https://helt.dspng.tech', desc: 'Remote medical triage.' },
+  { name: 'Trust Marketplace', icon: React.createElement(ShieldCheck, { className: "w-5 h-5 text-blue-600" }), href: 'https://trust.dspng.tech', desc: 'Verified PNG e-commerce.' },
 ];
 
 export const storeItem = {
