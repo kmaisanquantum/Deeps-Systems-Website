@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   ArrowRight,
   Mail,
-  Building2,
   Send
 } from 'lucide-react';
 
@@ -16,16 +15,18 @@ const ShopServices: React.FC = () => {
 
   const categories = [
     {
+      id: "shop-infra",
       title: "Infrastructure & Security",
       icon: <Shield className="w-6 h-6" />,
       price: "K 1,500",
       services: [
-        { name: "Secure Office Bundle", features: ["Endpoint Protection", "Zero-Trust Access", "24/7 Monitoring"] },
-        { name: "MeshCentral Deployment", features: ["Remote Management", "Secure Desktop Access", "Asset Tracking"] },
-        { name: "Cloud Security Audit", features: ["Vulnerability Scan", "Compliance Check", "Remediation Roadmap"] }
+        { name: "Secure Office Setup", features: ["Zero-Trust Networking", "Encrypted Backups", "Managed Firewall"] },
+        { name: "Cloud Migration", features: ["Legacy-to-Cloud Move", "Minimal Downtime", "Cost Optimization"] },
+        { name: "Security Audit", features: ["Vulnerability Scan", "Compliance Check", "Remediation Roadmap"] }
       ]
     },
     {
+      id: "shop-saas",
       title: "Cloud Platforms / SaaS",
       icon: <Cloud className="w-6 h-6" />,
       price: "K 2,500",
@@ -36,6 +37,7 @@ const ShopServices: React.FC = () => {
       ]
     },
     {
+      id: "shop-automation",
       title: "Workflow Automation",
       icon: <Zap className="w-6 h-6" />,
       price: "K 3,000",
@@ -46,6 +48,7 @@ const ShopServices: React.FC = () => {
       ]
     },
     {
+      id: "shop-advisory",
       title: "Strategic Advisory",
       icon: <Lightbulb className="w-6 h-6" />,
       price: "K 800",
@@ -86,7 +89,7 @@ const ShopServices: React.FC = () => {
         {/* Categories & Pricing Grid */}
         <div className="space-y-24">
           {categories.map((category, catIdx) => (
-            <div key={catIdx} className="space-y-10">
+            <div key={catIdx} id={category.id} className="scroll-mt-32 space-y-10 outline-none">
               <div className="flex items-center gap-4">
                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-emerald-500">
                   {category.icon}
@@ -127,7 +130,7 @@ const ShopServices: React.FC = () => {
         </div>
 
         {/* Contact & Inquiry Form */}
-        <div id="inquiry-form" className="mt-32 max-w-4xl mx-auto">
+        <div id="inquiry-form" className="mt-32 max-w-4xl mx-auto scroll-mt-32">
           <div className="p-8 md:p-16 bg-white/5 backdrop-blur-2xl rounded-[3rem] border border-white/10 shadow-2xl relative overflow-hidden">
              {/* Form Decoration */}
              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-[80px] -z-10"></div>

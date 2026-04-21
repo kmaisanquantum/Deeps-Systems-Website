@@ -1,27 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
   Menu,
   X,
   ChevronDown,
   ShoppingBag,
-  Cloud,
   Rocket,
+  Cloud,
   ArrowRight,
-  Shield,
-  Zap,
-  Lightbulb
+  Globe
 } from 'lucide-react';
-import { servicesItems, advantageItems, storeItem, shopItems } from './navbarData';
+import { servicesItems, shopItems, advantageItems, ecosystemItems } from './navbarData';
 
 const Navbar: React.FC = () => {
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [mobileActiveSubmenu, setMobileActiveSubmenu] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
-
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileActiveSubmenu, setMobileActiveSubmenu] = useState<string | null>(null);
   const location = useLocation();
-  const navigate = useNavigate();
+  const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,20 +28,28 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setMobileActiveSubmenu(null);
-  }, [location.pathname]);
+    setActiveDropdown(null);
+  }, [location]);
 
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (href.startsWith('/#') || href.startsWith('#')) {
-      const hash = href.includes('#') ? href.split('#')[1] : href.replace('#', '');
-      if (location.pathname === '/') {
+  const handleLinkClick = (e: React.MouseEvent | React.FocusEvent | React.KeyboardEvent, href: string) => {
+    if (href.startsWith('#')) {
+      e.preventDefault();
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        (element as HTMLElement).focus();
+      }
+    } else if (href.includes('#')) {
+      const [path, hash] = href.split('#');
+      if (location.pathname === path) {
         e.preventDefault();
         const element = document.getElementById(hash);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
+          (element as HTMLElement).focus();
         }
       }
     }
@@ -56,18 +61,27 @@ const Navbar: React.FC = () => {
     setMobileActiveSubmenu(mobileActiveSubmenu === menu ? null : menu);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent, menu: string) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setActiveDropdown(activeDropdown === menu ? null : menu);
+    } else if (e.key === 'Escape') {
+      setActiveDropdown(null);
+    }
+  };
+
   return (
     <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/5 py-3' : 'bg-transparent py-5'}`}>
-      <div className="max-w-7xl mx-auto px-5 md:px-6 flex items-center justify-between">
-
+      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
         <Link
-          to="/" aria-current={location.pathname === "/" ? "page" : undefined}
-          className="flex items-center gap-2 group relative z-[60]"
+          to="/"
+          className="flex items-center gap-3 group"
           onClick={(e) => handleLinkClick(e, '/')}
+          aria-label="Deeps Systems Home"
         >
           <div className="w-10 h-10 rounded-xl overflow-hidden bg-white group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-emerald-500/20">
-            <img src="/assets/logo.jpg" alt="Deeps Systems Logo" className="w-full h-full object-contain" />
+            <img src="/assets/logo.jpg" alt="" className="w-full h-full object-contain" />
           </div>
           <span className="text-xl md:text-2xl font-montserrat font-extrabold tracking-tight text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors">
             Deeps <span className="text-emerald-600 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">Systems</span>
@@ -75,28 +89,30 @@ const Navbar: React.FC = () => {
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-1 lg:gap-2">
+        <div className="hidden md:flex items-center gap-1 lg:gap-2" role="menubar">
 
-          <div className="relative">
+          <div className="relative" onMouseEnter={() => setActiveDropdown('advantages')} onMouseLeave={() => setActiveDropdown(null)}>
             <button 
-              onMouseEnter={() => setActiveDropdown('advantages')}
+              aria-expanded={activeDropdown === 'advantages'}
+              aria-haspopup="true"
+              onKeyDown={(e) => handleKeyDown(e, 'advantages')}
               className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${activeDropdown === 'advantages' ? 'text-emerald-600' : 'text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white'}`}
             >
               Advantages <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'advantages' ? 'rotate-180' : ''}`} />
             </button>
             {activeDropdown === 'advantages' && (
               <div 
-                onMouseLeave={() => setActiveDropdown(null)}
-                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-white dark:bg-[#0a0a0a] backdrop-blur-2xl border border-gray-100 dark:border-white/10 rounded-2xl shadow-2xl p-4 animate-in fade-in slide-in-from-top-2 duration-300"
+                className="absolute top-full left-0 mt-2 w-72 bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-4 animate-in fade-in slide-in-from-top-2 duration-200"
+                role="menu"
               >
-                <div className="space-y-1">
-                  <div className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest px-2 mb-2">Technical Advantage</div>
+                <div className="grid grid-cols-1 gap-2">
                   {advantageItems.map((item) => (
                     <Link
                       key={item.name}
                       to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
                       onClick={(e) => handleLinkClick(e, item.href)}
                       className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
+                      role="menuitem"
                     >
                       <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover/item:scale-110 transition-all">
                         {item.icon}
@@ -112,26 +128,28 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
-          <div className="relative">
+          <div className="relative" onMouseEnter={() => setActiveDropdown('services')} onMouseLeave={() => setActiveDropdown(null)}>
             <button 
-              onMouseEnter={() => setActiveDropdown('services')}
+              aria-expanded={activeDropdown === 'services'}
+              aria-haspopup="true"
+              onKeyDown={(e) => handleKeyDown(e, 'services')}
               className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${activeDropdown === 'services' ? 'text-emerald-600' : 'text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white'}`}
             >
               Outcome Solutions <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'services' ? 'rotate-180' : ''}`} />
             </button>
             {activeDropdown === 'services' && (
               <div 
-                onMouseLeave={() => setActiveDropdown(null)}
-                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-80 bg-white dark:bg-[#0a0a0a] backdrop-blur-2xl border border-gray-100 dark:border-white/10 rounded-2xl shadow-2xl p-4 animate-in fade-in slide-in-from-top-2 duration-300"
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[480px] bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200"
+                role="menu"
               >
-                <div className="space-y-1">
-                  <div className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest px-2 mb-2">Outcome Solutions</div>
+                <div className="grid grid-cols-2 gap-4">
                   {servicesItems.map((item) => (
                     <Link
                       key={item.name}
                       to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
                       onClick={(e) => handleLinkClick(e, item.href)}
                       className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
+                      role="menuitem"
                     >
                       <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover/item:scale-110 transition-all">
                         {item.icon}
@@ -147,29 +165,68 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
-          {/* Shop Dropdown */}
-          <div className="relative">
+          <div className="relative" onMouseEnter={() => setActiveDropdown('ecosystem')} onMouseLeave={() => setActiveDropdown(null)}>
             <button
-              onMouseEnter={() => setActiveDropdown('shop')}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${activeDropdown === 'shop' ? 'text-emerald-600' : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300'}`}
+              aria-expanded={activeDropdown === 'ecosystem'}
+              aria-haspopup="true"
+              onKeyDown={(e) => handleKeyDown(e, 'ecosystem')}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${activeDropdown === 'ecosystem' ? 'text-emerald-600' : 'text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white'}`}
             >
-              <ShoppingBag className="w-4 h-4" />
-              <span>Online Shop</span>
-              <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'shop' ? 'rotate-180' : ''}`} />
+              Ecosystem <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'ecosystem' ? 'rotate-180' : ''}`} />
+            </button>
+            {activeDropdown === 'ecosystem' && (
+              <div
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[480px] bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200"
+                role="menu"
+              >
+                <div className="grid grid-cols-2 gap-4">
+                  {ecosystemItems.map((item) => (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
+                      role="menuitem"
+                    >
+                      <div className="p-2 rounded-lg bg-emerald-500/10 group-hover/item:scale-110 transition-all">
+                        {item.icon}
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-gray-900 dark:text-white group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
+                        <div className="text-[11px] text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Shop Dropdown */}
+          <div className="relative" onMouseEnter={() => setActiveDropdown('shop')} onMouseLeave={() => setActiveDropdown(null)}>
+            <button
+              aria-expanded={activeDropdown === 'shop'}
+              aria-haspopup="true"
+              onKeyDown={(e) => handleKeyDown(e, 'shop')}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${activeDropdown === 'shop' ? 'text-emerald-600' : 'text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white'}`}
+            >
+              Online Shop <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'shop' ? 'rotate-180' : ''}`} />
             </button>
             {activeDropdown === 'shop' && (
               <div
-                onMouseLeave={() => setActiveDropdown(null)}
-                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-80 bg-white dark:bg-[#0a0a0a] backdrop-blur-2xl border border-gray-100 dark:border-white/10 rounded-2xl shadow-2xl p-4 animate-in fade-in slide-in-from-top-2 duration-300"
+                className="absolute top-full right-0 mt-2 w-[380px] bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200"
+                role="menu"
               >
-                <div className="space-y-1">
-                  <div className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest px-2 mb-2">Shop & Services</div>
+                <div className="grid grid-cols-1 gap-2">
+                  <div className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest px-2 mb-2">Shop & Services</div>
                   {shopItems.map((item) => (
                     <Link
                       key={item.name}
                       to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
                       onClick={(e) => handleLinkClick(e, item.href)}
                       className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
+                      role="menuitem"
                     >
                       <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover/item:scale-110 transition-all">
                         {item.icon}
@@ -184,6 +241,7 @@ const Navbar: React.FC = () => {
                     <Link
                       to="/shop"
                       className="flex items-center justify-between w-full p-3 rounded-xl bg-emerald-600 text-white font-bold text-xs group/all"
+                      role="menuitem"
                     >
                       <span>Browse All Services</span>
                       <ArrowRight className="w-3.5 h-3.5 group-hover/all:translate-x-1 transition-transform" />
@@ -209,7 +267,9 @@ const Navbar: React.FC = () => {
         {/* Mobile Menu Toggle */}
         <div className="flex items-center gap-3 md:hidden">
           <button 
-            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"} className="text-gray-900 dark:text-white p-2 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/10"
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMobileMenuOpen}
+            className="text-gray-900 dark:text-white p-2 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/10"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -225,6 +285,7 @@ const Navbar: React.FC = () => {
             <div className="space-y-2">
               <button
                 onClick={() => toggleMobileSubmenu('shop')}
+                aria-expanded={mobileActiveSubmenu === 'shop'}
                 className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-emerald-600 border border-gray-100 dark:border-white/10"
               >
                 <div className="flex items-center gap-3">
@@ -263,6 +324,7 @@ const Navbar: React.FC = () => {
             <div className="space-y-2">
               <button 
                 onClick={() => toggleMobileSubmenu('advantages')}
+                aria-expanded={mobileActiveSubmenu === 'advantages'}
                 className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
               >
                 <div className="flex items-center gap-3">
@@ -295,6 +357,7 @@ const Navbar: React.FC = () => {
             <div className="space-y-2">
               <button 
                 onClick={() => toggleMobileSubmenu('services')}
+                aria-expanded={mobileActiveSubmenu === 'services'}
                 className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
               >
                 <div className="flex items-center gap-3">
@@ -319,6 +382,40 @@ const Navbar: React.FC = () => {
                         <span className="text-[10px] text-gray-600 dark:text-slate-400">{item.desc}</span>
                       </div>
                     </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <button
+                onClick={() => toggleMobileSubmenu('ecosystem')}
+                aria-expanded={mobileActiveSubmenu === 'ecosystem'}
+                className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
+              >
+                <div className="flex items-center gap-3">
+                   <Globe className="w-5 h-5 text-emerald-600" />
+                   <span className="font-bold text-sm uppercase tracking-widest">Ecosystem</span>
+                </div>
+                <ChevronDown className={`w-5 h-5 transition-transform ${mobileActiveSubmenu === 'ecosystem' ? 'rotate-180' : ''}`} />
+              </button>
+
+              {mobileActiveSubmenu === 'ecosystem' && (
+                <div className="grid grid-cols-1 gap-2 pt-2 px-1">
+                  {ecosystemItems.map(item => (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-4 p-4 bg-white dark:bg-white/2 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
+                    >
+                      <div className="p-2 rounded-lg bg-emerald-500/10">{item.icon}</div>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-sm">{item.name}</span>
+                        <span className="text-[10px] text-gray-600 dark:text-slate-400">{item.desc}</span>
+                      </div>
+                    </a>
                   ))}
                 </div>
               )}
