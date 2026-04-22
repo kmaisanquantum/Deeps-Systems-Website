@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import QuantumAssistant from './components/QuantumAssistant';
+import ScrollUpButton from './components/ScrollUpButton';
 import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import SolutionsPage from './pages/SolutionsPage';
@@ -35,6 +36,7 @@ const App: React.FC = () => {
         </main>
         <Footer />
         <QuantumAssistant />
+        <ScrollUpButton />
       </div>
     </Router>
   );
