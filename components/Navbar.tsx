@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileActiveSubmenu, setMobileActiveSubmenu] = useState<string | null>(null);
   const location = useLocation();
-  const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,6 +33,20 @@ const Navbar: React.FC = () => {
     setMobileActiveSubmenu(null);
     setActiveDropdown(null);
   }, [location]);
+
+  const handleMouseEnter = (menu: string) => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current);
+      leaveTimeoutRef.current = null;
+    }
+    setActiveDropdown(menu);
+  };
+
+  const handleMouseLeave = () => {
+    leaveTimeoutRef.current = setTimeout(() => {
+      setActiveDropdown(null);
+    }, 150);
+  };
 
   const handleLinkClick = (e: React.MouseEvent | React.FocusEvent | React.KeyboardEvent, href: string) => {
     if (href.startsWith('#')) {
@@ -91,7 +105,7 @@ const Navbar: React.FC = () => {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-1 lg:gap-2" role="menubar">
 
-          <div className="relative" onMouseEnter={() => setActiveDropdown('advantages')} onMouseLeave={() => setActiveDropdown(null)}>
+          <div className="relative group" onMouseEnter={() => handleMouseEnter('advantages')} onMouseLeave={handleMouseLeave}>
             <button 
               aria-expanded={activeDropdown === 'advantages'}
               aria-haspopup="true"
@@ -102,33 +116,35 @@ const Navbar: React.FC = () => {
             </button>
             {activeDropdown === 'advantages' && (
               <div 
-                className="absolute top-full left-0 mt-2 w-72 bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-4 animate-in fade-in slide-in-from-top-2 duration-200"
+                className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-[480px] z-50"
                 role="menu"
               >
-                <div className="grid grid-cols-1 gap-2">
-                  {advantageItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
-                      onClick={(e) => handleLinkClick(e, item.href)}
-                      className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
-                      role="menuitem"
-                    >
-                      <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover/item:scale-110 transition-all">
-                        {item.icon}
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold text-gray-900 dark:text-white mb-0.5 group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
-                        <div className="text-[10px] text-gray-600 dark:text-slate-300 leading-tight">{item.desc}</div>
-                      </div>
-                    </Link>
-                  ))}
+                <div className="bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="grid grid-cols-2 gap-4">
+                    {advantageItems.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
+                        onClick={(e) => handleLinkClick(e, item.href)}
+                        className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
+                        role="menuitem"
+                      >
+                        <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover/item:scale-110 transition-all">
+                          {item.icon}
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-gray-900 dark:text-white mb-0.5 group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
+                          <div className="text-[10px] text-gray-600 dark:text-slate-300 leading-tight">{item.desc}</div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
-          <div className="relative" onMouseEnter={() => setActiveDropdown('services')} onMouseLeave={() => setActiveDropdown(null)}>
+          <div className="relative group" onMouseEnter={() => handleMouseEnter('services')} onMouseLeave={handleMouseLeave}>
             <button 
               aria-expanded={activeDropdown === 'services'}
               aria-haspopup="true"
@@ -139,33 +155,35 @@ const Navbar: React.FC = () => {
             </button>
             {activeDropdown === 'services' && (
               <div 
-                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[480px] bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200"
+                className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-[480px] z-50"
                 role="menu"
               >
-                <div className="grid grid-cols-2 gap-4">
-                  {servicesItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
-                      onClick={(e) => handleLinkClick(e, item.href)}
-                      className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
-                      role="menuitem"
-                    >
-                      <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover/item:scale-110 transition-all">
-                        {item.icon}
-                      </div>
-                      <div>
-                        <div className="text-sm font-bold text-gray-900 dark:text-white group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
-                        <div className="text-[11px] text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
-                      </div>
-                    </Link>
-                  ))}
+                <div className="bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="grid grid-cols-2 gap-4">
+                    {servicesItems.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
+                        onClick={(e) => handleLinkClick(e, item.href)}
+                        className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
+                        role="menuitem"
+                      >
+                        <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover/item:scale-110 transition-all">
+                          {item.icon}
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-gray-900 dark:text-white group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
+                          <div className="text-[11px] text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
-          <div className="relative" onMouseEnter={() => setActiveDropdown('ecosystem')} onMouseLeave={() => setActiveDropdown(null)}>
+          <div className="relative group" onMouseEnter={() => handleMouseEnter('ecosystem')} onMouseLeave={handleMouseLeave}>
             <button
               aria-expanded={activeDropdown === 'ecosystem'}
               aria-haspopup="true"
@@ -176,35 +194,37 @@ const Navbar: React.FC = () => {
             </button>
             {activeDropdown === 'ecosystem' && (
               <div
-                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[480px] bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200"
+                className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-[480px] z-50"
                 role="menu"
               >
-                <div className="grid grid-cols-2 gap-4">
-                  {ecosystemItems.map((item) => (
-                    <a
-                      key={item.name}
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
-                      role="menuitem"
-                    >
-                      <div className="p-2 rounded-lg bg-emerald-500/10 group-hover/item:scale-110 transition-all">
-                        {item.icon}
-                      </div>
-                      <div>
-                        <div className="text-sm font-bold text-gray-900 dark:text-white group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
-                        <div className="text-[11px] text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
-                      </div>
-                    </a>
-                  ))}
+                <div className="bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="grid grid-cols-2 gap-4">
+                    {ecosystemItems.map((item) => (
+                      <a
+                        key={item.name}
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
+                        role="menuitem"
+                      >
+                        <div className="p-2 rounded-lg bg-emerald-500/10 group-hover/item:scale-110 transition-all">
+                          {item.icon}
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-gray-900 dark:text-white group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
+                          <div className="text-[11px] text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
           {/* Shop Dropdown */}
-          <div className="relative" onMouseEnter={() => setActiveDropdown('shop')} onMouseLeave={() => setActiveDropdown(null)}>
+          <div className="relative group" onMouseEnter={() => handleMouseEnter('shop')} onMouseLeave={handleMouseLeave}>
             <button
               aria-expanded={activeDropdown === 'shop'}
               aria-haspopup="true"
@@ -215,37 +235,39 @@ const Navbar: React.FC = () => {
             </button>
             {activeDropdown === 'shop' && (
               <div
-                className="absolute top-full right-0 mt-2 w-[380px] bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200"
+                className="absolute top-full right-0 pt-2 w-[380px] z-50"
                 role="menu"
               >
-                <div className="grid grid-cols-1 gap-2">
-                  <div className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest px-2 mb-2">Shop & Services</div>
-                  {shopItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
-                      onClick={(e) => handleLinkClick(e, item.href)}
-                      className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
-                      role="menuitem"
-                    >
-                      <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover/item:scale-110 transition-all">
-                        {item.icon}
-                      </div>
-                      <div>
-                        <div className="text-sm font-bold text-gray-900 dark:text-white group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
-                        <div className="text-[11px] text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
-                      </div>
-                    </Link>
-                  ))}
-                  <div className="pt-2 mt-2 border-t border-gray-100 dark:border-white/5">
-                    <Link
-                      to="/shop"
-                      className="flex items-center justify-between w-full p-3 rounded-xl bg-emerald-600 text-white font-bold text-xs group/all"
-                      role="menuitem"
-                    >
-                      <span>Browse All Services</span>
-                      <ArrowRight className="w-3.5 h-3.5 group-hover/all:translate-x-1 transition-transform" />
-                    </Link>
+                <div className="bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="grid grid-cols-1 gap-2">
+                    <div className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest px-2 mb-2">Shop & Services</div>
+                    {shopItems.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
+                        onClick={(e) => handleLinkClick(e, item.href)}
+                        className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
+                        role="menuitem"
+                      >
+                        <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover/item:scale-110 transition-all">
+                          {item.icon}
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-gray-900 dark:text-white group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
+                          <div className="text-[11px] text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
+                        </div>
+                      </Link>
+                    ))}
+                    <div className="pt-2 mt-2 border-t border-gray-100 dark:border-white/5">
+                      <Link
+                        to="/shop"
+                        className="flex items-center justify-between w-full p-3 rounded-xl bg-emerald-600 text-white font-bold text-xs group/all"
+                        role="menuitem"
+                      >
+                        <span>Browse All Services</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover/all:translate-x-1 transition-transform" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
