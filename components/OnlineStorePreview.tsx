@@ -47,7 +47,7 @@ const OnlineStorePreview: React.FC = () => {
                 href={storeItem.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-fit flex items-center gap-3 px-10 py-5 rounded-2xl quantum-gradient text-white font-bold text-lg btn-cta-pulse active-click shadow-xl shadow-emerald-500/20"
+                className="w-fit flex items-center gap-3 px-10 py-5 rounded-2xl quantum-gradient text-white font-bold text-lg relative btn-cta-pulse active-click shadow-xl shadow-emerald-500/20"
               >
                 Shop Now <ArrowRight className="w-6 h-6" />
               </a>

@@ -279,7 +279,7 @@ const Navbar: React.FC = () => {
           <div className="ml-2 pl-4 border-l border-gray-100 dark:border-white/10 flex items-center gap-4">
             <Link
               to="/contact" aria-current={location.pathname === "/contact" ? "page" : undefined}
-              className="px-5 py-2.5 rounded-full quantum-gradient text-white text-sm font-bold btn-cta-pulse active-click shadow-lg"
+              className="px-5 py-2.5 rounded-full quantum-gradient text-white text-sm font-bold relative btn-cta-pulse active-click shadow-lg"
             >
               Contact Us
             </Link>

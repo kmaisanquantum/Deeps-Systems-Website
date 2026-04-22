@@ -306,7 +306,7 @@ const Contact: React.FC = () => {
                 <button 
                   type="submit" 
                   disabled={status === 'submitting' || (Object.keys(errors).length > 0 && Object.keys(touched).length > 0)}
-                  className="w-full py-5 rounded-2xl quantum-gradient text-white font-bold text-lg flex items-center justify-center gap-3 btn-cta-pulse active-click transition-all duration-300 shadow-xl shadow-emerald-500/20 group disabled:opacity-50 disabled:grayscale"
+                  className="w-full py-5 rounded-2xl quantum-gradient text-white font-bold text-lg flex items-center justify-center gap-3 relative btn-cta-pulse active-click transition-all duration-300 shadow-xl shadow-emerald-500/20 group disabled:opacity-50 disabled:grayscale"
                 >
                   Secure Dispatch
                   <Zap className="w-5 h-5 group-hover:scale-125 transition-transform" />
