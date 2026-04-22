@@ -158,7 +158,7 @@ const AdvancedSolutions: React.FC = () => {
                 <div className="flex-grow flex flex-col justify-center items-center text-center">
                   <button 
                     onClick={handleScanInfrastructure}
-                    className="px-6 py-3 rounded-xl bg-white dark:bg-emerald-500/10 border border-gray-200 dark:border-emerald-500/20 text-emerald-600 text-xs font-bold uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition-all btn-cta-pulse active-click flex items-center gap-2 shadow-sm"
+                    className="px-6 py-3 rounded-xl bg-white dark:bg-emerald-500/10 border border-gray-200 dark:border-emerald-500/20 text-emerald-600 text-xs font-bold uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition-all relative btn-cta-pulse active-click flex items-center gap-2 shadow-sm"
                   >
                     <Search className="w-3.5 h-3.5" />
                     Scan Nodes
@@ -201,7 +201,7 @@ const AdvancedSolutions: React.FC = () => {
             <div className="bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/10 p-6 text-center shadow-inner">
               <button 
                 onClick={handleGenerateReport}
-                className="w-full py-4 rounded-xl bg-gray-900 dark:bg-blue-600 hover:bg-gray-800 dark:hover:bg-blue-500 text-white font-bold text-sm flex items-center justify-center gap-3 btn-cta-pulse active-click shadow-lg"
+                className="w-full py-4 rounded-xl bg-gray-900 dark:bg-blue-600 hover:bg-gray-800 dark:hover:bg-blue-500 text-white font-bold text-sm flex items-center justify-center gap-3 relative btn-cta-pulse active-click shadow-lg"
               >
                 {isGenerating ? (
                   <>

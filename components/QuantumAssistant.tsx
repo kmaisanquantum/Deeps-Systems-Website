@@ -34,17 +34,28 @@ const QuantumAssistant: React.FC = () => {
   return (
     <>
       {/* Floating Toggle Button */}
-      <button 
-        aria-label={isOpen ? "Close support chat" : "Open support chat"} onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full quantum-gradient shadow-2xl flex items-center justify-center text-white z-[60] btn-cta-pulse active-click transition-all duration-300 group"
-      >
-        {isOpen ? <X className="w-6 h-6" /> : (
-          <>
-            <MessageSquare className="w-6 h-6 group-hover:hidden" />
-            <Sparkles className="w-6 h-6 hidden group-hover:block animate-pulse" />
-          </>
+      <div className="fixed bottom-6 right-6 z-[60] flex flex-col items-center">
+        {!isOpen && (
+          <div className="mb-3 px-3 py-1.5 bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-lg shadow-xl animate-bounce flex items-center gap-1.5 border border-emerald-500/50">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+            Chat with us
+          </div>
         )}
-      </button>
+        <button
+          aria-label={isOpen ? "Close support chat" : "Open support chat"} onClick={() => setIsOpen(!isOpen)}
+          className="relative w-14 h-14 rounded-full quantum-gradient shadow-[0_0_30px_rgba(5,150,105,0.4)] flex items-center justify-center text-white btn-cta-pulse active-click transition-all duration-300 group ring-4 ring-emerald-500/20 dark:ring-white/10"
+        >
+          {/* Pulsing outer ring */}
+          {!isOpen && <span className="absolute inset-0 rounded-full quantum-gradient animate-ping-slow -z-10 opacity-60"></span>}
+
+          {isOpen ? <X className="w-6 h-6" /> : (
+            <>
+              <MessageSquare className="w-6 h-6 group-hover:hidden" />
+              <Sparkles className="w-6 h-6 hidden group-hover:block animate-pulse" />
+            </>
+          )}
+        </button>
+      </div>
 
       {/* Chat Window */}
       {isOpen && (
@@ -100,7 +111,7 @@ const QuantumAssistant: React.FC = () => {
             <button 
               aria-label="Send message" onClick={handleSend}
               disabled={isLoading || !input.trim()}
-              className="p-2 rounded-xl quantum-gradient text-white btn-cta-pulse active-click transition-all duration-300 disabled:opacity-50 disabled:grayscale disabled:scale-100 group shadow-md"
+              className="relative p-2 rounded-xl quantum-gradient text-white btn-cta-pulse active-click transition-all duration-300 disabled:opacity-50 disabled:grayscale disabled:scale-100 group shadow-md"
             >
               <Send className="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </button>

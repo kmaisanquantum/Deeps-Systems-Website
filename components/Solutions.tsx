@@ -249,7 +249,7 @@ const Solutions: React.FC = () => {
                     <a 
                       href="#advanced-solutions" 
                       onClick={(e) => handleSmoothScroll(e, '#advanced-solutions')}
-                      className="inline-flex items-center justify-center gap-2 text-white quantum-gradient transition-all text-xs md:text-sm font-bold btn-cta-pulse active-click px-6 py-3 rounded-xl shadow-lg shadow-emerald-500/10 group/advanced"
+                      className="inline-flex items-center justify-center gap-2 text-white quantum-gradient transition-all text-xs md:text-sm font-bold relative btn-cta-pulse active-click px-6 py-3 rounded-xl shadow-lg shadow-emerald-500/10 group/advanced"
                     >
                       View Advanced Suite
                       <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4 transition-transform group-hover/advanced:translate-x-1" />
