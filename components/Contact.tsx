@@ -92,21 +92,44 @@ const Contact: React.FC = () => {
 
     setStatus('submitting');
     setLogs([]);
-    addLog("Initializing BITC Secure Tunnel...");
+    addLog("Initializing outbound connection...");
     
-    await new Promise(r => setTimeout(r, 800));
-    addLog("Encrypting payload with AES-256...");
     await new Promise(r => setTimeout(r, 600));
+    addLog("Preparing dispatch payload...");
+    await new Promise(r => setTimeout(r, 500));
     addLog("Routing through Port Moresby Node 01...");
-    await new Promise(r => setTimeout(r, 900));
-    addLog("Validating digital signatures...");
-    await new Promise(r => setTimeout(r, 1000));
-    addLog("Dispatch confirmed. Outcome secured.");
+    await new Promise(r => setTimeout(r, 700));
+    addLog("Transmitting data to endpoint...");
 
-    const mailtoUrl = `mailto:wokman@dspng.tech?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
-    window.location.href = mailtoUrl;
+    try {
+      const response = await fetch("https://formspree.io/f/mqakppov", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message
+        })
+      });
 
-    setStatus('success');
+      if (response.ok) {
+        addLog("Transmission dispatched successfully.");
+        await new Promise(r => setTimeout(r, 500));
+        setStatus('success');
+      } else {
+        addLog("Transmission failed: server returned error status.");
+        await new Promise(r => setTimeout(r, 1000));
+        setStatus('error');
+      }
+    } catch (error) {
+      addLog("Transmission aborted: network connection failed.");
+      await new Promise(r => setTimeout(r, 1000));
+      setStatus('error');
+    }
   };
 
   const getFieldClass = (name: string) => {
@@ -302,6 +325,13 @@ const Contact: React.FC = () => {
                     </div>
                   )}
                 </div>
+
+                {status === 'error' && (
+                  <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <AlertCircle className="w-5 h-5 shrink-0" />
+                    <span className="text-xs font-semibold">Failed to dispatch inquiry. Please check your connection or try again, or email us directly at wokman@dspng.tech.</span>
+                  </div>
+                )}
 
                 <button 
                   type="submit" 

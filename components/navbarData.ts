@@ -53,6 +53,9 @@ export const ecosystemItems = [
   { name: 'Kingsmen Finance', icon: React.createElement(CreditCard, { className: "w-5 h-5 text-amber-600" }), href: 'https://kingsmen.dspng.tech', desc: 'Digital lending platform.' },
   { name: 'Helt', icon: React.createElement(Activity, { className: "w-5 h-5 text-blue-600" }), href: 'https://helt.dspng.tech', desc: 'Remote medical triage.' },
   { name: 'Trust Marketplace', icon: React.createElement(ShieldCheck, { className: "w-5 h-5 text-blue-600" }), href: 'https://trust.dspng.tech', desc: 'Verified PNG e-commerce.' },
+  { name: 'Maket', icon: React.createElement(Truck, { className: "w-5 h-5 text-amber-600" }), href: 'https://maket.dspng.tech', desc: 'SME logistics & agricultural market prices.' },
+  { name: 'Pe', icon: React.createElement(Wallet, { className: "w-5 h-5 text-amber-600" }), href: 'https://pe.dspng.tech', desc: 'Micro-payment & credit scoring.' },
+  { name: 'RBM', icon: React.createElement(Monitor, { className: "w-5 h-5 text-blue-600" }), href: 'https://rbm.dspng.tech', desc: 'Reserve business monitoring.' },
 ];
 
 export const storeItem = {

@@ -198,7 +198,7 @@ const Solutions: React.FC = () => {
             <div 
               key={`detail-${idx}`} 
               id={sol.id} 
-              className="scroll-mt-32 bg-white dark:bg-white/2 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 lg:p-16 border border-gray-100 dark:border-white/5 relative overflow-hidden group shadow-sm hover:shadow-xl reveal-on-scroll outline-none focus:ring-0"
+              className="scroll-mt-20 bg-white dark:bg-white/2 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 lg:p-16 border border-gray-100 dark:border-white/5 relative overflow-hidden group shadow-sm hover:shadow-xl reveal-on-scroll outline-none focus:ring-0"
             >
               {/* Volumetric background glow */}
               <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-emerald-500/[0.02] dark:bg-emerald-500/5 rounded-full blur-[80px] md:blur-[100px] -z-10 transition-colors duration-1000"></div>

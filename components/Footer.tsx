@@ -119,10 +119,7 @@ const Footer: React.FC = () => {
           <p className="text-gray-600 dark:text-slate-600 text-xs text-center md:text-left">
             © {currentYear} Deeps Systems. All rights reserved.
           </p>
-          <div className="flex gap-8">
-            <a href="#" className="text-gray-600 dark:text-slate-600 hover:text-gray-900 dark:hover:text-white transition-colors text-xs">Privacy Policy</a>
-            <a href="#" className="text-gray-600 dark:text-slate-600 hover:text-gray-900 dark:hover:text-white transition-colors text-xs">Terms of Service</a>
-          </div>
+
         </div>
       </div>
     </footer>

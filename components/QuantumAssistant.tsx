@@ -1,11 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Send, X, MessageSquare, Loader2, Sparkles } from 'lucide-react';
+
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  text: string;
+  showOptions?: boolean;
+}
 
 const QuantumAssistant: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<{role: 'user' | 'assistant', text: string}[]>([
-    { role: 'assistant', text: "Welcome to Deeps Systems. How can we help you today?" }
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { role: 'assistant', text: "Welcome to Deeps Systems. We are currently offline, but you can leave a message here or connect with us directly." }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -25,7 +32,8 @@ const QuantumAssistant: React.FC = () => {
     setTimeout(() => {
       setMessages(prev => [...prev, {
         role: 'assistant',
-        text: "Thank you for your message. A member of our support team will get back to you shortly. For immediate assistance, please use the contact form or email us at wokman@dspng.tech."
+        text: "We are currently offline. Please choose one of the direct channels below to securely dispatch your message to our team:",
+        showOptions: true
       }]);
       setIsLoading(false);
     }, 1000);
@@ -37,8 +45,8 @@ const QuantumAssistant: React.FC = () => {
       <div className="fixed bottom-6 right-6 z-[60] flex flex-col items-center">
         {!isOpen && (
           <div className="mb-3 px-3 py-1.5 bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-lg shadow-xl animate-bounce flex items-center gap-1.5 border border-emerald-500/50">
-            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-            Chat with us
+            <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+            Leave a message
           </div>
         )}
         <button
@@ -65,10 +73,10 @@ const QuantumAssistant: React.FC = () => {
                 <MessageSquare className="w-4 h-4 text-white" />
              </div>
              <div>
-                <h3 className="font-bold text-sm text-gray-900 dark:text-white">Deeps Support</h3>
-                <span className="flex items-center gap-1.5 text-[10px] text-emerald-600 font-bold uppercase tracking-widest">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-                  Online
+                <h3 className="font-bold text-sm text-gray-900 dark:text-white">Deeps Offline Support</h3>
+                <span className="flex items-center gap-1.5 text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                  Offline
                 </span>
              </div>
              <button aria-label="Close chat" onClick={() => setIsOpen(false)} className="ml-auto text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:scale-110 active:scale-90 transition-all">
@@ -84,7 +92,32 @@ const QuantumAssistant: React.FC = () => {
                     ? 'bg-blue-600 dark:bg-blue-700 text-white rounded-br-none shadow-md'
                     : 'bg-gray-100 dark:bg-slate-800/80 text-gray-700 dark:text-slate-200 rounded-bl-none border border-gray-200 dark:border-white/5 shadow-sm'
                 }`}>
-                  {m.text}
+                  <p>{m.text}</p>
+                  {m.showOptions && (
+                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/10 flex flex-col gap-2 w-full">
+                      <a
+                        href={`https://wa.me/67583009881?text=${encodeURIComponent(messages[messages.length - 2]?.text || "Hello Deeps Systems")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md active-click"
+                      >
+                        Send via WhatsApp
+                      </a>
+                      <a
+                        href={`mailto:wokman@dspng.tech?subject=Inquiry&body=${encodeURIComponent(messages[messages.length - 2]?.text || "")}`}
+                        className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md active-click"
+                      >
+                        Send via Email
+                      </a>
+                      <Link
+                        to="/contact"
+                        onClick={() => setIsOpen(false)}
+                        className="w-full py-2.5 px-4 rounded-xl bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20 text-gray-800 dark:text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md active-click text-center"
+                      >
+                        Use Contact Form
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
