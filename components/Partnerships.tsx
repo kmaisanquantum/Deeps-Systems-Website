@@ -47,7 +47,7 @@ const Partnerships: React.FC = () => {
   ];
 
   return (
-    <section id="partners" className="py-24 overflow-hidden relative bg-white dark:bg-[#0a0a0a]">
+    <section id="partners" className="scroll-mt-20 py-24 overflow-hidden relative bg-white dark:bg-[#0a0a0a]">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/[0.02] dark:bg-emerald-500/5 rounded-full blur-[100px] -z-10"></div>
       
       <div className="max-w-7xl mx-auto px-6 text-center">

@@ -108,7 +108,7 @@ const AdvancedSolutions: React.FC = () => {
   };
 
   return (
-    <section id="advanced-solutions" className="py-24 relative bg-white dark:bg-[#0a0a0a] overflow-hidden">
+    <section id="advanced-solutions" className="scroll-mt-20 py-24 relative bg-white dark:bg-[#0a0a0a] overflow-hidden">
       {/* Background radial glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(22,163,74,0.03)_0%,transparent_70%)] pointer-events-none"></div>
 

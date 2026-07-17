@@ -49,7 +49,7 @@ const Advantages: React.FC = () => {
             <div 
               key={idx} 
               id={adv.id}
-              className="scroll-mt-32 bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 hover:border-emerald-500/30 transition-all duration-300 hover:-translate-y-2 group cursor-default shadow-sm hover:shadow-xl outline-none"
+              className="scroll-mt-20 bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 hover:border-emerald-500/30 transition-all duration-300 hover:-translate-y-2 group cursor-default shadow-sm hover:shadow-xl outline-none"
             >
               <div className="mb-6 inline-block p-4 rounded-2xl bg-gray-50 dark:bg-slate-900/50 group-hover:scale-110 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-500/10 transition-all duration-300 shadow-inner">
                 {adv.icon}
