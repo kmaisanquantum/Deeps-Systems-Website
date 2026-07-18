@@ -7,11 +7,18 @@ import {
   CheckCircle2,
   ArrowRight,
   Mail,
-  Send
+  Send,
+  Loader2
 } from 'lucide-react';
 
 const ShopServices: React.FC = () => {
   const [selectedService, setSelectedService] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    business: '',
+    message: ''
+  });
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
   const categories = [
     {
@@ -65,6 +72,52 @@ const ShopServices: React.FC = () => {
     const formElement = document.getElementById('inquiry-form');
     if (formElement) {
       formElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name.trim() || !formData.business.trim() || !selectedService || !formData.message.trim()) {
+      setStatus('error');
+      return;
+    }
+
+    setStatus('submitting');
+
+    const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:3001/api/inquiries'
+      : 'https://api.dspng.tech/api/inquiries';
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          type: 'shop',
+          name: formData.name,
+          business: formData.business,
+          service: selectedService,
+          message: formData.message
+        })
+      });
+
+      if (response.ok) {
+        setStatus('success');
+        setFormData({ name: '', business: '', message: '' });
+        setSelectedService('');
+      } else {
+        setStatus('error');
+      }
+    } catch (err) {
+      setStatus('error');
     }
   };
 
@@ -135,74 +188,115 @@ const ShopServices: React.FC = () => {
              {/* Form Decoration */}
              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-[80px] -z-10"></div>
 
-             <div className="flex flex-col md:flex-row items-center gap-10 mb-12">
-                <div className="p-6 rounded-[2rem] bg-emerald-600/20 border border-emerald-500/30 text-emerald-500">
-                   <Mail className="w-12 h-12" />
-                </div>
-                <div className="text-center md:text-left">
-                   <h3 className="text-3xl font-montserrat font-black uppercase mb-2">Service Inquiry</h3>
-                   <p className="text-slate-400 font-medium">Ready to transform? Send us your requirements.</p>
-                </div>
-             </div>
+             {status === 'success' ? (
+               <div className="text-center py-12 animate-in zoom-in duration-300">
+                  <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6 relative">
+                    <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+                    <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping"></div>
+                  </div>
+                  <h3 className="text-3xl font-montserrat font-black uppercase mb-4">Inquiry Received</h3>
+                  <p className="text-slate-300 mb-8 max-w-md mx-auto">Your service inquiry has been securely stored in our database and routed to <span className="text-emerald-500 font-mono">wokman@dspng.tech</span>.</p>
+                  <button
+                    onClick={() => setStatus('idle')}
+                    className="px-8 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 transition-all text-white font-bold text-sm uppercase tracking-wider active-click"
+                  >
+                    Submit Another Inquiry
+                  </button>
+               </div>
+             ) : (
+               <>
+                 <div className="flex flex-col md:flex-row items-center gap-10 mb-12">
+                    <div className="p-6 rounded-[2rem] bg-emerald-600/20 border border-emerald-500/30 text-emerald-500">
+                       <Mail className="w-12 h-12" />
+                    </div>
+                    <div className="text-center md:text-left">
+                       <h3 className="text-3xl font-montserrat font-black uppercase mb-2">Service Inquiry</h3>
+                       <p className="text-slate-400 font-medium">Ready to transform? Send us your requirements.</p>
+                    </div>
+                 </div>
 
-             <form action="https://formspree.io/f/mqakppov" method="POST" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4">Full Name</label>
-                      <input
-                        type="text"
-                        name="name"
-                        required
-                        placeholder="e.g. John Doe"
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-emerald-500/50 transition-all text-white font-medium"
-                      />
-                   </div>
-                   <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4">Business Name</label>
-                      <input
-                        type="text"
-                        name="business"
-                        required
-                        placeholder="e.g. PNG Enterprises"
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-emerald-500/50 transition-all text-white font-medium"
-                      />
-                   </div>
-                </div>
+                 <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4">Full Name</label>
+                          <input
+                            type="text"
+                            name="name"
+                            required
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            placeholder="e.g. John Doe"
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-emerald-500/50 transition-all text-white font-medium"
+                          />
+                       </div>
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4">Business Name</label>
+                          <input
+                            type="text"
+                            name="business"
+                            required
+                            value={formData.business}
+                            onChange={handleInputChange}
+                            placeholder="e.g. PNG Enterprises"
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-emerald-500/50 transition-all text-white font-medium"
+                          />
+                       </div>
+                    </div>
 
-                <div className="space-y-2">
-                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4">Selected Service</label>
-                   <select
-                     name="service"
-                     value={selectedService}
-                     onChange={(e) => setSelectedService(e.target.value)}
-                     className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-emerald-500/50 transition-all text-white font-medium appearance-none"
-                   >
-                      <option value="" disabled className="bg-gray-900">Choose a service</option>
-                      {categories.flatMap(cat => cat.services).map(srv => (
-                        <option key={srv.name} value={srv.name} className="bg-gray-900">{srv.name}</option>
-                      ))}
-                   </select>
-                </div>
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4">Selected Service</label>
+                       <select
+                         name="service"
+                         value={selectedService}
+                         onChange={(e) => setSelectedService(e.target.value)}
+                         className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-emerald-500/50 transition-all text-white font-medium appearance-none"
+                       >
+                          <option value="" disabled className="bg-gray-900">Choose a service</option>
+                          {categories.flatMap(cat => cat.services).map(srv => (
+                            <option key={srv.name} value={srv.name} className="bg-gray-900">{srv.name}</option>
+                          ))}
+                       </select>
+                    </div>
 
-                <div className="space-y-2">
-                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4">Message</label>
-                   <textarea
-                     name="message"
-                     rows={5}
-                     required
-                     placeholder="Tell us about your requirements..."
-                     className="w-full bg-white/5 border border-white/10 rounded-3xl px-6 py-4 outline-none focus:border-emerald-500/50 transition-all text-white font-medium resize-none"
-                   ></textarea>
-                </div>
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4">Message</label>
+                       <textarea
+                         name="message"
+                         rows={5}
+                         required
+                         value={formData.message}
+                         onChange={handleInputChange}
+                         placeholder="Tell us about your requirements..."
+                         className="w-full bg-white/5 border border-white/10 rounded-3xl px-6 py-4 outline-none focus:border-emerald-500/50 transition-all text-white font-medium resize-none"
+                       ></textarea>
+                    </div>
 
-                <button
-                  type="submit"
-                  className="w-full py-5 rounded-2xl bg-emerald-600 text-white font-black text-lg uppercase tracking-widest shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:bg-emerald-500 hover:shadow-[0_0_40px_rgba(16,185,129,0.5)] transition-all flex items-center justify-center gap-3 active-click"
-                >
-                  Submit Inquiry
-                  <Send className="w-5 h-5" />
-                </button>
-             </form>
+                    {status === 'error' && (
+                      <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-semibold flex items-center gap-3 animate-in fade-in duration-300">
+                        Failed to submit inquiry. Please complete all fields and verify your network, or email us at wokman@dspng.tech.
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={status === 'submitting'}
+                      className="w-full py-5 rounded-2xl bg-emerald-600 text-white font-black text-lg uppercase tracking-widest shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:bg-emerald-500 hover:shadow-[0_0_40px_rgba(16,185,129,0.5)] transition-all flex items-center justify-center gap-3 active-click disabled:opacity-50"
+                    >
+                      {status === 'submitting' ? (
+                        <>
+                          Submitting...
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        </>
+                      ) : (
+                        <>
+                          Submit Inquiry
+                          <Send className="w-5 h-5" />
+                        </>
+                      )}
+                    </button>
+                 </form>
+               </>
+             )}
 
              <p className="text-center mt-10 text-slate-500 text-xs font-medium">
                 Alternatively, email us directly at <a href="mailto:wokman@dspng.tech" className="text-emerald-500 hover:underline">wokman@dspng.tech</a>
