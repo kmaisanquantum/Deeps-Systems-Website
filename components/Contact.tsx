@@ -101,9 +101,9 @@ const Contact: React.FC = () => {
     await new Promise(r => setTimeout(r, 700));
     addLog("Transmitting data to API layer...");
 
-    const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    const apiUrl = import.meta.env.DEV
       ? 'http://localhost:3001/api/inquiries'
-      : 'https://api.dspng.tech/api/inquiries';
+      : '/api/inquiries';
 
     try {
       const response = await fetch(apiUrl, {
