@@ -230,7 +230,7 @@ const ShopServices: React.FC = () => {
                  <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4">Full Name</label>
+                          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-4">Full Name</label>
                           <input
                             type="text"
                             name="name"
@@ -242,7 +242,7 @@ const ShopServices: React.FC = () => {
                           />
                        </div>
                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4">Business Name</label>
+                          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-4">Business Name</label>
                           <input
                             type="text"
                             name="business"
@@ -256,7 +256,7 @@ const ShopServices: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4">Selected Service</label>
+                       <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-4">Selected Service</label>
                        <select
                          name="service"
                          value={selectedService}
@@ -271,7 +271,7 @@ const ShopServices: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4">Message</label>
+                       <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-4">Message</label>
                        <textarea
                          name="message"
                          rows={5}

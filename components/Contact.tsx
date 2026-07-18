@@ -150,7 +150,7 @@ const Contact: React.FC = () => {
   };
 
   const getFieldClass = (name: string) => {
-    const base = "w-full bg-white dark:bg-white/5 border rounded-2xl px-12 py-4 text-gray-900 dark:text-white placeholder:text-gray-600 dark:placeholder:text-slate-600 focus:outline-none focus:ring-2 transition-all duration-300";
+    const base = "w-full bg-white dark:bg-white/5 border rounded-2xl px-12 py-4 text-gray-900 dark:text-white placeholder:text-gray-600 dark:placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all duration-300";
     if (touched[name] && errors[name as keyof FormErrors]) {
       return `${base} border-emerald-500/50 focus:ring-emerald-500/20`;
     }
@@ -167,7 +167,7 @@ const Contact: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
           <div className="reveal-on-scroll">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-emerald-600 text-[10px] font-bold uppercase tracking-widest mb-8 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-emerald-600 text-xs font-bold uppercase tracking-widest mb-8 shadow-sm">
               <Send className="w-3.5 h-3.5" />
               Secure Dispatch
             </div>
@@ -187,7 +187,7 @@ const Contact: React.FC = () => {
                     <Mail className="w-6 h-6 text-emerald-600" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest mb-1">Direct Protocol</p>
+                    <p className="text-xs font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest mb-1">Direct Protocol</p>
                     <p className="text-gray-900 dark:text-white font-bold font-mono">wokman@dspng.tech</p>
                   </div>
                 </a>
@@ -199,7 +199,7 @@ const Contact: React.FC = () => {
                     <MessageSquare className="w-6 h-6 text-emerald-600" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest mb-1">Instant Messaging</p>
+                    <p className="text-xs font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest mb-1">Instant Messaging</p>
                     <p className="text-gray-900 dark:text-white font-bold font-mono">+675 83009881</p>
                   </div>
                 </a>
@@ -232,10 +232,10 @@ const Contact: React.FC = () => {
                  
                  <div className="flex items-center gap-3 mb-6">
                     <Terminal className="w-5 h-5 text-emerald-600" />
-                    <span className="text-[10px] font-bold text-gray-600 dark:text-slate-300 uppercase tracking-widest">Digital Dispatch Log</span>
+                    <span className="text-xs font-bold text-gray-600 dark:text-slate-300 uppercase tracking-widest">Digital Dispatch Log</span>
                  </div>
                  
-                 <div className="flex-grow font-mono text-[11px] md:text-xs text-emerald-600/80 space-y-2 overflow-y-auto max-h-[250px] scrollbar-none">
+                 <div className="flex-grow font-mono text-xs text-emerald-600/80 space-y-2 overflow-y-auto max-h-[250px] scrollbar-none">
                     {logs.map((log, i) => (
                       <div key={i} className="animate-in fade-in slide-in-from-left-2 duration-300">
                         <span className="text-gray-300 dark:text-slate-600 mr-2">{'>'}</span> {log}
@@ -272,7 +272,7 @@ const Contact: React.FC = () => {
                     {touched.name && errors.name && (
                       <div className="flex items-center gap-1.5 px-1 pt-1 animate-in fade-in slide-in-from-top-1">
                         <AlertCircle className="w-3 h-3 text-emerald-500" />
-                        <span className="text-[10px] text-emerald-500 font-medium">{errors.name}</span>
+                        <span className="text-xs text-emerald-500 font-medium">{errors.name}</span>
                       </div>
                     )}
                   </div>
@@ -293,7 +293,7 @@ const Contact: React.FC = () => {
                     {touched.email && errors.email && (
                       <div className="flex items-center gap-1.5 px-1 pt-1 animate-in fade-in slide-in-from-top-1">
                         <AlertCircle className="w-3 h-3 text-emerald-500" />
-                        <span className="text-[10px] text-emerald-500 font-medium">{errors.email}</span>
+                        <span className="text-xs text-emerald-500 font-medium">{errors.email}</span>
                       </div>
                     )}
                   </div>
@@ -316,7 +316,7 @@ const Contact: React.FC = () => {
                   {touched.subject && errors.subject && (
                     <div className="flex items-center gap-1.5 px-1 pt-1 animate-in fade-in slide-in-from-top-1">
                       <AlertCircle className="w-3 h-3 text-emerald-500" />
-                      <span className="text-[10px] text-emerald-500 font-medium">{errors.subject}</span>
+                      <span className="text-xs text-emerald-500 font-medium">{errors.subject}</span>
                     </div>
                   )}
                 </div>
@@ -338,7 +338,7 @@ const Contact: React.FC = () => {
                   {touched.message && errors.message && (
                     <div className="flex items-center gap-1.5 px-1 pt-1 animate-in fade-in slide-in-from-top-1">
                       <AlertCircle className="w-3 h-3 text-emerald-500" />
-                      <span className="text-[10px] text-emerald-500 font-medium">{errors.message}</span>
+                      <span className="text-xs text-emerald-500 font-medium">{errors.message}</span>
                     </div>
                   )}
                 </div>
@@ -347,7 +347,7 @@ const Contact: React.FC = () => {
                   <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                     <AlertCircle className="w-5 h-5 shrink-0" />
                     <span className="text-xs font-semibold">
-                      Failed to dispatch inquiry: {submitError || "Unknown connection error."} Please check your connection or email us directly at wokman@dspng.tech.
+                      Failed to dispatch inquiry: {submitError || "Unknown connection error."} Please check your connection or try again, or email us directly at wokman@dspng.tech.
                     </span>
                   </div>
                 )}
