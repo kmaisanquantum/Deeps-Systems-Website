@@ -92,6 +92,8 @@ const allowedOrigins = [
   'https://www.dspng.tech',
   'http://localhost:3000',
   'http://localhost:5173',
+  'https://dspng.space',
+  'https://www.dspng.space',
 ];
 
 app.use(cors({
@@ -110,7 +112,7 @@ app.use(express.json());
 // Serve static assets from Vite dist/ folder
 app.use(express.static(distPath));
 
-// Health Check Endpoint
+// Health Check Endpoint (For internal database-aware deep testing)
 app.get('/health', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
@@ -128,6 +130,34 @@ app.get('/health', async (req, res) => {
     });
   }
 });
+
+// Database-Independent Public Status Endpoints (For external uptime monitoring)
+const handleStatus = (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+
+  if (req.method === 'HEAD') {
+    return res.status(200).end();
+  }
+
+  res.status(200).json({
+    status: 'online',
+    service: 'deeps-systems-website',
+    timestamp: new Date().toISOString(),
+  });
+};
+
+app.options('/status', handleStatus);
+app.options('/api/status', handleStatus);
+app.get('/status', handleStatus);
+app.get('/api/status', handleStatus);
+app.head('/status', handleStatus);
+app.head('/api/status', handleStatus);
 
 // Reusable SMTP transporter configuration via Nodemailer
 const transporter = nodemailer.createTransport({
@@ -285,6 +315,11 @@ app.post('/api/inquiries', async (req, res) => {
       error: 'An internal server error occurred while processing your inquiry.',
     });
   }
+});
+
+// Catch-all HEAD endpoint to accept HEAD requests on route catch-all without parsing html
+app.head('*', (req, res) => {
+  res.status(200).end();
 });
 
 // Catch-all route to serve the React SPA index.html for non-API requests

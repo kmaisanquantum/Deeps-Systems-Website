@@ -8,7 +8,7 @@ This document describes the architecture, configuration, operation, and troubles
 Deeps Systems is deployed as a consolidated monolithic single-container application running inside **Coolify**.
 
 * **Frontend Process**: Serves statically compiled React SPA files directly from the `/dist` directory via Express `express.static`.
-* **Backend API Process**: Exposes REST endpoints (`/api/inquiries`) and a diagnostic health check endpoint (`/health`) on the same origin.
+* **Backend API Process**: Exposes REST endpoints (`/api/inquiries`), public status check routes, and a diagnostic health check endpoint (`/health`) on the same origin.
 * **SPA Routing Catch-all**: Routes any request not matching static files or APIs back to `index.html` to fully support client-side deep links (e.g., direct refreshes on `/shop` or `/contact`).
 * **Database Platform**: Private PostgreSQL database inside Coolify.
 
@@ -26,7 +26,21 @@ All configuration is managed securely via environment variables. No secrets are 
 
 ---
 
-## 3. How to Run Locally
+## 3. CORS Architecture Update
+
+To facilitate seamless panel integrations, the monolithic server allows cross-origin requests.
+
+Permitted CORS origins:
+* `https://dspng.tech` (Primary)
+* `https://www.dspng.tech` (Primary)
+* `https://dspng.space` (AIO Cloud Office Platform)
+* `https://www.dspng.space` (AIO Cloud Office Platform)
+* `http://localhost:3000` (Local Development)
+* `http://localhost:5173` (Local Development)
+
+---
+
+## 4. How to Run Locally
 
 ### A. Development Mode (Port 3000 & 3001)
 To run frontend and backend processes separately with hot-reloading:
@@ -59,11 +73,15 @@ To verify the single-container execution locally:
 
 ---
 
-## 4. Diagnostic & Health Monitoring
+## 5. Diagnostic & Health Monitoring
 
-The monolith includes an active `/health` check endpoint:
-* **Query Route**: `GET http://localhost:3000/health`
-* **Healthy Output**:
+The monolith provides two distinct diagnostic endpoints:
+
+### A. Internal Diagnostics (`/health`)
+* **Route**: `GET /health`
+* **Purpose**: Active, deep database-aware testing.
+* **Mechanism**: Runs a live query `SELECT NOW()` on the PostgreSQL database.
+* **Output**:
   ```json
   {
     "status": "healthy",
@@ -71,13 +89,28 @@ The monolith includes an active `/health` check endpoint:
     "timestamp": "2026-07-18T01:35:00.000Z"
   }
   ```
-* **Error Response**: In case of a database connectivity failure, it returns a `500 Internal Server Error` with `{"status":"unhealthy","database":"error"}`.
+* **Failure Response**: Returns `500 Internal Server Error` in case of database pool connection issues. Use this strictly for internal diagnostic scripting.
+
+### B. External Public Monitoring (`/status` or `/api/status`)
+* **Route**: `GET /status`, `GET /api/status`, `HEAD /status`, `HEAD /api/status`
+* **Purpose**: Database-independent external liveness check for uptime monitors (such as the dspng.space AIO Connected Sites Monitor).
+* **Mechanism**: Checks purely if the Express HTTP server process is running, bypassing database checks (ensuring it returns 200 even during database hiccup intervals).
+* **CORS Behavior**: Explicitly sets `Access-Control-Allow-Origin: *` to bypass the default cors strict whitelist and facilitate public checks.
+* **Output**:
+  ```json
+  {
+    "status": "online",
+    "service": "deeps-systems-website",
+    "timestamp": "2026-07-18T01:42:00.000Z"
+  }
+  ```
+* **Monitoring Guidance**: External monitoring platforms should target `https://www.dspng.tech/status` (or `https://www.dspng.tech/api/status`) to establish clean liveness checking.
 
 ---
 
-## 5. Inquiries API Specification (`POST /api/inquiries`)
+## 6. Inquiries API Specification (`POST /api/inquiries`)
 
-All submissions from the Contact form and Shop Service Inquiry form write directly to the database `inquiries` table as the source of truth, then trigger a background, best-effort forward to Formspree for email notification.
+All submissions from the Contact form and Shop Service Inquiry form write directly to the database `inquiries` table as the source of truth, then trigger a background, best-effort direct email via Nodemailer.
 
 ### Data Validation Schema:
 * `type`: `'contact'` or `'shop'` (Required)
@@ -92,11 +125,11 @@ All submissions from the Contact form and Shop Service Inquiry form write direct
 
 ---
 
-## 6. Troubleshooting "Failed to submit inquiry"
+## 7. Troubleshooting "Failed to submit inquiry"
 
 If a user reports a submission error:
 1. **Check the Client UI**: The UI will extract and print the exact, specific diagnostic error message returned from the backend instead of showing a generic text.
 2. **Run Health Check**: Query `/health` to verify if the Postgres database is accessible from the container.
 3. **Check Container Logs**:
    - `[Database] inquiries table initialized successfully.` indicates correct database tables setup.
-   - `[Formspree] Failed forwarding with status: ...` indicates Formspree failures, but remember that **Formspree failures will NOT fail the user submission** as long as Postgres persists successfully!
+   - `[Nodemailer] SMTP notification failed: ...` indicates SMTP failures, but remember that **SMTP failures will NOT fail the user submission** as long as Postgres persists successfully!
