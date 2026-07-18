@@ -3,6 +3,7 @@ import cors from 'cors';
 import pg from 'pg';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import nodemailer from 'nodemailer';
 
 const { Pool } = pg;
 
@@ -128,37 +129,81 @@ app.get('/health', async (req, res) => {
   }
 });
 
-// Best-effort Formspree notification fallback
-async function forwardToFormspree(type, data) {
-  const formspreeUrl = process.env.FORMSPREE_URL || 'https://formspree.io/f/mqakppov';
+// Reusable SMTP transporter configuration via Nodemailer
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'localhost',
+  port: parseInt(process.env.SMTP_PORT || '587', 10),
+  secure: process.env.SMTP_SECURE === 'true',
+  auth: {
+    user: process.env.SMTP_USER || '',
+    pass: process.env.SMTP_PASS || '',
+  },
+});
+
+// Direct SMTP email notification via Nodemailer
+async function sendInquiryEmail(type, data) {
+  const recipient = 'wokman@dspng.tech';
+
+  let subjectLine = '';
+  let htmlBody = '';
+
+  if (type === 'shop') {
+    subjectLine = `New Shop Service Inquiry: ${data.service}`;
+    htmlBody = `
+      <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">New Service Inquiry</h2>
+        <p><strong>Full Name:</strong> ${data.name}</p>
+        <p><strong>Business Name:</strong> ${data.business}</p>
+        <p><strong>Selected Service:</strong> ${data.service}</p>
+        <div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #10b981; margin-top: 20px;">
+          <p style="margin: 0; font-weight: bold;">Requirements Message:</p>
+          <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${data.message}</p>
+        </div>
+        <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+          Sent from Deeps Systems Monolith
+        </p>
+      </div>
+    `;
+  } else {
+    subjectLine = `New Contact Inquiry: ${data.subject}`;
+    htmlBody = `
+      <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">New Contact Inquiry</h2>
+        <p><strong>Full Name:</strong> ${data.name}</p>
+        <p><strong>Email Address:</strong> ${data.email}</p>
+        <p><strong>Subject:</strong> ${data.subject}</p>
+        <div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #10b981; margin-top: 20px;">
+          <p style="margin: 0; font-weight: bold;">Inquiry Message:</p>
+          <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${data.message}</p>
+        </div>
+        <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+          Sent from Deeps Systems Monolith
+        </p>
+      </div>
+    `;
+  }
+
+  const mailOptions = {
+    from: process.env.SMTP_USER ? `"Deeps Systems Monolith" <${process.env.SMTP_USER}>` : '"Deeps Systems Monolith" <no-reply@dspng.tech>',
+    to: recipient,
+    subject: subjectLine,
+    html: htmlBody,
+  };
+
   try {
-    console.log(`[Formspree] Attempting fallback notification to: ${formspreeUrl}`);
-
-    // Construct payload suitable for Formspree
-    const payload = {
-      _subject: type === 'shop'
-        ? `New Shop Service Inquiry: ${data.service}`
-        : `New Contact Inquiry: ${data.subject}`,
-      type,
-      ...data
-    };
-
-    const response = await fetch(formspreeUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (response.ok) {
-      console.log('[Formspree] Best-effort notification forwarded successfully.');
-    } else {
-      console.error(`[Formspree] Failed forwarding with status: ${response.status}`);
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.log('[Nodemailer] SMTP credentials omitted. Logging email content instead:');
+      console.log('To:', recipient);
+      console.log('Subject:', subjectLine);
+      console.log('Body Preview:', htmlBody.replace(/<[^>]*>/g, '').trim().substring(0, 300) + '...');
+      return;
     }
+
+    console.log(`[Nodemailer] Dispatching direct SMTP notification to: ${recipient}`);
+    await transporter.sendMail(mailOptions);
+    console.log('[Nodemailer] SMTP notification dispatched successfully.');
   } catch (err) {
-    console.error('[Formspree] Asynchronous forwarding encountered an error:', err);
+    console.error('[Nodemailer] SMTP notification failed:', err);
   }
 }
 
@@ -219,13 +264,13 @@ app.post('/api/inquiries', async (req, res) => {
 
     console.log(`[Database] Inquiry persisted successfully with ID: ${persistedInquiry.id}`);
 
-    // 2. Best-Effort Notification: Forward to Formspree asynchronously in background
-    const formspreePayload = type === 'contact'
+    // 2. Best-Effort Notification: Send direct SMTP notification asynchronously in background
+    const emailPayload = type === 'contact'
       ? { name, email, subject, message }
       : { name, business, service, message };
 
     // Trigger in the background so we don't delay client response
-    forwardToFormspree(type, formspreePayload);
+    sendInquiryEmail(type, emailPayload);
 
     // 3. Return success code 201 to user
     return res.status(201).json({
