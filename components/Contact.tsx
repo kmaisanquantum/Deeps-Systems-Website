@@ -39,6 +39,7 @@ const Contact: React.FC = () => {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [logs, setLogs] = useState<string[]>([]);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const validateField = (name: string, value: string): string => {
     switch (name) {
@@ -91,6 +92,7 @@ const Contact: React.FC = () => {
     }
 
     setStatus('submitting');
+    setSubmitError(null);
     setLogs([]);
     addLog("Initializing outbound connection...");
     
@@ -126,12 +128,22 @@ const Contact: React.FC = () => {
         await new Promise(r => setTimeout(r, 500));
         setStatus('success');
       } else {
-        addLog("Transmission failed: server returned error status.");
+        let errMsg = "Server returned error status.";
+        try {
+          const errData = await response.json();
+          if (errData && errData.error) {
+            errMsg = errData.error;
+          }
+        } catch (_) {}
+        addLog(`Transmission failed: ${errMsg}`);
+        setSubmitError(errMsg);
         await new Promise(r => setTimeout(r, 1000));
         setStatus('error');
       }
     } catch (error) {
-      addLog("Transmission aborted: network connection failed.");
+      const connectionError = "Network connection failed. Please verify your connection.";
+      addLog(`Transmission aborted: ${connectionError}`);
+      setSubmitError(connectionError);
       await new Promise(r => setTimeout(r, 1000));
       setStatus('error');
     }
@@ -334,7 +346,9 @@ const Contact: React.FC = () => {
                 {status === 'error' && (
                   <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                     <AlertCircle className="w-5 h-5 shrink-0" />
-                    <span className="text-xs font-semibold">Failed to dispatch inquiry. Please check your connection or try again, or email us directly at wokman@dspng.tech.</span>
+                    <span className="text-xs font-semibold">
+                      Failed to dispatch inquiry: {submitError || "Unknown connection error."} Please check your connection or email us directly at wokman@dspng.tech.
+                    </span>
                   </div>
                 )}
 

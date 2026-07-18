@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 const distPath = path.join(__dirname, '../dist');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // Database Configuration (Supports 'mock' mode for local verification)
 let pool;
