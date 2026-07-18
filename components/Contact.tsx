@@ -99,16 +99,21 @@ const Contact: React.FC = () => {
     await new Promise(r => setTimeout(r, 500));
     addLog("Routing through Port Moresby Node 01...");
     await new Promise(r => setTimeout(r, 700));
-    addLog("Transmitting data to endpoint...");
+    addLog("Transmitting data to API layer...");
+
+    const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:3001/api/inquiries'
+      : 'https://api.dspng.tech/api/inquiries';
 
     try {
-      const response = await fetch("https://formspree.io/f/mqakppov", {
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
         body: JSON.stringify({
+          type: "contact",
           name: formData.name,
           email: formData.email,
           subject: formData.subject,
@@ -198,7 +203,7 @@ const Contact: React.FC = () => {
                   <div className="absolute inset-0 bg-emerald-400/20 rounded-full animate-ping"></div>
                 </div>
                 <h3 className="text-3xl font-bold mb-4 font-montserrat text-gray-900 dark:text-white">Dispatch Confirmed</h3>
-                <p className="text-gray-600 dark:text-slate-300 mb-8">Payload successfully routed to <span className="text-emerald-600 font-mono">wokman@dspng.tech</span>.</p>
+                <p className="text-gray-600 dark:text-slate-300 mb-8">Payload successfully routed to database & <span className="text-emerald-600 font-mono">wokman@dspng.tech</span>.</p>
                 
                 <button 
                   onClick={() => setStatus('idle')}
@@ -335,7 +340,7 @@ const Contact: React.FC = () => {
 
                 <button 
                   type="submit" 
-                  disabled={status === 'submitting' || (Object.keys(errors).length > 0 && Object.keys(touched).length > 0)}
+                  disabled={status === 'submitting' || Object.values(errors).some(error => error)}
                   className="w-full py-5 rounded-2xl quantum-gradient text-white font-bold text-lg flex items-center justify-center gap-3 relative btn-cta-pulse active-click transition-all duration-300 shadow-xl shadow-emerald-500/20 group disabled:opacity-50 disabled:grayscale"
                 >
                   Secure Dispatch
