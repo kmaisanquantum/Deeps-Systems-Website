@@ -8,7 +8,9 @@ import {
   Rocket,
   Cloud,
   ArrowRight,
-  Globe
+  Globe,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { servicesItems, shopItems, advantageItems, ecosystemItems } from './navbarData';
 
@@ -17,6 +19,7 @@ const Navbar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileActiveSubmenu, setMobileActiveSubmenu] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const location = useLocation();
   const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -33,6 +36,24 @@ const Navbar: React.FC = () => {
     setMobileActiveSubmenu(null);
     setActiveDropdown(null);
   }, [location]);
+
+  // Synchronize theme on mount
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains('dark');
+    setTheme(isDark ? 'dark' : 'light');
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  };
 
   const handleMouseEnter = (menu: string) => {
     if (leaveTimeoutRef.current) {
@@ -116,11 +137,11 @@ const Navbar: React.FC = () => {
             </button>
             {activeDropdown === 'advantages' && (
               <div 
-                className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-[480px] z-50"
+                className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-[480px] max-w-[calc(100vw-2rem)] z-50"
                 role="menu"
               >
                 <div className="bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {advantageItems.map((item) => (
                       <Link
                         key={item.name}
@@ -134,7 +155,7 @@ const Navbar: React.FC = () => {
                         </div>
                         <div>
                           <div className="text-xs font-bold text-gray-900 dark:text-white mb-0.5 group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
-                          <div className="text-[10px] text-gray-600 dark:text-slate-300 leading-tight">{item.desc}</div>
+                          <div className="text-xs text-gray-600 dark:text-slate-300 leading-tight">{item.desc}</div>
                         </div>
                       </Link>
                     ))}
@@ -155,11 +176,11 @@ const Navbar: React.FC = () => {
             </button>
             {activeDropdown === 'services' && (
               <div 
-                className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-[480px] z-50"
+                className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-[480px] max-w-[calc(100vw-2rem)] z-50"
                 role="menu"
               >
                 <div className="bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {servicesItems.map((item) => (
                       <Link
                         key={item.name}
@@ -173,7 +194,7 @@ const Navbar: React.FC = () => {
                         </div>
                         <div>
                           <div className="text-sm font-bold text-gray-900 dark:text-white group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
-                          <div className="text-[11px] text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
+                          <div className="text-xs text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
                         </div>
                       </Link>
                     ))}
@@ -194,11 +215,11 @@ const Navbar: React.FC = () => {
             </button>
             {activeDropdown === 'ecosystem' && (
               <div
-                className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-[480px] z-50"
+                className="absolute top-full right-0 lg:left-1/2 lg:-translate-x-1/2 lg:right-auto pt-2 w-[480px] max-w-[calc(100vw-2rem)] z-50"
                 role="menu"
               >
                 <div className="bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {ecosystemItems.map((item) => (
                       <a
                         key={item.name}
@@ -213,7 +234,7 @@ const Navbar: React.FC = () => {
                         </div>
                         <div>
                           <div className="text-sm font-bold text-gray-900 dark:text-white group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
-                          <div className="text-[11px] text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
+                          <div className="text-xs text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
                         </div>
                       </a>
                     ))}
@@ -235,12 +256,12 @@ const Navbar: React.FC = () => {
             </button>
             {activeDropdown === 'shop' && (
               <div
-                className="absolute top-full right-0 pt-2 w-[380px] z-50"
+                className="absolute top-full right-0 pt-2 w-[380px] max-w-[calc(100vw-2rem)] z-50"
                 role="menu"
               >
                 <div className="bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="grid grid-cols-1 gap-2">
-                    <div className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest px-2 mb-2">Shop & Services</div>
+                    <div className="text-xs font-bold text-emerald-600 uppercase tracking-widest px-2 mb-2">Shop & Services</div>
                     {shopItems.map((item) => (
                       <Link
                         key={item.name}
@@ -254,7 +275,7 @@ const Navbar: React.FC = () => {
                         </div>
                         <div>
                           <div className="text-sm font-bold text-gray-900 dark:text-white group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
-                          <div className="text-[11px] text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
+                          <div className="text-xs text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
                         </div>
                       </Link>
                     ))}
@@ -277,6 +298,14 @@ const Navbar: React.FC = () => {
           <Link to="/insights" aria-current={location.pathname === "/insights" ? "page" : undefined} className="px-3 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white transition-all">Insights</Link>
           
           <div className="ml-2 pl-4 border-l border-gray-100 dark:border-white/10 flex items-center gap-4">
+            {/* Desktop Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 rounded-full bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white transition-colors active-click"
+              aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            >
+              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
             <Link
               to="/contact" aria-current={location.pathname === "/contact" ? "page" : undefined}
               className="px-5 py-2.5 rounded-full quantum-gradient text-white text-sm font-bold relative btn-cta-pulse active-click shadow-lg"
@@ -304,6 +333,18 @@ const Navbar: React.FC = () => {
         <div className="md:hidden fixed inset-0 top-0 pt-[72px] bg-white dark:bg-[#0a0a0a] backdrop-blur-3xl z-[45] flex flex-col animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex-grow overflow-y-auto px-6 py-8 space-y-4">
             
+            {/* Theme Toggle in Mobile */}
+            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/10 mb-2">
+              <span className="font-bold text-sm uppercase tracking-widest text-gray-900 dark:text-white">Theme Mode</span>
+              <button
+                onClick={toggleTheme}
+                className="p-2.5 rounded-full bg-white dark:bg-white/10 border border-gray-100 dark:border-white/10 text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white transition-colors active-click"
+                aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+              >
+                {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+            </div>
+
             <div className="space-y-2">
               <button
                 onClick={() => toggleMobileSubmenu('shop')}
@@ -329,7 +370,7 @@ const Navbar: React.FC = () => {
                       <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">{item.icon}</div>
                       <div className="flex flex-col">
                         <span className="font-bold text-sm">{item.name}</span>
-                        <span className="text-[10px] text-gray-600 dark:text-slate-400">{item.desc}</span>
+                        <span className="text-xs text-gray-600 dark:text-slate-400">{item.desc}</span>
                       </div>
                     </Link>
                   ))}
@@ -368,7 +409,7 @@ const Navbar: React.FC = () => {
                       <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">{item.icon}</div>
                       <div className="flex flex-col">
                         <span className="font-bold text-sm">{item.name}</span>
-                        <span className="text-[10px] text-gray-600 dark:text-slate-400">{item.desc}</span>
+                        <span className="text-xs text-gray-600 dark:text-slate-400">{item.desc}</span>
                       </div>
                     </Link>
                   ))}
@@ -401,7 +442,7 @@ const Navbar: React.FC = () => {
                       <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">{item.icon}</div>
                       <div className="flex flex-col">
                         <span className="font-bold text-sm">{item.name}</span>
-                        <span className="text-[10px] text-gray-600 dark:text-slate-400">{item.desc}</span>
+                        <span className="text-xs text-gray-600 dark:text-slate-400">{item.desc}</span>
                       </div>
                     </Link>
                   ))}
@@ -435,7 +476,7 @@ const Navbar: React.FC = () => {
                       <div className="p-2 rounded-lg bg-emerald-500/10">{item.icon}</div>
                       <div className="flex flex-col">
                         <span className="font-bold text-sm">{item.name}</span>
-                        <span className="text-[10px] text-gray-600 dark:text-slate-400">{item.desc}</span>
+                        <span className="text-xs text-gray-600 dark:text-slate-400">{item.desc}</span>
                       </div>
                     </a>
                   ))}

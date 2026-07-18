@@ -55,7 +55,9 @@ const Partnerships: React.FC = () => {
           <Globe className="w-12 h-12 text-emerald-600 group-hover:rotate-45 transition-transform duration-700" />
         </div>
         <div className="reveal-on-scroll">
-          <h2 className="text-3xl md:text-4xl font-montserrat font-bold mb-6 text-gray-900 dark:text-white">Global Partnership. <span className="quantum-text-gradient">Local Muscle.</span></h2>
+          <h2 className="text-3xl md:text-4xl font-montserrat font-bold mb-6 text-gray-900 dark:text-white">
+            Global Partnership. <span className="text-emerald-700 dark:text-emerald-400">Local Muscle.</span>
+          </h2>
           <p className="text-gray-600 dark:text-slate-300 max-w-2xl mx-auto mb-16 text-lg font-medium">
             We bridge the gap by bringing international technology partnerships and world-class digital logic to solve localized challenges in the Pacific.
           </p>
@@ -70,7 +72,7 @@ const Partnerships: React.FC = () => {
               <div className="mb-4 transform group-hover:rotate-12 transition-transform duration-500">
                 {partner.logo}
               </div>
-              <span className="font-bold text-[10px] tracking-[0.2em] uppercase text-gray-600 dark:text-slate-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+              <span className="font-bold text-xs tracking-[0.2em] uppercase text-gray-600 dark:text-slate-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
                 {partner.name}
               </span>
             </div>

@@ -98,15 +98,15 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-gray-900 dark:text-white font-bold mb-6">Credentials</h4>
             <div className="bg-white dark:bg-white/2 p-6 rounded-2xl border border-gray-100 dark:border-white/5 space-y-4 shadow-sm">
-              <div className="flex justify-between items-center text-[10px] tracking-widest uppercase font-bold">
+              <div className="flex justify-between items-center text-xs tracking-widest uppercase font-bold">
                 <span className="text-gray-600 dark:text-slate-400">IPA REG:</span>
                 <span className="text-gray-900 dark:text-white">6-165201</span>
               </div>
-              <div className="flex justify-between items-center text-[10px] tracking-widest uppercase font-bold">
+              <div className="flex justify-between items-center text-xs tracking-widest uppercase font-bold">
                 <span className="text-gray-600 dark:text-slate-400">TIN (IRC):</span>
                 <span className="text-gray-900 dark:text-white">500286059</span>
               </div>
-              <div className="flex justify-between items-center text-[10px] tracking-widest uppercase font-bold">
+              <div className="flex justify-between items-center text-xs tracking-widest uppercase font-bold">
                 <span className="text-gray-600 dark:text-slate-400">EST:</span>
                 <span className="text-gray-900 dark:text-white">2014</span>
               </div>
@@ -116,7 +116,7 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="pt-10 border-t border-gray-100 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
-          <p className="text-gray-600 dark:text-slate-600 text-xs text-center md:text-left">
+          <p className="text-gray-600 dark:text-slate-400 text-xs text-center md:text-left">
             © {currentYear} Deeps Systems. All rights reserved.
           </p>
 
