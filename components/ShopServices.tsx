@@ -19,6 +19,7 @@ const ShopServices: React.FC = () => {
     message: ''
   });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const categories = [
     {
@@ -83,11 +84,13 @@ const ShopServices: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.business.trim() || !selectedService || !formData.message.trim()) {
+      setSubmitError("All fields are required.");
       setStatus('error');
       return;
     }
 
     setStatus('submitting');
+    setSubmitError(null);
 
     const apiUrl = import.meta.env.DEV
       ? 'http://localhost:3001/api/inquiries'
@@ -114,9 +117,18 @@ const ShopServices: React.FC = () => {
         setFormData({ name: '', business: '', message: '' });
         setSelectedService('');
       } else {
+        let errMsg = "Server returned error status.";
+        try {
+          const errData = await response.json();
+          if (errData && errData.error) {
+            errMsg = errData.error;
+          }
+        } catch (_) {}
+        setSubmitError(errMsg);
         setStatus('error');
       }
     } catch (err) {
+      setSubmitError("Network connection failed. Please verify your connection.");
       setStatus('error');
     }
   };
@@ -273,7 +285,7 @@ const ShopServices: React.FC = () => {
 
                     {status === 'error' && (
                       <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-semibold flex items-center gap-3 animate-in fade-in duration-300">
-                        Failed to submit inquiry. Please complete all fields and verify your network, or email us at wokman@dspng.tech.
+                        Failed to submit inquiry: {submitError || "Unknown connection error."} Please complete all fields and verify your network, or email us at wokman@dspng.tech.
                       </div>
                     )}
 
