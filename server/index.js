@@ -1,8 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import pg from 'pg';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const { Pool } = pg;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distPath = path.join(__dirname, '../dist');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -99,6 +105,9 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+// Serve static assets from Vite dist/ folder
+app.use(express.static(distPath));
 
 // Health Check Endpoint
 app.get('/health', async (req, res) => {
@@ -233,7 +242,12 @@ app.post('/api/inquiries', async (req, res) => {
   }
 });
 
+// Catch-all route to serve the React SPA index.html for non-API requests
+app.get('*', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
+});
+
 // Start listening
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`[Server] Deeps Systems API layer listening on port ${PORT}`);
+  console.log(`[Server] Monolithic Deeps Systems Server listening on port ${PORT}`);
 });
