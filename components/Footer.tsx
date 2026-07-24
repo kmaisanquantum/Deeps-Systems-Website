@@ -1,9 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Binary, Mail, MapPin,
-  ShieldCheck, ArrowUpRight, ShoppingBag
-} from 'lucide-react';
+import { Mail, MapPin, ShoppingBag } from 'lucide-react';
 import { storeItem } from './navbarData';
 
 const Footer: React.FC = () => {
@@ -34,7 +31,7 @@ const Footer: React.FC = () => {
   ];
 
   return (
-    <footer className="bg-gray-50 dark:bg-[#050505] border-t border-gray-100 dark:border-white/5 pt-20 pb-10">
+    <footer className="bg-gray-50 dark:bg-[#050505] border-t border-gray-100 dark:border-white/5 pt-20 pb-44 md:pb-10">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
 
@@ -113,11 +110,19 @@ const Footer: React.FC = () => {
 
         </div>
 
-        <div className="pt-10 border-t border-gray-100 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="pt-10 border-t border-gray-100 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 md:pr-48 pb-12 md:pb-0">
           <p className="text-gray-600 dark:text-slate-400 text-xs text-center md:text-left">
             © {currentYear} Deeps Systems. All rights reserved.
           </p>
-
+          <a
+            href="http://webmail.dspng.tech/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-600 dark:text-slate-400 text-xs hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-2"
+          >
+            <Mail className="w-4 h-4" />
+            Staff Webmail
+          </a>
         </div>
       </div>
     </footer>
