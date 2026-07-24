@@ -96,14 +96,6 @@ const QuantumAssistant: React.FC = () => {
                   {m.showOptions && (
                     <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/10 flex flex-col gap-2 w-full">
                       <a
-                        href={`https://wa.me/67583009881?text=${encodeURIComponent(messages[messages.length - 2]?.text || "Hello Deeps Systems")}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md active-click"
-                      >
-                        Send via WhatsApp
-                      </a>
-                      <a
                         href={`mailto:wokman@dspng.tech?subject=Inquiry&body=${encodeURIComponent(messages[messages.length - 2]?.text || "")}`}
                         className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md active-click"
                       >
