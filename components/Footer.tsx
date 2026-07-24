@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Binary, Mail, MapPin,
-  ShieldCheck, ArrowUpRight, ShoppingBag, Phone, MessageSquare
+  ShieldCheck, ArrowUpRight, ShoppingBag
 } from 'lucide-react';
 import { storeItem } from './navbarData';
 
@@ -30,8 +30,6 @@ const Footer: React.FC = () => {
 
   const contactInfo = [
     { icon: <Mail className="w-5 h-5 text-emerald-600" />, text: 'wokman@dspng.tech', href: 'mailto:wokman@dspng.tech' },
-    { icon: <Phone className="w-5 h-5 text-emerald-600" />, text: '+675 83009881', href: 'tel:83009881' },
-    { icon: <MessageSquare className="w-5 h-5 text-emerald-600" />, text: 'WhatsApp: +675 83009881', href: 'https://wa.me/67583009881' },
     { icon: <MapPin className="w-5 h-5 text-emerald-600" />, text: 'Port Moresby, PNG', href: '#' },
   ];
 

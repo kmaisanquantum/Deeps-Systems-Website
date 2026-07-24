@@ -192,18 +192,6 @@ const Contact: React.FC = () => {
                   </div>
                 </a>
               </div>
-
-              <div className="flex items-center gap-6 group">
-                <a href="https://wa.me/67583009881" target="_blank" rel="noopener noreferrer" className="flex items-center gap-6 group">
-                  <div className="p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 group-hover:border-emerald-500/30 transition-all shadow-sm">
-                    <MessageSquare className="w-6 h-6 text-emerald-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest mb-1">Instant Messaging</p>
-                    <p className="text-gray-900 dark:text-white font-bold font-mono">+675 83009881</p>
-                  </div>
-                </a>
-              </div>
             </div>
           </div>
 
