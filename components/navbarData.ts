@@ -34,10 +34,8 @@ export const servicesItems = [
 ];
 
 export const shopItems = [
-  { name: 'Infrastructure & Security', icon: React.createElement(Shield, { className: "w-5 h-5" }), href: '/shop#shop-infra', desc: 'Secure Office, Cloud Audits.' },
-  { name: 'Cloud Platforms/SaaS', icon: React.createElement(Cloud, { className: "w-5 h-5" }), href: '/shop#shop-saas', desc: 'Finance, Property, Agri-Trace.' },
-  { name: 'Workflow Automation', icon: React.createElement(Zap, { className: "w-5 h-5" }), href: '/shop#shop-automation', desc: 'Forms, Legal, Financial Recon.' },
-  { name: 'Strategic Advisory', icon: React.createElement(Lightbulb, { className: "w-5 h-5" }), href: '/shop#shop-advisory', desc: 'Strategy, Roadmaps, Quantum.' },
+  { name: 'Microsoft Office', icon: React.createElement(Monitor, { className: "w-5 h-5" }), href: '/shop#shop-microsoft', desc: 'Microsoft 365 licensing (reseller).' },
+  { name: 'Starlink Kits', icon: React.createElement(Rocket, { className: "w-5 h-5" }), href: '/shop#shop-starlink', desc: 'Satellite internet hardware (reseller).' },
 ];
 
 export const advantageItems = [
