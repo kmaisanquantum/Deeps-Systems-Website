@@ -1,13 +1,13 @@
 import React from 'react';
-import { ShoppingBag, ArrowRight, CheckCircle2, ShieldCheck, Zap } from 'lucide-react';
+import { ShoppingBag, ArrowRight, CheckCircle2, ShieldCheck, Rocket } from 'lucide-react';
 import { storeItem } from './navbarData';
 
 const OnlineStorePreview: React.FC = () => {
   const features = [
-    "Secure PGK Payments",
-    "Nationwide Delivery",
-    "Business Hardware",
-    "Digital Licensing"
+    "Microsoft 365 Licensing",
+    "Starlink Hardware Kits",
+    "PNG Local Reseller Support",
+    "SME Cloud Provisioning"
   ];
 
   return (
@@ -59,17 +59,17 @@ const OnlineStorePreview: React.FC = () => {
                 <div className="bg-white dark:bg-[#0a0a0a] p-8 rounded-[2.5rem] border border-gray-200 dark:border-white/10 shadow-2xl space-y-6 transform rotate-3 hover:rotate-0 transition-transform duration-700">
                    <div className="flex justify-between items-start">
                       <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600">
-                        <Zap className="w-8 h-8" />
+                        <Rocket className="w-8 h-8" />
                       </div>
                       <div className="text-right">
                          <p className="text-[10px] font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest mb-1">Price</p>
-                         <p className="text-2xl font-bold text-gray-900 dark:text-white">K 1,299</p>
+                         <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">Pricing coming soon</p>
                       </div>
                    </div>
                    <div className="space-y-2">
-                      <h4 className="text-xl font-bold text-gray-900 dark:text-white">BITC Access Hub</h4>
+                      <h4 className="text-xl font-bold text-gray-900 dark:text-white">Starlink Standard Kit</h4>
                       <p className="text-xs text-gray-600 dark:text-slate-400 font-medium leading-relaxed">
-                        Pre-configured enterprise gateway for secure SME cloud connectivity.
+                        Authorized reseller satellite hardware for high-speed connectivity across PNG.
                       </p>
                    </div>
                    <div className="pt-4 border-t border-gray-100 dark:border-white/5 flex items-center justify-between">
