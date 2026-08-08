@@ -11,10 +11,12 @@ import AdvantagePage from './pages/AdvantagePage';
 import InsightsPage from './pages/InsightsPage';
 import Contact from './components/Contact';
 import ShopPage from './pages/ShopPage';
+import { CartProvider } from './components/CartContext';
 
 const App: React.FC = () => {
   return (
     <Router>
+      <CartProvider>
       <ScrollToTop />
       <div className="min-h-screen selection:bg-emerald-500/30">
         <a
@@ -38,6 +40,7 @@ const App: React.FC = () => {
         <QuantumAssistant />
         <ScrollUpButton />
       </div>
+      </CartProvider>
     </Router>
   );
 };

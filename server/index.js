@@ -109,6 +109,16 @@ app.use(cors({
 
 app.use(express.json());
 
+// Canonical Host Redirection: www.dspng.tech -> dspng.tech
+app.use((req, res, next) => {
+  const host = req.headers.host || '';
+  if (host === 'www.dspng.tech') {
+    console.log(`[Redirect] Redirecting www.dspng.tech${req.originalUrl} -> https://dspng.tech${req.originalUrl}`);
+    return res.redirect(301, `https://dspng.tech${req.originalUrl}`);
+  }
+  next();
+});
+
 // Serve static assets from Vite dist/ folder
 app.use(express.static(distPath));
 

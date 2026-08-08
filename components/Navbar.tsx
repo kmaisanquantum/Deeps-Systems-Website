@@ -13,8 +13,11 @@ import {
   Moon
 } from 'lucide-react';
 import { servicesItems, shopItems, advantageItems, ecosystemItems } from './navbarData';
+import { useCart } from './CartContext';
+import CartDrawer from './CartDrawer';
 
 const Navbar: React.FC = () => {
+  const { totalItems, isCartOpen, setIsCartOpen } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -298,6 +301,20 @@ const Navbar: React.FC = () => {
           <Link to="/insights" aria-current={location.pathname === "/insights" ? "page" : undefined} className="px-3 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white transition-all">Insights</Link>
           
           <div className="ml-2 pl-4 border-l border-gray-100 dark:border-white/10 flex items-center gap-4">
+            {/* Desktop Basket Toggle */}
+            <button
+              onClick={() => setIsCartOpen(!isCartOpen)}
+              className="relative p-2.5 rounded-full bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white transition-colors active-click"
+              aria-label="Open basket"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-[10px] font-bold text-white ring-2 ring-white dark:ring-[#0a0a0a] animate-in zoom-in duration-300">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+
             {/* Desktop Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -317,6 +334,20 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Menu Toggle */}
         <div className="flex items-center gap-3 md:hidden">
+          {/* Mobile Basket Toggle */}
+          <button
+            onClick={() => setIsCartOpen(!isCartOpen)}
+            className="relative p-2 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/10 text-gray-900 dark:text-white"
+            aria-label="Open basket"
+          >
+            <ShoppingBag className="w-5 h-5" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-[9px] font-bold text-white ring-2 ring-white dark:ring-[#0a0a0a]">
+                {totalItems}
+              </span>
+            )}
+          </button>
+
           <button 
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMobileMenuOpen}
@@ -327,6 +358,9 @@ const Navbar: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Cart Drawer */}
+      <CartDrawer />
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
