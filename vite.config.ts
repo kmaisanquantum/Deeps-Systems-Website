@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
         tailwindcss(),
         VitePWA({
           registerType: 'autoUpdate',
-          includeAssets: ['robots.txt', 'sitemap.xml', 'apple-touch-icon.png'],
+          includeAssets: ['robots.txt', 'sitemap.xml', 'apple-touch-icon.png', 'favicon.ico', 'favicon-96x96.png'],
           manifest: {
             name: 'Deeps Systems',
             short_name: 'Deeps Systems',
