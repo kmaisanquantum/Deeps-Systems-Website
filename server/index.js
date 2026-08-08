@@ -109,6 +109,16 @@ app.use(cors({
 
 app.use(express.json());
 
+// Early middleware to enforce canonical host (301 redirect www.dspng.tech -> dspng.tech)
+app.use((req, res, next) => {
+  const host = req.headers.host;
+  if (host && (host === 'www.dspng.tech' || host.startsWith('www.dspng.tech:'))) {
+    const canonicalUrl = `https://dspng.tech${req.originalUrl}`;
+    return res.redirect(301, canonicalUrl);
+  }
+  next();
+});
+
 // Serve static assets from Vite dist/ folder
 app.use(express.static(distPath));
 
