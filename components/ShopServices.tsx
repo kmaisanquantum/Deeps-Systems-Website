@@ -12,6 +12,7 @@ import {
   ShoppingCart
 } from 'lucide-react';
 import { useCart } from './CartContext';
+import { getApiUrl } from '../utils/api';
 
 const ShopServices: React.FC = () => {
   const { addToCart, setIsCartOpen } = useCart();
@@ -28,6 +29,7 @@ const ShopServices: React.FC = () => {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [addedFeedback, setAddedFeedback] = useState<Record<string, boolean>>({});
 
+  // TODO: confirm real pricing with the site owner before final production release.
   const categories = [
     {
       id: "shop-microsoft",
@@ -38,7 +40,7 @@ const ShopServices: React.FC = () => {
         {
           id: "m365-basic",
           name: "Microsoft 365 Business Basic",
-          price: 25.00,
+          price: 25.00, // TODO: confirm real pricing
           billing: "/ month",
           features: [
             "Web and mobile apps of Office",
@@ -50,7 +52,7 @@ const ShopServices: React.FC = () => {
         {
           id: "m365-standard",
           name: "Microsoft 365 Business Standard",
-          price: 55.00,
+          price: 55.00, // TODO: confirm real pricing
           billing: "/ month",
           features: [
             "Premium desktop apps of Office",
@@ -62,7 +64,7 @@ const ShopServices: React.FC = () => {
         {
           id: "m365-premium",
           name: "Microsoft 365 Business Premium",
-          price: 95.00,
+          price: 95.00, // TODO: confirm real pricing
           billing: "/ month",
           features: [
             "Advanced cyberthreat protection",
@@ -74,7 +76,7 @@ const ShopServices: React.FC = () => {
         {
           id: "m365-apps",
           name: "Microsoft 365 Apps for Business",
-          price: 40.00,
+          price: 40.00, // TODO: confirm real pricing
           billing: "/ month",
           features: [
             "Desktop apps (Word, Excel, PPT, etc.)",
@@ -94,7 +96,7 @@ const ShopServices: React.FC = () => {
         {
           id: "starlink-standard",
           name: "Starlink Standard Kit",
-          price: 2500.00,
+          price: 2500.00, // TODO: confirm real pricing
           billing: " once",
           features: [
             "High-speed, low-latency satellite internet",
@@ -106,7 +108,7 @@ const ShopServices: React.FC = () => {
         {
           id: "starlink-mini",
           name: "Starlink Mini Kit",
-          price: 1500.00,
+          price: 1500.00, // TODO: confirm real pricing
           billing: " once",
           features: [
             "Ultra-portable high-speed internet design",
@@ -118,7 +120,7 @@ const ShopServices: React.FC = () => {
         {
           id: "starlink-business",
           name: "Starlink Business / High-Performance",
-          price: 9500.00,
+          price: 9500.00, // TODO: confirm real pricing
           billing: " once",
           features: [
             "High-gain flat panel satellite antenna",
@@ -130,7 +132,7 @@ const ShopServices: React.FC = () => {
         {
           id: "starlink-monthly",
           name: "Starlink Monthly Service Plan",
-          price: 350.00,
+          price: 350.00, // TODO: confirm real pricing
           billing: "/ month",
           features: [
             "High-priority data allocation options",
@@ -186,12 +188,8 @@ const ShopServices: React.FC = () => {
     setStatus('submitting');
     setSubmitError(null);
 
-    const apiUrl = import.meta.env.DEV
-      ? 'http://localhost:3001/api/inquiries'
-      : '/api/inquiries';
-
     try {
-      const response = await fetch(apiUrl, {
+      const response = await fetch(getApiUrl('/api/inquiries'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -256,7 +254,7 @@ const ShopServices: React.FC = () => {
                 <div>
                   <h3 className="text-2xl font-bold uppercase tracking-widest">{category.title}</h3>
                   <p className="text-emerald-500/80 font-bold text-sm uppercase tracking-wider">
-                    {category.pricing_label} (Placeholders)
+                    {category.pricing_label}
                   </p>
                 </div>
               </div>

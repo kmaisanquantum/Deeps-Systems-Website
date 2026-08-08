@@ -55,13 +55,13 @@ if (process.env.DATABASE_URL === 'mock') {
   pool = new Pool(poolConfig);
 }
 
-// Startup migration: Ensure the inquiries table exists
+// Startup migration: Ensure the inquiries, orders, and order_items tables exist
 async function initializeDatabase() {
   if (process.env.DATABASE_URL === 'mock') {
-    console.log('[Database] inquiries table mocked successfully.');
+    console.log('[Database] inquiries, orders, and order_items tables mocked successfully.');
     return;
   }
-  const createTableQuery = `
+  const createInquiriesTableQuery = `
     CREATE TABLE IF NOT EXISTS inquiries (
       id SERIAL PRIMARY KEY,
       type VARCHAR(50) NOT NULL,
@@ -74,13 +74,37 @@ async function initializeDatabase() {
       created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
   `;
+  const createOrdersTableQuery = `
+    CREATE TABLE IF NOT EXISTS orders (
+      id SERIAL PRIMARY KEY,
+      customer_name VARCHAR(255) NOT NULL,
+      business VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL,
+      total_items INT NOT NULL,
+      total_price NUMERIC(12, 2) NOT NULL,
+      notes TEXT,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+  const createOrderItemsTableQuery = `
+    CREATE TABLE IF NOT EXISTS order_items (
+      id SERIAL PRIMARY KEY,
+      order_id INT REFERENCES orders(id) ON DELETE CASCADE,
+      product_id VARCHAR(255) NOT NULL,
+      product_name VARCHAR(255) NOT NULL,
+      unit_price NUMERIC(12, 2) NOT NULL,
+      quantity INT NOT NULL
+    );
+  `;
   try {
     const client = await pool.connect();
-    await client.query(createTableQuery);
+    await client.query(createInquiriesTableQuery);
+    await client.query(createOrdersTableQuery);
+    await client.query(createOrderItemsTableQuery);
     client.release();
-    console.log('[Database] inquiries table initialized successfully.');
+    console.log('[Database] inquiries, orders, and order_items tables initialized successfully.');
   } catch (err) {
-    console.error('[Database] Failed to initialize table:', err);
+    console.error('[Database] Failed to initialize database tables:', err);
   }
 }
 
@@ -246,6 +270,213 @@ async function sendInquiryEmail(type, data) {
     console.error('[Nodemailer] SMTP notification failed:', err);
   }
 }
+
+// Direct SMTP order email notification via Nodemailer
+async function sendOrderEmail(order, items) {
+  const recipient = 'wokman@dspng.tech';
+  const subjectLine = `New Order #${order.id} from ${order.customer_name}`;
+
+  const itemsHtml = items.map(item => `
+    <tr>
+      <td style="padding: 8px; border: 1px solid #e2e8f0;">${item.product_name}</td>
+      <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${item.quantity}</td>
+      <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${parseFloat(item.unit_price || item.price).toFixed(2)}</td>
+      <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${(parseFloat(item.unit_price || item.price) * item.quantity).toFixed(2)}</td>
+    </tr>
+  `).join('');
+
+  const htmlBody = `
+    <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
+      <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">New Order #${order.id}</h2>
+      <p><strong>Customer Name:</strong> ${order.customer_name}</p>
+      <p><strong>Business Name:</strong> ${order.business}</p>
+      <p><strong>Email Address:</strong> ${order.email}</p>
+
+      <h3 style="color: #1e293b; margin-top: 20px;">Ordered Items</h3>
+      <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <thead>
+          <tr style="background-color: #f8fafc;">
+            <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: left;">Product</th>
+            <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">Qty</th>
+            <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Unit Price</th>
+            <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHtml}
+        </tbody>
+        <tfoot>
+          <tr style="font-weight: bold;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Grand Total:</td>
+            <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${parseFloat(order.total_price).toFixed(2)}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      ${order.notes ? `
+        <div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #10b981; margin-top: 20px;">
+          <p style="margin: 0; font-weight: bold;">Customer Notes:</p>
+          <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${order.notes}</p>
+        </div>
+      ` : ''}
+
+      <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+        Sent from Deeps Systems Monolith
+      </p>
+    </div>
+  `;
+
+  const mailOptions = {
+    from: process.env.SMTP_USER ? `"Deeps Systems Monolith" <${process.env.SMTP_USER}>` : '"Deeps Systems Monolith" <no-reply@dspng.tech>',
+    to: recipient,
+    subject: subjectLine,
+    html: htmlBody,
+  };
+
+  try {
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.log('[Nodemailer] SMTP credentials omitted. Logging order email content instead:');
+      console.log('To:', recipient);
+      console.log('Subject:', subjectLine);
+      console.log('Body Preview:', htmlBody.replace(/<[^>]*>/g, '').trim().substring(0, 300) + '...');
+      return;
+    }
+
+    console.log(`[Nodemailer] Dispatching direct SMTP order notification to: ${recipient}`);
+    await transporter.sendMail(mailOptions);
+    console.log('[Nodemailer] SMTP order notification dispatched successfully.');
+  } catch (err) {
+    console.error('[Nodemailer] SMTP order notification failed:', err);
+  }
+}
+
+// Orders API Endpoint
+app.post('/api/orders', async (req, res) => {
+  const { name, business, email, notes, items, totalItems, totalPrice } = req.body;
+
+  // Validation
+  if (!name || typeof name !== 'string' || name.trim().length < 2) {
+    return res.status(400).json({ error: 'Name must be at least 2 characters.' });
+  }
+
+  if (!business || typeof business !== 'string' || business.trim().length === 0) {
+    return res.status(400).json({ error: 'Business name is required.' });
+  }
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: 'Valid email address is required.' });
+  }
+
+  if (!Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ error: 'Cart items are required.' });
+  }
+
+  // Handle mock database mode
+  if (process.env.DATABASE_URL === 'mock') {
+    const mockOrder = {
+      id: Math.floor(Math.random() * 10000) + 1,
+      customer_name: name.trim(),
+      business: business.trim(),
+      email: email.trim(),
+      total_items: totalItems || items.reduce((acc, cur) => acc + cur.quantity, 0),
+      total_price: totalPrice || items.reduce((acc, cur) => acc + (cur.price * cur.quantity), 0),
+      notes: notes ? notes.trim() : null,
+      created_at: new Date().toISOString()
+    };
+
+    const mockItems = items.map(item => ({
+      product_id: item.id,
+      product_name: item.name,
+      unit_price: item.price,
+      quantity: item.quantity
+    }));
+
+    console.log('[Mock DB] Creating order in transaction:');
+    console.log('[Mock DB] Order payload:', mockOrder);
+    console.log('[Mock DB] Order items payload:', mockItems);
+
+    // Send email notification asynchronously in background
+    sendOrderEmail(mockOrder, mockItems);
+
+    return res.status(201).json({
+      success: true,
+      message: 'Order created successfully (mock mode).',
+      orderId: mockOrder.id
+    });
+  }
+
+  // Database transaction for live PG database
+  let client;
+  try {
+    client = await pool.connect();
+    await client.query('BEGIN');
+
+    // 1. Insert order
+    const insertOrderQuery = `
+      INSERT INTO orders (customer_name, business, email, total_items, total_price, notes)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *
+    `;
+    const orderValues = [
+      name.trim(),
+      business.trim(),
+      email.trim(),
+      totalItems || items.reduce((acc, cur) => acc + cur.quantity, 0),
+      totalPrice || items.reduce((acc, cur) => acc + (cur.price * cur.quantity), 0),
+      notes ? notes.trim() : null
+    ];
+
+    const orderResult = await client.query(insertOrderQuery, orderValues);
+    const order = orderResult.rows[0];
+
+    // 2. Insert order items
+    const insertedItems = [];
+    for (const item of items) {
+      const insertItemQuery = `
+        INSERT INTO order_items (order_id, product_id, product_name, unit_price, quantity)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING *
+      `;
+      const itemValues = [
+        order.id,
+        item.id,
+        item.name,
+        item.price,
+        item.quantity
+      ];
+      const itemResult = await client.query(insertItemQuery, itemValues);
+      insertedItems.push(itemResult.rows[0]);
+    }
+
+    await client.query('COMMIT');
+    client.release();
+
+    console.log(`[Database] Transaction committed successfully. Order #${order.id} created.`);
+
+    // 3. Send email notification asynchronously in background
+    sendOrderEmail(order, insertedItems);
+
+    return res.status(201).json({
+      success: true,
+      message: 'Order created successfully.',
+      orderId: order.id
+    });
+
+  } catch (err) {
+    if (client) {
+      try {
+        await client.query('ROLLBACK');
+        client.release();
+      } catch (rollbackErr) {
+        console.error('[API] Rollback error:', rollbackErr);
+      }
+    }
+    console.error('[API] Error handling order request:', err);
+    return res.status(500).json({
+      error: 'An internal server error occurred while processing your order.',
+    });
+  }
+});
 
 // Inquiries API Endpoint
 app.post('/api/inquiries', async (req, res) => {
