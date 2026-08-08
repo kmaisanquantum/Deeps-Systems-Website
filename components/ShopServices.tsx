@@ -6,10 +6,15 @@ import {
   ArrowRight,
   Mail,
   Send,
-  Loader2
+  Loader2,
+  Plus,
+  Minus,
+  ShoppingCart
 } from 'lucide-react';
+import { useCart } from './CartContext';
 
 const ShopServices: React.FC = () => {
+  const { addToCart, setIsCartOpen } = useCart();
   const [selectedService, setSelectedService] = useState('');
   const [formData, setFormData] = useState({
     name: '',
@@ -19,15 +24,22 @@ const ShopServices: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Quantities & visual feedback states per product id
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [addedFeedback, setAddedFeedback] = useState<Record<string, boolean>>({});
+
   const categories = [
     {
       id: "shop-microsoft",
       title: "Microsoft Office Applications",
       icon: <Monitor className="w-6 h-6" />,
-      pricing: { pgk: null, usd: null, aud: null }, // Deferred pricing structure for future accounts & finance module
+      pricing_label: "Reseller Licenses — Pricing in PGK",
       services: [
         {
+          id: "m365-basic",
           name: "Microsoft 365 Business Basic",
+          price: 25.00,
+          billing: "/ month",
           features: [
             "Web and mobile apps of Office",
             "Teams, Exchange, OneDrive (1 TB)",
@@ -36,7 +48,10 @@ const ShopServices: React.FC = () => {
           ]
         },
         {
+          id: "m365-standard",
           name: "Microsoft 365 Business Standard",
+          price: 55.00,
+          billing: "/ month",
           features: [
             "Premium desktop apps of Office",
             "Webinars with attendee registration",
@@ -45,7 +60,10 @@ const ShopServices: React.FC = () => {
           ]
         },
         {
+          id: "m365-premium",
           name: "Microsoft 365 Business Premium",
+          price: 95.00,
+          billing: "/ month",
           features: [
             "Advanced cyberthreat protection",
             "Comprehensive mobile device management",
@@ -54,7 +72,10 @@ const ShopServices: React.FC = () => {
           ]
         },
         {
+          id: "m365-apps",
           name: "Microsoft 365 Apps for Business",
+          price: 40.00,
+          billing: "/ month",
           features: [
             "Desktop apps (Word, Excel, PPT, etc.)",
             "1 TB secure OneDrive storage per user",
@@ -68,10 +89,13 @@ const ShopServices: React.FC = () => {
       id: "shop-starlink",
       title: "Starlink Kits",
       icon: <Rocket className="w-6 h-6" />,
-      pricing: { pgk: null, usd: null, aud: null }, // Deferred pricing structure for future accounts & finance module
+      pricing_label: "Hardware & Subscriptions — Pricing in PGK",
       services: [
         {
+          id: "starlink-standard",
           name: "Starlink Standard Kit",
+          price: 2500.00,
+          billing: " once",
           features: [
             "High-speed, low-latency satellite internet",
             "Easy self-install kit with base & cables",
@@ -80,7 +104,10 @@ const ShopServices: React.FC = () => {
           ]
         },
         {
+          id: "starlink-mini",
           name: "Starlink Mini Kit",
+          price: 1500.00,
+          billing: " once",
           features: [
             "Ultra-portable high-speed internet design",
             "Low power consumption for field work",
@@ -89,7 +116,10 @@ const ShopServices: React.FC = () => {
           ]
         },
         {
+          id: "starlink-business",
           name: "Starlink Business / High-Performance",
+          price: 9500.00,
+          billing: " once",
           features: [
             "High-gain flat panel satellite antenna",
             "Double the transmitter power output",
@@ -98,7 +128,10 @@ const ShopServices: React.FC = () => {
           ]
         },
         {
+          id: "starlink-monthly",
           name: "Starlink Monthly Service Plan",
+          price: 350.00,
+          billing: "/ month",
           features: [
             "High-priority data allocation options",
             "Unlimited standard high-speed data",
@@ -109,6 +142,25 @@ const ShopServices: React.FC = () => {
       ]
     }
   ];
+
+  const handleQuantityChange = (productId: string, val: number) => {
+    if (val < 1) return;
+    setQuantities(prev => ({ ...prev, [productId]: val }));
+  };
+
+  const handleAddToCartClick = (service: { id: string; name: string; price: number }) => {
+    const qty = quantities[service.id] || 1;
+    addToCart({ id: service.id, name: service.name, price: service.price }, qty);
+
+    // Provide visual feedback
+    setAddedFeedback(prev => ({ ...prev, [service.id]: true }));
+    setTimeout(() => {
+      setAddedFeedback(prev => ({ ...prev, [service.id]: false }));
+    }, 1500);
+
+    // Open Cart drawer for a smoother user experience
+    setIsCartOpen(true);
+  };
 
   const handleRequestService = (serviceName: string) => {
     setSelectedService(serviceName);
@@ -204,35 +256,98 @@ const ShopServices: React.FC = () => {
                 <div>
                   <h3 className="text-2xl font-bold uppercase tracking-widest">{category.title}</h3>
                   <p className="text-emerald-500/80 font-bold text-sm uppercase tracking-wider">
-                    Pricing available soon — PGK / USD / AUD
+                    {category.pricing_label} (Placeholders)
                   </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {category.services.map((service, srvIdx) => (
-                  <div
-                    key={srvIdx}
-                    className="group p-6 bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 hover:border-emerald-500/50 transition-all duration-500 hover:bg-white/10 flex flex-col shadow-2xl"
-                  >
-                    <h4 className="text-lg font-bold mb-4 group-hover:text-emerald-400 transition-colors line-clamp-2 min-h-[3.5rem] flex items-center">{service.name}</h4>
-                    <ul className="space-y-3 mb-8 flex-grow">
-                      {service.features.map((feature, fIdx) => (
-                        <li key={fIdx} className="flex items-start gap-2.5 text-xs text-slate-400">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <button
-                      onClick={() => handleRequestService(service.name)}
-                      className="w-full py-3.5 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-xs uppercase tracking-widest hover:bg-emerald-600 hover:border-emerald-500 transition-all flex items-center justify-center gap-2 group/btn active-click"
+                {category.services.map((service, srvIdx) => {
+                  const qty = quantities[service.id] || 1;
+                  const isAdded = addedFeedback[service.id];
+                  return (
+                    <div
+                      key={srvIdx}
+                      className="group p-6 bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 hover:border-emerald-500/50 transition-all duration-500 hover:bg-white/10 flex flex-col shadow-2xl relative overflow-hidden"
                     >
-                      Enquire / Request Quote
-                      <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
-                    </button>
-                  </div>
-                ))}
+                      <h4 className="text-lg font-bold mb-2 group-hover:text-emerald-400 transition-colors line-clamp-2 min-h-[3.5rem] flex items-center">{service.name}</h4>
+
+                      {/* Price Tag */}
+                      <div className="mb-4">
+                        <span className="text-2xl font-black text-emerald-400">
+                          K{service.price.toFixed(2)}
+                        </span>
+                        <span className="text-xs text-slate-400">{service.billing}</span>
+                      </div>
+
+                      <ul className="space-y-3 mb-6 flex-grow">
+                        {service.features.map((feature, fIdx) => (
+                          <li key={fIdx} className="flex items-start gap-2.5 text-xs text-slate-400">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      {/* Quantity Stepper */}
+                      <div className="flex items-center justify-between gap-2 mb-4 p-2 bg-white/5 rounded-xl border border-white/10">
+                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider pl-2">Qty</span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => handleQuantityChange(service.id, qty - 1)}
+                            className="p-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 transition-colors"
+                            aria-label="Decrease quantity"
+                          >
+                            <Minus className="w-3.5 h-3.5" />
+                          </button>
+                          <input
+                            type="number"
+                            min="1"
+                            value={qty}
+                            onChange={(e) => handleQuantityChange(service.id, parseInt(e.target.value) || 1)}
+                            className="w-10 bg-transparent text-center text-sm font-bold outline-none border-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                          <button
+                            onClick={() => handleQuantityChange(service.id, qty + 1)}
+                            className="p-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 transition-colors"
+                            aria-label="Increase quantity"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Add to Cart CTA */}
+                      <button
+                        onClick={() => handleAddToCartClick(service)}
+                        className={`w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 group/btn active-click ${
+                          isAdded
+                            ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
+                            : 'bg-white/5 border border-white/10 text-white hover:bg-emerald-600 hover:border-emerald-500'
+                        }`}
+                      >
+                        {isAdded ? (
+                          <>
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            Added!
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingCart className="w-3.5 h-3.5" />
+                            Add to Cart
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => handleRequestService(service.name)}
+                        className="mt-2 w-full py-2 rounded-lg text-[10px] uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
+                      >
+                        or request quote
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ))}
