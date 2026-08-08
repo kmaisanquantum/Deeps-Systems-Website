@@ -12,6 +12,7 @@ import {
   AlertCircle,
   Tag
 } from 'lucide-react';
+import { getApiUrl } from '../utils/api';
 
 interface FormData {
   name: string;
@@ -103,12 +104,8 @@ const Contact: React.FC = () => {
     await new Promise(r => setTimeout(r, 700));
     addLog("Transmitting data to API layer...");
 
-    const apiUrl = import.meta.env.DEV
-      ? 'http://localhost:3001/api/inquiries'
-      : '/api/inquiries';
-
     try {
-      const response = await fetch(apiUrl, {
+      const response = await fetch(getApiUrl('/api/inquiries'), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

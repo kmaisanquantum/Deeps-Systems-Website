@@ -10,6 +10,7 @@ import {
   Loader2,
   CheckCircle2
 } from 'lucide-react';
+import { getApiUrl } from '../utils/api';
 
 const CartDrawer: React.FC = () => {
   const {
@@ -26,6 +27,7 @@ const CartDrawer: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     business: '',
+    email: '',
     message: ''
   });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -40,8 +42,14 @@ const CartDrawer: React.FC = () => {
 
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.business.trim()) {
-      setSubmitError("Name and Business Name are required.");
+    if (!formData.name.trim() || !formData.business.trim() || !formData.email.trim()) {
+      setSubmitError("Name, Business Name, and Email are required.");
+      setStatus('error');
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setSubmitError("Please enter a valid email address.");
       setStatus('error');
       return;
     }
@@ -49,46 +57,33 @@ const CartDrawer: React.FC = () => {
     setStatus('submitting');
     setSubmitError(null);
 
-    // Format a beautiful cart summary message
-    const cartSummary = cart
-      .map(item => `- ${item.name} (Qty: ${item.quantity}) @ K${item.price.toFixed(2)} each`)
-      .join('\n');
-
-    const formattedMessage = `
-[Cart Order Details]
-${cartSummary}
-
-Total Items: ${totalItems}
-Total Order Value: K${totalPrice.toFixed(2)}
-
-[Customer Remarks]
-${formData.message.trim() || 'No additional comments provided.'}
-    `.trim();
-
-    const apiUrl = import.meta.env.DEV
-      ? 'http://localhost:3001/api/inquiries'
-      : '/api/inquiries';
-
     try {
-      const response = await fetch(apiUrl, {
+      const response = await fetch(getApiUrl('/api/orders'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          type: 'shop',
           name: formData.name,
           business: formData.business,
-          service: 'Cart Order',
-          message: formattedMessage
+          email: formData.email,
+          notes: formData.message.trim() || null,
+          items: cart.map(item => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity
+          })),
+          totalItems,
+          totalPrice
         })
       });
 
       if (response.ok) {
         setStatus('success');
         clearCart();
-        setFormData({ name: '', business: '', message: '' });
+        setFormData({ name: '', business: '', email: '', message: '' });
       } else {
         let errMsg = "Server returned error status.";
         try {
@@ -242,6 +237,21 @@ ${formData.message.trim() || 'No additional comments provided.'}
 
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                name="email"
+                required
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="john@example.com"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-emerald-500/50 transition-all text-white text-sm font-medium"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2">
                 Additional Message / Requirements (Optional)
               </label>
               <textarea
@@ -292,7 +302,7 @@ ${formData.message.trim() || 'No additional comments provided.'}
       />
 
       <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md">
+        <div className="h-full w-screen max-w-md">
           <div className="h-full flex flex-col bg-gray-950 border-l border-white/10 shadow-2xl overflow-y-auto animate-in slide-in-from-right duration-300">
 
             {/* Header */}
