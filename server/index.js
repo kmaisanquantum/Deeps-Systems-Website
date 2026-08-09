@@ -249,9 +249,28 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Configurable recipient addresses
+const MAIL_SALES = process.env.MAIL_SALES || 'sales@dspng.tech';
+const MAIL_SERVICE = process.env.MAIL_SERVICE || 'service@dspng.tech';
+const MAIL_ADMIN = process.env.MAIL_ADMIN || 'wokman@dspng.tech';
+
 // Direct SMTP email notification via Nodemailer
 async function sendInquiryEmail(type, data) {
-  const recipient = 'wokman@dspng.tech';
+  let recipient = MAIL_ADMIN;
+  let ccRecipient = null;
+
+  if (type === 'shop') {
+    recipient = MAIL_SERVICE;
+    ccRecipient = MAIL_ADMIN;
+  } else {
+    // contact inquiry: default to MAIL_ADMIN, but route to MAIL_SALES if purchase intent detected
+    const textToAnalyze = `${data.subject || ''} ${data.message || ''}`.toLowerCase();
+    const purchaseKeywords = ['buy', 'purchase', 'order', 'price', 'quote', 'cost', 'shop', 'sales', 'pricing', 'acquisition', 'interest'];
+    const hasPurchaseIntent = purchaseKeywords.some(keyword => textToAnalyze.includes(keyword));
+    if (hasPurchaseIntent) {
+      recipient = MAIL_SALES;
+    }
+  }
 
   let subjectLine = '';
   let htmlBody = '';
@@ -298,27 +317,97 @@ async function sendInquiryEmail(type, data) {
     subject: subjectLine,
     html: htmlBody,
   };
+  if (ccRecipient) {
+    mailOptions.cc = ccRecipient;
+  }
 
   try {
     if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
       console.log('[Nodemailer] SMTP credentials omitted. Logging email content instead:');
       console.log('To:', recipient);
+      if (ccRecipient) {
+        console.log('Cc:', ccRecipient);
+      }
       console.log('Subject:', subjectLine);
       console.log('Body Preview:', htmlBody.replace(/<[^>]*>/g, '').trim().substring(0, 300) + '...');
+
+      // Customer confirmation log fallback
+      if (data.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+        const customerSubjectLine = `Inquiry Confirmed - Deeps Systems`;
+        const customerHtmlBody = `
+          <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
+            <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">We have received your inquiry</h2>
+            <p>Dear ${data.name},</p>
+            <p>Thank you for reaching out to Deeps Systems. This is a confirmation that we have received your inquiry regarding <strong>"${type === 'shop' ? data.service : data.subject}"</strong>.</p>
+
+            <p>Our team will review your inquiry and follow up with you as soon as possible.</p>
+
+            <div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #10b981; margin-top: 20px;">
+              <p style="margin: 0; font-weight: bold;">Your Message:</p>
+              <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${data.message}</p>
+            </div>
+
+            <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+              Deeps Systems Monolith
+            </p>
+          </div>
+        `;
+        console.log('[Nodemailer] SMTP credentials omitted. Logging customer inquiry confirmation instead:');
+        console.log('To:', data.email);
+        console.log('Subject:', customerSubjectLine);
+        console.log('Body Preview:', customerHtmlBody.replace(/<[^>]*>/g, '').trim().substring(0, 300) + '...');
+      }
       return;
     }
 
-    console.log(`[Nodemailer] Dispatching direct SMTP notification to: ${recipient}`);
+    console.log(`[Nodemailer] Dispatching direct SMTP notification to: ${recipient}${ccRecipient ? `, Cc: ${ccRecipient}` : ''}`);
     await transporter.sendMail(mailOptions);
     console.log('[Nodemailer] SMTP notification dispatched successfully.');
   } catch (err) {
     console.error('[Nodemailer] SMTP notification failed:', err);
   }
+
+  // Automated customer confirmation email (sent only when SMTP credentials are present)
+  if (process.env.SMTP_USER && process.env.SMTP_PASS && data.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    try {
+      const customerSubjectLine = `Inquiry Confirmed - Deeps Systems`;
+      const customerHtmlBody = `
+        <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">We have received your inquiry</h2>
+          <p>Dear ${data.name},</p>
+          <p>Thank you for reaching out to Deeps Systems. This is a confirmation that we have received your inquiry regarding <strong>"${type === 'shop' ? data.service : data.subject}"</strong>.</p>
+
+          <p>Our team will review your inquiry and follow up with you as soon as possible.</p>
+
+          <div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #10b981; margin-top: 20px;">
+            <p style="margin: 0; font-weight: bold;">Your Message:</p>
+            <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${data.message}</p>
+          </div>
+
+          <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+            Deeps Systems Monolith
+          </p>
+        </div>
+      `;
+
+      const customerMailOptions = {
+        from: `"Deeps Systems Monolith" <${process.env.SMTP_USER}>`,
+        to: data.email,
+        subject: customerSubjectLine,
+        html: customerHtmlBody,
+      };
+
+      console.log(`[Nodemailer] Dispatching customer inquiry confirmation to: ${data.email}`);
+      await transporter.sendMail(customerMailOptions);
+      console.log('[Nodemailer] Customer inquiry confirmation dispatched successfully.');
+    } catch (custErr) {
+      console.error('[Nodemailer] Customer inquiry confirmation failed:', custErr);
+    }
+  }
 }
 
 // Direct SMTP order email notification via Nodemailer
 async function sendOrderEmail(order, items) {
-  const recipient = 'wokman@dspng.tech';
   const subjectLine = `New Order #${order.id} from ${order.customer_name}`;
 
   const itemsHtml = items.map(item => `
@@ -373,7 +462,8 @@ async function sendOrderEmail(order, items) {
 
   const mailOptions = {
     from: process.env.SMTP_USER ? `"Deeps Systems Monolith" <${process.env.SMTP_USER}>` : '"Deeps Systems Monolith" <no-reply@dspng.tech>',
-    to: recipient,
+    to: MAIL_SALES,
+    cc: MAIL_ADMIN,
     subject: subjectLine,
     html: htmlBody,
   };
@@ -381,17 +471,113 @@ async function sendOrderEmail(order, items) {
   try {
     if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
       console.log('[Nodemailer] SMTP credentials omitted. Logging order email content instead:');
-      console.log('To:', recipient);
+      console.log('To:', MAIL_SALES);
+      console.log('Cc:', MAIL_ADMIN);
       console.log('Subject:', subjectLine);
       console.log('Body Preview:', htmlBody.replace(/<[^>]*>/g, '').trim().substring(0, 300) + '...');
+
+      // Customer confirmation log fallback
+      if (order.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(order.email)) {
+        const customerSubjectLine = `Order Confirmation #${order.id} - Deeps Systems`;
+        const customerHtmlBody = `
+          <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
+            <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">Thank you for your order!</h2>
+            <p>Dear ${order.customer_name},</p>
+            <p>Thank you for placing an order with Deeps Systems. We have received your order <strong>#${order.id}</strong> and our team will follow up with you shortly.</p>
+
+            <h3 style="color: #1e293b; margin-top: 20px;">Order Summary</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+              <thead>
+                <tr style="background-color: #f8fafc;">
+                  <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: left;">Product</th>
+                  <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">Qty</th>
+                  <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Unit Price</th>
+                  <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemsHtml}
+              </tbody>
+              <tfoot>
+                <tr style="font-weight: bold;">
+                  <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Grand Total:</td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${parseFloat(order.total_price).toFixed(2)}</td>
+                </tr>
+              </tfoot>
+            </table>
+
+            <p style="margin-top: 20px;">If you have any questions, please feel free to reply to this email.</p>
+            <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+              Deeps Systems Monolith
+            </p>
+          </div>
+        `;
+        console.log('[Nodemailer] SMTP credentials omitted. Logging customer order confirmation instead:');
+        console.log('To:', order.email);
+        console.log('Subject:', customerSubjectLine);
+        console.log('Body Preview:', customerHtmlBody.replace(/<[^>]*>/g, '').trim().substring(0, 300) + '...');
+      }
       return;
     }
 
-    console.log(`[Nodemailer] Dispatching direct SMTP order notification to: ${recipient}`);
+    console.log(`[Nodemailer] Dispatching direct SMTP order notification to: ${MAIL_SALES}, Cc: ${MAIL_ADMIN}`);
     await transporter.sendMail(mailOptions);
     console.log('[Nodemailer] SMTP order notification dispatched successfully.');
   } catch (err) {
     console.error('[Nodemailer] SMTP order notification failed:', err);
+  }
+
+  // Automated customer confirmation email (sent only when SMTP credentials are present)
+  if (process.env.SMTP_USER && process.env.SMTP_PASS && order.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(order.email)) {
+    try {
+      const customerSubjectLine = `Order Confirmation #${order.id} - Deeps Systems`;
+      const customerHtmlBody = `
+        <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">Thank you for your order!</h2>
+          <p>Dear ${order.customer_name},</p>
+          <p>Thank you for placing an order with Deeps Systems. We have received your order <strong>#${order.id}</strong> and our team will follow up with you shortly.</p>
+
+          <h3 style="color: #1e293b; margin-top: 20px;">Order Summary</h3>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead>
+              <tr style="background-color: #f8fafc;">
+                <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: left;">Product</th>
+                <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">Qty</th>
+                <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Unit Price</th>
+                <th style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHtml}
+            </tbody>
+            <tfoot>
+              <tr style="font-weight: bold;">
+                <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Grand Total:</td>
+                <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${parseFloat(order.total_price).toFixed(2)}</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <p style="margin-top: 20px;">If you have any questions, please feel free to reply to this email.</p>
+          <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+            Deeps Systems Monolith
+          </p>
+        </div>
+      `;
+
+      const customerMailOptions = {
+        from: `"Deeps Systems Monolith" <${process.env.SMTP_USER}>`,
+        to: order.email,
+        subject: customerSubjectLine,
+        html: customerHtmlBody,
+      };
+
+      console.log(`[Nodemailer] Dispatching customer order confirmation to: ${order.email}`);
+      await transporter.sendMail(customerMailOptions);
+      console.log('[Nodemailer] Customer order confirmation dispatched successfully.');
+    } catch (custErr) {
+      console.error('[Nodemailer] Customer order confirmation failed:', custErr);
+    }
   }
 }
 

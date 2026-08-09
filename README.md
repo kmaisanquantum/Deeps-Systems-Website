@@ -16,7 +16,7 @@ Deeps Systems runs as a unified fullstack monolithic application in a single con
 
 * **Vite + React SPA**: Statically built into `/dist` and served securely by the Node.js Express server.
 * **Express REST APIs**: Under `/api` (for inquiries, health, and status checks).
-* **SMTP Nodemailer Support**: Directly triggers direct HTML email notifications to `wokman@dspng.tech`.
+* **SMTP Nodemailer Support**: Triggers direct HTML email notifications using configurable intent-based routing to Sales, Service, or Admin mailboxes, and automatically generates customer confirmations.
 * **SPA Catch-All Route**: Rewrites any deep-linked routes back to `index.html` to avoid 404s.
 
 ---
