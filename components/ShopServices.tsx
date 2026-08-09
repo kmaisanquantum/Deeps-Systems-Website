@@ -102,7 +102,32 @@ const ShopServices: React.FC = () => {
         }
         const data = await res.json();
         if (Array.isArray(data)) {
-          setStarlinkProducts(data);
+          const normalized = data.map((p: any) => {
+            const rawPrice = p.price !== undefined ? p.price : p.price_pgk;
+            const parsedPrice = Number(rawPrice);
+            const price = isNaN(parsedPrice) ? 0 : parsedPrice;
+
+            let features: string[] = [];
+            if (Array.isArray(p.features)) {
+              features = p.features;
+            } else if (typeof p.features === 'string') {
+              try {
+                const parsed = JSON.parse(p.features);
+                if (Array.isArray(parsed)) {
+                  features = parsed;
+                }
+              } catch (_) {}
+            }
+
+            return {
+              id: String(p.sku || p.id || ''),
+              name: String(p.name || ''),
+              price,
+              billing: String(p.billing || ''),
+              features
+            };
+          });
+          setStarlinkProducts(normalized);
         } else {
           throw new Error("Invalid product data format received.");
         }
@@ -327,13 +352,13 @@ const ShopServices: React.FC = () => {
                       {/* Price Tag */}
                       <div className="mb-4">
                         <span className="text-2xl font-black text-emerald-400">
-                          K{service.price.toFixed(2)}
+                          K{Number(service.price || 0).toFixed(2)}
                         </span>
                         <span className="text-xs text-slate-400">{service.billing}</span>
                       </div>
 
                       <ul className="space-y-3 mb-6 flex-grow">
-                        {service.features.map((feature, fIdx) => (
+                        {(Array.isArray(service.features) ? service.features : []).map((feature, fIdx) => (
                           <li key={fIdx} className="flex items-start gap-2.5 text-xs text-slate-400">
                             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                             <span>{feature}</span>

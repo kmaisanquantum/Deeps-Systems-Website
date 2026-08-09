@@ -653,13 +653,18 @@ app.get('/api/products', async (req, res) => {
       results = results.filter(p => p.category === category);
     }
 
-    return res.json(results.map(p => ({
-      id: p.id,
-      name: p.name,
-      price: p.price,
-      billing: p.billing,
-      features: p.features
-    })));
+    return res.json(results.map(p => {
+      const parsedPrice = parseFloat(p.price);
+      const price = isNaN(parsedPrice) ? 0 : parsedPrice;
+      const features = Array.isArray(p.features) ? p.features : (typeof p.features === 'string' ? JSON.parse(p.features) : []);
+      return {
+        id: p.id,
+        name: p.name,
+        price,
+        billing: p.billing,
+        features
+      };
+    }));
   }
 
   try {
@@ -682,13 +687,18 @@ app.get('/api/products', async (req, res) => {
     query += ' ORDER BY id ASC';
 
     const result = await pool.query(query, values);
-    const mapped = result.rows.map(row => ({
-      id: row.sku,
-      name: row.name,
-      price: parseFloat(row.price_pgk),
-      billing: row.billing,
-      features: Array.isArray(row.features) ? row.features : (typeof row.features === 'string' ? JSON.parse(row.features) : [])
-    }));
+    const mapped = result.rows.map(row => {
+      const parsedPrice = parseFloat(row.price_pgk);
+      const price = isNaN(parsedPrice) ? 0 : parsedPrice;
+      const features = Array.isArray(row.features) ? row.features : (typeof row.features === 'string' ? JSON.parse(row.features) : []);
+      return {
+        id: row.sku,
+        name: row.name,
+        price,
+        billing: row.billing,
+        features
+      };
+    });
 
     res.json(mapped);
   } catch (err) {
