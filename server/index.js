@@ -55,10 +55,10 @@ if (process.env.DATABASE_URL === 'mock') {
   pool = new Pool(poolConfig);
 }
 
-// Startup migration: Ensure the inquiries, orders, and order_items tables exist
+// Startup migration: Ensure the inquiries, orders, order_items, and products tables exist
 async function initializeDatabase() {
   if (process.env.DATABASE_URL === 'mock') {
-    console.log('[Database] inquiries, orders, and order_items tables mocked successfully.');
+    console.log('[Database] inquiries, orders, order_items, and products tables mocked successfully.');
     return;
   }
   const createInquiriesTableQuery = `
@@ -96,13 +96,58 @@ async function initializeDatabase() {
       quantity INT NOT NULL
     );
   `;
+  const createProductsTableQuery = `
+    CREATE TABLE IF NOT EXISTS products (
+      id SERIAL PRIMARY KEY,
+      sku VARCHAR(100) UNIQUE NOT NULL,
+      provider VARCHAR(50) NOT NULL DEFAULT 'starlink',
+      category VARCHAR(100) NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      price_pgk NUMERIC(12, 2) NOT NULL,
+      billing VARCHAR(50),
+      features JSONB,
+      active BOOLEAN DEFAULT true,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+  const seedProductsQuery = `
+    INSERT INTO products (sku, provider, category, name, price_pgk, billing, features)
+    VALUES
+      ('starlink-standard', 'starlink', 'shop-starlink', 'Starlink Standard Kit', 2500.00, ' once', '[
+        "High-speed, low-latency satellite internet",
+        "Easy self-install kit with base & cables",
+        "Ideal for residential & basic SME setups",
+        "All-weather durable performance"
+      ]'::jsonb),
+      ('starlink-mini', 'starlink', 'shop-starlink', 'Starlink Mini Kit', 1500.00, ' once', '[
+        "Ultra-portable high-speed internet design",
+        "Low power consumption for field work",
+        "Integrated router and kickstand built-in",
+        "Fits perfectly in a backpack for travel"
+      ]'::jsonb),
+      ('starlink-business', 'starlink', 'shop-starlink', 'Starlink Business / High-Performance', 9500.00, ' once', '[
+        "High-gain flat panel satellite antenna",
+        "Double the transmitter power output",
+        "Prioritized network priority allocation",
+        "Excellent connectivity in extreme weather"
+      ]'::jsonb),
+      ('starlink-monthly', 'starlink', 'shop-starlink', 'Starlink Monthly Service Plan', 350.00, '/ month', '[
+        "High-priority data allocation options",
+        "Unlimited standard high-speed data",
+        "Flexible, commitment-free monthly plans",
+        "Authorized local reseller technical support"
+      ]'::jsonb)
+    ON CONFLICT (sku) DO NOTHING;
+  `;
   try {
     const client = await pool.connect();
     await client.query(createInquiriesTableQuery);
     await client.query(createOrdersTableQuery);
     await client.query(createOrderItemsTableQuery);
+    await client.query(createProductsTableQuery);
+    await client.query(seedProductsQuery);
     client.release();
-    console.log('[Database] inquiries, orders, and order_items tables initialized successfully.');
+    console.log('[Database] inquiries, orders, order_items, and products tables initialized successfully.');
   } catch (err) {
     console.error('[Database] Failed to initialize database tables:', err);
   }
@@ -349,6 +394,122 @@ async function sendOrderEmail(order, items) {
     console.error('[Nodemailer] SMTP order notification failed:', err);
   }
 }
+
+// Products API Endpoint
+app.get('/api/products', async (req, res) => {
+  const { provider, category } = req.query;
+
+  if (process.env.DATABASE_URL === 'mock') {
+    const mockProducts = [
+      {
+        id: 'starlink-standard',
+        name: 'Starlink Standard Kit',
+        price: 2500.00,
+        billing: ' once',
+        features: [
+          "High-speed, low-latency satellite internet",
+          "Easy self-install kit with base & cables",
+          "Ideal for residential & basic SME setups",
+          "All-weather durable performance"
+        ],
+        provider: 'starlink',
+        category: 'shop-starlink'
+      },
+      {
+        id: 'starlink-mini',
+        name: 'Starlink Mini Kit',
+        price: 1500.00,
+        billing: ' once',
+        features: [
+          "Ultra-portable high-speed internet design",
+          "Low power consumption for field work",
+          "Integrated router and kickstand built-in",
+          "Fits perfectly in a backpack for travel"
+        ],
+        provider: 'starlink',
+        category: 'shop-starlink'
+      },
+      {
+        id: 'starlink-business',
+        name: 'Starlink Business / High-Performance',
+        price: 9500.00,
+        billing: ' once',
+        features: [
+          "High-gain flat panel satellite antenna",
+          "Double the transmitter power output",
+          "Prioritized network priority allocation",
+          "Excellent connectivity in extreme weather"
+        ],
+        provider: 'starlink',
+        category: 'shop-starlink'
+      },
+      {
+        id: 'starlink-monthly',
+        name: 'Starlink Monthly Service Plan',
+        price: 350.00,
+        billing: '/ month',
+        features: [
+          "High-priority data allocation options",
+          "Unlimited standard high-speed data",
+          "Flexible, commitment-free monthly plans",
+          "Authorized local reseller technical support"
+        ],
+        provider: 'starlink',
+        category: 'shop-starlink'
+      }
+    ];
+
+    let results = mockProducts;
+    if (provider) {
+      results = results.filter(p => p.provider === provider);
+    }
+    if (category) {
+      results = results.filter(p => p.category === category);
+    }
+
+    return res.json(results.map(p => ({
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      billing: p.billing,
+      features: p.features
+    })));
+  }
+
+  try {
+    let query = 'SELECT sku, name, price_pgk, billing, features FROM products WHERE active = true';
+    const values = [];
+    let paramCount = 1;
+
+    if (provider) {
+      query += ` AND provider = $${paramCount}`;
+      values.push(provider);
+      paramCount++;
+    }
+
+    if (category) {
+      query += ` AND category = $${paramCount}`;
+      values.push(category);
+      paramCount++;
+    }
+
+    query += ' ORDER BY id ASC';
+
+    const result = await pool.query(query, values);
+    const mapped = result.rows.map(row => ({
+      id: row.sku,
+      name: row.name,
+      price: parseFloat(row.price_pgk),
+      billing: row.billing,
+      features: Array.isArray(row.features) ? row.features : (typeof row.features === 'string' ? JSON.parse(row.features) : [])
+    }));
+
+    res.json(mapped);
+  } catch (err) {
+    console.error('[API] Error fetching products:', err);
+    res.status(500).json({ error: 'An internal server error occurred while retrieving products.' });
+  }
+});
 
 // Orders API Endpoint
 app.post('/api/orders', async (req, res) => {
