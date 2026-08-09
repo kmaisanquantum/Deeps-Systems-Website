@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Monitor,
   Rocket,
@@ -13,6 +13,14 @@ import {
 } from 'lucide-react';
 import { useCart } from './CartContext';
 import { getApiUrl } from '../utils/api';
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  billing: string;
+  features: string[];
+}
 
 const ShopServices: React.FC = () => {
   const { addToCart, setIsCartOpen } = useCart();
@@ -29,6 +37,137 @@ const ShopServices: React.FC = () => {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [addedFeedback, setAddedFeedback] = useState<Record<string, boolean>>({});
 
+  // Dynamic Starlink catalog states
+  const [starlinkProducts, setStarlinkProducts] = useState<Product[]>([]);
+  const [isLoadingStarlink, setIsLoadingStarlink] = useState(true);
+  const [starlinkError, setStarlinkError] = useState<string | null>(null);
+
+  const fallbackStarlinkProducts: Product[] = [
+    {
+      id: "starlink-standard",
+      name: "Starlink Standard Kit",
+      price: 2500.00,
+      billing: " once",
+      features: [
+        "High-speed, low-latency satellite internet",
+        "Easy self-install kit with base & cables",
+        "Ideal for residential & basic SME setups",
+        "All-weather durable performance"
+      ]
+    },
+    {
+      id: "starlink-mini",
+      name: "Starlink Mini Kit",
+      price: 1500.00,
+      billing: " once",
+      features: [
+        "Ultra-portable high-speed internet design",
+        "Low power consumption for field work",
+        "Integrated router and kickstand built-in",
+        "Fits perfectly in a backpack for travel"
+      ]
+    },
+    {
+      id: "starlink-business",
+      name: "Starlink Business / High-Performance",
+      price: 9500.00,
+      billing: " once",
+      features: [
+        "High-gain flat panel satellite antenna",
+        "Double the transmitter power output",
+        "Prioritized network priority allocation",
+        "Excellent connectivity in extreme weather"
+      ]
+    },
+    {
+      id: "starlink-monthly",
+      name: "Starlink Monthly Service Plan",
+      price: 350.00,
+      billing: "/ month",
+      features: [
+        "High-priority data allocation options",
+        "Unlimited standard high-speed data",
+        "Flexible, commitment-free monthly plans",
+        "Authorized local reseller technical support"
+      ]
+    }
+  ];
+
+  useEffect(() => {
+    const fetchStarlinkProducts = async () => {
+      try {
+        const res = await fetch(getApiUrl('/api/products?provider=starlink'));
+        if (!res.ok) {
+          throw new Error(`Server returned status ${res.status}`);
+        }
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setStarlinkProducts(data);
+        } else {
+          throw new Error("Invalid product data format received.");
+        }
+      } catch (err: any) {
+        console.error("Failed to load Starlink products:", err);
+        setStarlinkError(err.message || "Failed to load products from server.");
+      } finally {
+        setIsLoadingStarlink(false);
+      }
+    };
+
+    fetchStarlinkProducts();
+  }, []);
+
+  const microsoftServices: Product[] = [
+    {
+      id: "m365-basic",
+      name: "Microsoft 365 Business Basic",
+      price: 25.00,
+      billing: "/ month",
+      features: [
+        "Web and mobile apps of Office",
+        "Teams, Exchange, OneDrive (1 TB)",
+        "Basic cloud security & compliance",
+        "Professional business email included"
+      ]
+    },
+    {
+      id: "m365-standard",
+      name: "Microsoft 365 Business Standard",
+      price: 55.00,
+      billing: "/ month",
+      features: [
+        "Premium desktop apps of Office",
+        "Webinars with attendee registration",
+        "1 TB secure cloud storage per user",
+        "Advanced Teams collaboration features"
+      ]
+    },
+    {
+      id: "m365-premium",
+      name: "Microsoft 365 Business Premium",
+      price: 95.00,
+      billing: "/ month",
+      features: [
+        "Advanced cyberthreat protection",
+        "Comprehensive mobile device management",
+        "Secure remote access with Intune",
+        "Everything in Business Standard included"
+      ]
+    },
+    {
+      id: "m365-apps",
+      name: "Microsoft 365 Apps for Business",
+      price: 40.00,
+      billing: "/ month",
+      features: [
+        "Desktop apps (Word, Excel, PPT, etc.)",
+        "1 TB secure OneDrive storage per user",
+        "Covers 5 phones, tablets, and PCs/user",
+        "Does not include professional email"
+      ]
+    }
+  ];
+
   // TODO: confirm real pricing with the site owner before final production release.
   const categories = [
     {
@@ -36,112 +175,14 @@ const ShopServices: React.FC = () => {
       title: "Microsoft Office Applications",
       icon: <Monitor className="w-6 h-6" />,
       pricing_label: "Reseller Licenses — Pricing in PGK",
-      services: [
-        {
-          id: "m365-basic",
-          name: "Microsoft 365 Business Basic",
-          price: 25.00, // TODO: confirm real pricing
-          billing: "/ month",
-          features: [
-            "Web and mobile apps of Office",
-            "Teams, Exchange, OneDrive (1 TB)",
-            "Basic cloud security & compliance",
-            "Professional business email included"
-          ]
-        },
-        {
-          id: "m365-standard",
-          name: "Microsoft 365 Business Standard",
-          price: 55.00, // TODO: confirm real pricing
-          billing: "/ month",
-          features: [
-            "Premium desktop apps of Office",
-            "Webinars with attendee registration",
-            "1 TB secure cloud storage per user",
-            "Advanced Teams collaboration features"
-          ]
-        },
-        {
-          id: "m365-premium",
-          name: "Microsoft 365 Business Premium",
-          price: 95.00, // TODO: confirm real pricing
-          billing: "/ month",
-          features: [
-            "Advanced cyberthreat protection",
-            "Comprehensive mobile device management",
-            "Secure remote access with Intune",
-            "Everything in Business Standard included"
-          ]
-        },
-        {
-          id: "m365-apps",
-          name: "Microsoft 365 Apps for Business",
-          price: 40.00, // TODO: confirm real pricing
-          billing: "/ month",
-          features: [
-            "Desktop apps (Word, Excel, PPT, etc.)",
-            "1 TB secure OneDrive storage per user",
-            "Covers 5 phones, tablets, and PCs/user",
-            "Does not include professional email"
-          ]
-        }
-      ]
+      services: microsoftServices
     },
     {
       id: "shop-starlink",
       title: "Starlink Kits",
       icon: <Rocket className="w-6 h-6" />,
       pricing_label: "Hardware & Subscriptions — Pricing in PGK",
-      services: [
-        {
-          id: "starlink-standard",
-          name: "Starlink Standard Kit",
-          price: 2500.00, // TODO: confirm real pricing
-          billing: " once",
-          features: [
-            "High-speed, low-latency satellite internet",
-            "Easy self-install kit with base & cables",
-            "Ideal for residential & basic SME setups",
-            "All-weather durable performance"
-          ]
-        },
-        {
-          id: "starlink-mini",
-          name: "Starlink Mini Kit",
-          price: 1500.00, // TODO: confirm real pricing
-          billing: " once",
-          features: [
-            "Ultra-portable high-speed internet design",
-            "Low power consumption for field work",
-            "Integrated router and kickstand built-in",
-            "Fits perfectly in a backpack for travel"
-          ]
-        },
-        {
-          id: "starlink-business",
-          name: "Starlink Business / High-Performance",
-          price: 9500.00, // TODO: confirm real pricing
-          billing: " once",
-          features: [
-            "High-gain flat panel satellite antenna",
-            "Double the transmitter power output",
-            "Prioritized network priority allocation",
-            "Excellent connectivity in extreme weather"
-          ]
-        },
-        {
-          id: "starlink-monthly",
-          name: "Starlink Monthly Service Plan",
-          price: 350.00, // TODO: confirm real pricing
-          billing: "/ month",
-          features: [
-            "High-priority data allocation options",
-            "Unlimited standard high-speed data",
-            "Flexible, commitment-free monthly plans",
-            "Authorized local reseller technical support"
-          ]
-        }
-      ]
+      services: starlinkProducts.length > 0 ? starlinkProducts : (isLoadingStarlink ? [] : fallbackStarlinkProducts)
     }
   ];
 
@@ -260,6 +301,19 @@ const ShopServices: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {category.id === "shop-starlink" && isLoadingStarlink && (
+                  <div className="col-span-full py-12 flex flex-col items-center justify-center text-slate-400 gap-3">
+                    <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+                    <p className="text-sm font-medium">Loading Starlink products from catalog...</p>
+                  </div>
+                )}
+
+                {category.id === "shop-starlink" && starlinkError && (
+                  <div className="col-span-full p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-semibold mb-4">
+                    Notice: Failed to load real-time catalog ({starlinkError}). Showing locally cached product specifications.
+                  </div>
+                )}
+
                 {category.services.map((service, srvIdx) => {
                   const qty = quantities[service.id] || 1;
                   const isAdded = addedFeedback[service.id];

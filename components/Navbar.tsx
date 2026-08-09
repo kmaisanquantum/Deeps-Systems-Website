@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { servicesItems, shopItems, advantageItems, ecosystemItems } from './navbarData';
 import { useCart } from './CartContext';
-import CartDrawer from './CartDrawer';
 
 const Navbar: React.FC = () => {
   const { totalItems, isCartOpen, setIsCartOpen } = useCart();
@@ -358,9 +357,6 @@ const Navbar: React.FC = () => {
           </button>
         </div>
       </div>
-
-      {/* Cart Drawer */}
-      <CartDrawer />
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (

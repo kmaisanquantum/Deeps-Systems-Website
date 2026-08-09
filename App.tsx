@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import CartDrawer from './components/CartDrawer';
 import Footer from './components/Footer';
 import QuantumAssistant from './components/QuantumAssistant';
 import ScrollUpButton from './components/ScrollUpButton';
@@ -26,6 +27,7 @@ const App: React.FC = () => {
           Skip to main content
         </a>
         <Navbar />
+        <CartDrawer />
         <main id="main-content">
           <Routes>
             <Route path="/" element={<Home />} />
