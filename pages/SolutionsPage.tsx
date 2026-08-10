@@ -6,12 +6,7 @@ import Seo from '../components/Seo';
 
 const SolutionsPage: React.FC = () => {
   return (
-    <div className="pt-20">
-      <Seo
-        title="Industrial-Grade Solutions | Deeps Systems"
-        description="Bridging robust digital frameworks with high-performance architectures to deliver BITC outcomes across PNG."
-        canonicalUrl="https://dspng.tech/solutions"
-      />
+    <div className="pt-16 sm:pt-24">
       <Solutions />
       <AdvancedSolutions />
       <Comparison />

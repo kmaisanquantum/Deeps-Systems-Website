@@ -39,17 +39,7 @@ const App: React.FC = () => {
             <Route path="/advantage" element={<AdvantagePage />} />
             <Route path="/insights" element={<InsightsPage />} />
             <Route path="/shop" element={<ShopPage />} />
-            <Route path="/contact" element={
-              <>
-                <Seo
-                  title="Contact Us | Deeps Systems"
-                  description="Start your digital transformation consultation. Get in touch with our Port Moresby node specialized team."
-                  canonicalUrl="https://dspng.tech/contact"
-                />
-                <div className="pt-16 sm:pt-20 lg:pt-24"><Contact /></div>
-              </>
-            } />
-            <Route path="*" element={<NotFound />} />
+            <Route path="/contact" element={<div className="pt-16 sm:pt-24"><Contact /></div>} />
           </Routes>
         </main>
         <Footer />

@@ -8,12 +8,7 @@ const ShopPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="pt-[72px]">
-      <Seo
-        title="Online Shop & Starlink Reseller | Deeps Systems"
-        description="Authorized Starlink reseller in Papua New Guinea. Buy Starlink Standard, Mini, and Business kits with priority local technical support."
-        canonicalUrl="https://dspng.tech/shop"
-      />
+    <div className="pt-[64px] sm:pt-[76px]">
       <ShopServices />
     </div>
   );

@@ -23,6 +23,9 @@ All configuration is managed securely via environment variables. No secrets are 
 | `PORT` | Listening port for the monolithic server container. | `3000` |
 | `DATABASE_URL` | PostgreSQL connection string or `'mock'` for simulated offline mode. | Uses standard PG credentials or local. |
 | `FORMSPREE_URL` | Destination endpoint for best-effort email notification. | `https://formspree.io/f/mqakppov` |
+| `MAIL_SALES` | Destination recipient for orders / purchases. | `sales@dspng.tech` |
+| `MAIL_SERVICE` | Destination recipient for shop service / Starlink inquiries. | `service@dspng.tech` |
+| `MAIL_ADMIN` | Catch-all admin recipient that is CC'd on everything. | `wokman@dspng.tech` |
 
 ---
 
@@ -108,9 +111,19 @@ The monolith provides two distinct diagnostic endpoints:
 
 ---
 
-## 6. Inquiries API Specification (`POST /api/inquiries`)
+## 6. Inquiries and Orders API & Notifications Specification
 
-All submissions from the Contact form and Shop Service Inquiry form write directly to the database `inquiries` table as the source of truth, then trigger a background, best-effort direct email via Nodemailer.
+All submissions from the Contact form, Shop Service Inquiry form, and Checkout Cart write directly to the database as the source of truth, then trigger background, best-effort direct emails via Nodemailer with intent-based routing and customer-facing confirmations.
+
+### A. Intent-Based Routing Rules:
+- **Orders/Purchases (`POST /api/orders`)**: Routed directly to `MAIL_SALES`, with `cc: MAIL_ADMIN` included automatically.
+- **Service Inquiries (`POST /api/inquiries` where `type === 'shop'`)**: Routed directly to `MAIL_SERVICE`, with `cc: MAIL_ADMIN` included automatically.
+- **Contact Inquiries (`POST /api/inquiries` where `type === 'contact'`)**: Routed by default to `MAIL_ADMIN`. However, if purchase intent is detected (keywords like `buy`, `purchase`, `order`, `price`, `quote`, `cost`, `sales` in subject/message), the message is routed to `MAIL_SALES`.
+
+### B. Automated Customer Confirmations:
+- When a valid customer email is provided, an automatic customer-facing confirmation email is sent using the configured sender.
+- **Orders**: A detailed order confirmation echoing the assigned Order ID, item list, and grand total in PGK is generated and sent to the customer.
+- **Inquiries**: An inquiry confirmation acknowledging receipt of the inquiry and detailing the submitter's message is generated and sent to the customer.
 
 ### Data Validation Schema:
 * `type`: `'contact'` or `'shop'` (Required)

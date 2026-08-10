@@ -5,12 +5,7 @@ import Seo from '../components/Seo';
 
 const InsightsPage: React.FC = () => {
   return (
-    <div className="pt-20">
-      <Seo
-        title="Ecosystem Insights & News | Deeps Systems"
-        description="Read the latest articles, client success testimonials, and updates from Deeps Systems about digital transformation and PWA developments in PNG."
-        canonicalUrl="https://dspng.tech/insights"
-      />
+    <div className="pt-16 sm:pt-24">
       <Testimonials />
       <News />
     </div>
