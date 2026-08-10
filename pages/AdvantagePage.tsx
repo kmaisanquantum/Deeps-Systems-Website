@@ -4,7 +4,7 @@ import Partnerships from '../components/Partnerships';
 
 const AdvantagePage: React.FC = () => {
   return (
-    <div className="pt-20">
+    <div className="pt-16 sm:pt-24">
       <Advantages />
       <Partnerships />
     </div>

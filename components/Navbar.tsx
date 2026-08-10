@@ -108,7 +108,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/5 py-3' : 'bg-transparent py-5'}`}>
+    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${(scrolled || isMobileMenuOpen) ? 'bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-gray-100 dark:border-white/5 py-3' : 'bg-transparent py-5'}`}>
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
         <Link
@@ -120,13 +120,13 @@ const Navbar: React.FC = () => {
           <div className="w-10 h-10 rounded-xl overflow-hidden bg-white group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-emerald-500/20">
             <img src="/assets/logo.jpg" alt="" className="w-full h-full object-contain" />
           </div>
-          <span className="text-xl md:text-2xl font-montserrat font-extrabold tracking-tight text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors">
+          <span className="text-lg lg:text-2xl font-montserrat font-extrabold tracking-tight text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors">
             Deeps <span className="text-emerald-600 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">Systems</span>
           </span>
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-1 lg:gap-2" role="menubar">
+        <div className="hidden md:flex items-center gap-0.5 lg:gap-2" role="menubar">
 
           <div className="relative group" onMouseEnter={() => handleMouseEnter('advantages')} onMouseLeave={handleMouseLeave}>
             <button 
@@ -299,7 +299,7 @@ const Navbar: React.FC = () => {
 
           <Link to="/insights" aria-current={location.pathname === "/insights" ? "page" : undefined} className="px-3 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white transition-all">Insights</Link>
           
-          <div className="ml-2 pl-4 border-l border-gray-100 dark:border-white/10 flex items-center gap-4">
+          <div className="ml-1 pl-2 lg:ml-2 lg:pl-4 border-l border-gray-100 dark:border-white/10 flex items-center gap-2 lg:gap-4">
             {/* Desktop Basket Toggle */}
             <button
               onClick={() => setIsCartOpen(!isCartOpen)}
@@ -360,7 +360,7 @@ const Navbar: React.FC = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-0 pt-[72px] bg-white dark:bg-[#0a0a0a] backdrop-blur-3xl z-[45] flex flex-col animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="md:hidden fixed inset-0 top-0 pt-[68px] bg-white dark:bg-[#0a0a0a] backdrop-blur-3xl z-[45] flex flex-col animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex-grow overflow-y-auto px-6 py-8 space-y-4">
             
             {/* Theme Toggle in Mobile */}

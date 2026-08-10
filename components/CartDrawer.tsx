@@ -144,7 +144,7 @@ const CartDrawer: React.FC = () => {
     return (
       <div className="space-y-6">
         {/* Cart Line Items */}
-        <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">
+        <div className="space-y-4 max-h-[35vh] sm:max-h-[40vh] overflow-y-auto pr-1">
           {cart.map((item) => (
             <div
               key={item.id}
@@ -200,7 +200,7 @@ const CartDrawer: React.FC = () => {
             </span>
           </div>
 
-          <form onSubmit={handleCheckoutSubmit} className="space-y-4 pt-4 border-t border-white/5">
+          <form onSubmit={handleCheckoutSubmit} className="space-y-3 sm:space-y-4 pt-4 border-t border-white/5">
             <h4 className="text-xs font-black uppercase tracking-widest text-emerald-500 mb-2 font-montserrat">
               Complete Checkout & Submit Inquiry
             </h4>
@@ -216,7 +216,7 @@ const CartDrawer: React.FC = () => {
                 value={formData.name}
                 onChange={handleInputChange}
                 placeholder="John Doe"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-emerald-500/50 transition-all text-white text-sm font-medium"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-emerald-500/50 transition-all text-white text-sm font-medium min-h-[44px]"
               />
             </div>
 
@@ -231,7 +231,7 @@ const CartDrawer: React.FC = () => {
                 value={formData.business}
                 onChange={handleInputChange}
                 placeholder="e.g. PNG SME Ltd"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-emerald-500/50 transition-all text-white text-sm font-medium"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-emerald-500/50 transition-all text-white text-sm font-medium min-h-[44px]"
               />
             </div>
 
@@ -246,7 +246,7 @@ const CartDrawer: React.FC = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 placeholder="john@example.com"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-emerald-500/50 transition-all text-white text-sm font-medium"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-emerald-500/50 transition-all text-white text-sm font-medium min-h-[44px]"
               />
             </div>
 
@@ -260,7 +260,7 @@ const CartDrawer: React.FC = () => {
                 value={formData.message}
                 onChange={handleInputChange}
                 placeholder="Add special instructions or query info..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-emerald-500/50 transition-all text-white text-xs resize-none font-medium"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-emerald-500/50 transition-all text-white text-xs resize-none font-medium min-h-[60px]"
               ></textarea>
             </div>
 
@@ -273,7 +273,7 @@ const CartDrawer: React.FC = () => {
             <button
               type="submit"
               disabled={status === 'submitting'}
-              className="w-full py-4 rounded-xl bg-emerald-600 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-500 shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 active-click disabled:opacity-50 font-montserrat"
+              className="w-full py-3 sm:py-3.5 rounded-xl bg-emerald-600 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-500 shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 active-click disabled:opacity-50 font-montserrat min-h-[44px]"
             >
               {status === 'submitting' ? (
                 <>
@@ -301,7 +301,7 @@ const CartDrawer: React.FC = () => {
         onClick={() => setIsCartOpen(false)}
       />
 
-      <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
+      <div className="absolute inset-y-0 right-0 max-w-full flex pl-4 sm:pl-10">
         <div className="h-full w-screen max-w-md">
           <div className="h-full flex flex-col bg-gray-950 border-l border-white/10 shadow-2xl overflow-y-auto animate-in slide-in-from-right duration-300">
 

@@ -292,7 +292,7 @@ const ShopServices: React.FC = () => {
   };
 
   return (
-    <section id="shop-services" className="py-24 bg-gray-950 text-white overflow-hidden relative">
+    <section id="shop-services" className="py-12 sm:py-16 lg:py-24 bg-gray-950 text-white overflow-hidden relative">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20">
         <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-emerald-600/10 rounded-full blur-[120px]"></div>
@@ -300,20 +300,20 @@ const ShopServices: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-6xl font-montserrat font-black mb-6 uppercase tracking-tight">
+        <div className="text-center mb-10 sm:mb-14 lg:mb-20">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-montserrat font-black mb-6 uppercase tracking-tight">
             Shop & <span className="text-emerald-500">Services</span>
           </h2>
-          <p className="text-xl text-slate-400 max-w-3xl mx-auto font-medium">
+          <p className="text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto font-medium">
             Authorized reseller storefront for Microsoft 365 and Starlink for the PNG market. Sourced for reliability, configured for performance.
           </p>
         </div>
 
         {/* Categories & Pricing Grid */}
-        <div className="space-y-24">
+        <div className="space-y-12 sm:space-y-16 lg:space-y-24">
           {categories.map((category, catIdx) => (
-            <div key={catIdx} id={category.id} className="scroll-mt-32 space-y-10 outline-none">
-              <div className="flex items-center gap-4">
+            <div key={catIdx} id={category.id} className="scroll-mt-32 space-y-6 sm:space-y-10 outline-none">
+              <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4">
                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-emerald-500">
                   {category.icon}
                 </div>
@@ -325,7 +325,7 @@ const ShopServices: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                 {category.id === "shop-starlink" && isLoadingStarlink && (
                   <div className="col-span-full py-12 flex flex-col items-center justify-center text-slate-400 gap-3">
                     <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
@@ -431,8 +431,8 @@ const ShopServices: React.FC = () => {
         </div>
 
         {/* Contact & Inquiry Form */}
-        <div id="inquiry-form" className="mt-32 max-w-4xl mx-auto scroll-mt-32">
-          <div className="p-8 md:p-16 bg-white/5 backdrop-blur-2xl rounded-[3rem] border border-white/10 shadow-2xl relative overflow-hidden">
+        <div id="inquiry-form" className="mt-16 sm:mt-24 lg:mt-32 max-w-4xl mx-auto scroll-mt-32">
+          <div className="p-6 sm:p-10 lg:p-16 bg-white/5 backdrop-blur-2xl rounded-[3rem] border border-white/10 shadow-2xl relative overflow-hidden">
              {/* Form Decoration */}
              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-[80px] -z-10"></div>
 

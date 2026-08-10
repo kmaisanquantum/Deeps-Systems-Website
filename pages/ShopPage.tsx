@@ -7,7 +7,7 @@ const ShopPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="pt-[72px]">
+    <div className="pt-[64px] sm:pt-[76px]">
       <ShopServices />
     </div>
   );
