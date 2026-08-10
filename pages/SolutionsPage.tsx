@@ -5,7 +5,7 @@ import Comparison from '../components/Comparison';
 
 const SolutionsPage: React.FC = () => {
   return (
-    <div className="pt-20">
+    <div className="pt-16 sm:pt-24">
       <Solutions />
       <AdvancedSolutions />
       <Comparison />

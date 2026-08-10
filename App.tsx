@@ -35,7 +35,7 @@ const App: React.FC = () => {
             <Route path="/advantage" element={<AdvantagePage />} />
             <Route path="/insights" element={<InsightsPage />} />
             <Route path="/shop" element={<ShopPage />} />
-            <Route path="/contact" element={<div className="pt-20"><Contact /></div>} />
+            <Route path="/contact" element={<div className="pt-16 sm:pt-24"><Contact /></div>} />
           </Routes>
         </main>
         <Footer />
