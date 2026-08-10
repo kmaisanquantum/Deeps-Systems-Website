@@ -12,14 +12,18 @@ import AdvantagePage from './pages/AdvantagePage';
 import InsightsPage from './pages/InsightsPage';
 import Contact from './components/Contact';
 import ShopPage from './pages/ShopPage';
+import NotFound from './pages/NotFound';
 import { CartProvider } from './components/CartContext';
+import { HelmetProvider } from 'react-helmet-async';
+import Seo from './components/Seo';
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <CartProvider>
-      <ScrollToTop />
-      <div className="min-h-screen selection:bg-emerald-500/30">
+    <HelmetProvider>
+      <Router>
+        <CartProvider>
+        <ScrollToTop />
+        <div className="min-h-screen selection:bg-emerald-500/30">
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-6 focus:py-3 focus:bg-emerald-600 focus:text-white focus:font-bold focus:rounded-xl focus:shadow-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
@@ -41,9 +45,10 @@ const App: React.FC = () => {
         <Footer />
         <QuantumAssistant />
         <ScrollUpButton />
-      </div>
-      </CartProvider>
-    </Router>
+        </div>
+        </CartProvider>
+      </Router>
+    </HelmetProvider>
   );
 };
 

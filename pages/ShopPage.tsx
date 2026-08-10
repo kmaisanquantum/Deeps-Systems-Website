@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import ShopServices from '../components/ShopServices';
+import Seo from '../components/Seo';
 
 const ShopPage: React.FC = () => {
   useEffect(() => {

@@ -915,6 +915,18 @@ app.post('/api/inquiries', async (req, res) => {
   }
 });
 
+// Explicitly serve robots.txt to prevent any catch-all interference
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.sendFile(path.join(distPath, 'robots.txt'));
+});
+
+// Explicitly serve sitemap.xml to prevent any catch-all interference
+app.get('/sitemap.xml', (req, res) => {
+  res.type('application/xml');
+  res.sendFile(path.join(distPath, 'sitemap.xml'));
+});
+
 // Catch-all HEAD endpoint to accept HEAD requests on route catch-all without parsing html
 app.head('*', (req, res) => {
   res.status(200).end();

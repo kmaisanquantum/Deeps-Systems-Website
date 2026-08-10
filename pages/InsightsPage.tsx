@@ -1,6 +1,7 @@
 import React from 'react';
 import Testimonials from '../components/Testimonials';
 import News from '../components/News';
+import Seo from '../components/Seo';
 
 const InsightsPage: React.FC = () => {
   return (

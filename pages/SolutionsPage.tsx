@@ -2,6 +2,7 @@ import React from 'react';
 import Solutions from '../components/Solutions';
 import AdvancedSolutions from '../components/AdvancedSolutions';
 import Comparison from '../components/Comparison';
+import Seo from '../components/Seo';
 
 const SolutionsPage: React.FC = () => {
   return (

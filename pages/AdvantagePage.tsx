@@ -1,6 +1,7 @@
 import React from 'react';
 import Advantages from '../components/Advantages';
 import Partnerships from '../components/Partnerships';
+import Seo from '../components/Seo';
 
 const AdvantagePage: React.FC = () => {
   return (
