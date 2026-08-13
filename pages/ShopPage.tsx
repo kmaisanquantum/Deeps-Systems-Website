@@ -9,6 +9,11 @@ const ShopPage: React.FC = () => {
 
   return (
     <div className="pt-[64px] sm:pt-[76px]">
+      <Seo
+        title="Microsoft 365 & Starlink Reseller Shop PNG | Deeps Systems"
+        description="Deeps Systems is your trusted Microsoft 365, Office 365, and Starlink hardware authorized reseller in PNG. Access digital products and services."
+        canonicalUrl="https://dspng.tech/shop"
+      />
       <ShopServices />
     </div>
   );
