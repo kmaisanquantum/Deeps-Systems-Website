@@ -10,7 +10,7 @@ import Home from './pages/Home';
 import SolutionsPage from './pages/SolutionsPage';
 import AdvantagePage from './pages/AdvantagePage';
 import InsightsPage from './pages/InsightsPage';
-import Contact from './components/Contact';
+import ContactPage from './pages/ContactPage';
 import ShopPage from './pages/ShopPage';
 import NotFound from './pages/NotFound';
 import { CartProvider } from './components/CartContext';
@@ -39,7 +39,7 @@ const App: React.FC = () => {
             <Route path="/advantage" element={<AdvantagePage />} />
             <Route path="/insights" element={<InsightsPage />} />
             <Route path="/shop" element={<ShopPage />} />
-            <Route path="/contact" element={<div className="pt-16 sm:pt-24"><Contact /></div>} />
+            <Route path="/contact" element={<ContactPage />} />
           </Routes>
         </main>
         <Footer />
