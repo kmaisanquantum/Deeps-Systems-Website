@@ -14,6 +14,8 @@ const distPath = path.join(__dirname, '../dist');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const USD_TO_PGK_RATE = parseFloat(process.env.USD_TO_PGK_RATE) || 3.6;
+
 // Database Configuration (Supports 'mock' mode for local verification)
 let pool;
 
@@ -83,6 +85,8 @@ async function initializeDatabase() {
       total_items INT NOT NULL,
       total_price NUMERIC(12, 2) NOT NULL,
       notes TEXT,
+      exchange_rate NUMERIC(12, 4),
+      total_price_usd NUMERIC(12, 2),
       created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
   `;
@@ -104,6 +108,7 @@ async function initializeDatabase() {
       category VARCHAR(100) NOT NULL,
       name VARCHAR(255) NOT NULL,
       price_pgk NUMERIC(12, 2) NOT NULL,
+      price_usd NUMERIC(12, 2),
       billing VARCHAR(50),
       features JSONB,
       active BOOLEAN DEFAULT true,
@@ -111,27 +116,27 @@ async function initializeDatabase() {
     );
   `;
   const seedProductsQuery = `
-    INSERT INTO products (sku, provider, category, name, price_pgk, billing, features)
+    INSERT INTO products (sku, provider, category, name, price_pgk, price_usd, billing, features)
     VALUES
-      ('starlink-standard', 'starlink', 'shop-starlink', 'Starlink Standard Kit', 2500.00, ' once', '[
+      ('starlink-standard', 'starlink', 'shop-starlink', 'Starlink Standard Kit', 2500.00, 694.44, ' once', '[
         "High-speed, low-latency satellite internet",
         "Easy self-install kit with base & cables",
         "Ideal for residential & basic SME setups",
         "All-weather durable performance"
       ]'::jsonb),
-      ('starlink-mini', 'starlink', 'shop-starlink', 'Starlink Mini Kit', 1500.00, ' once', '[
+      ('starlink-mini', 'starlink', 'shop-starlink', 'Starlink Mini Kit', 1500.00, 416.67, ' once', '[
         "Ultra-portable high-speed internet design",
         "Low power consumption for field work",
         "Integrated router and kickstand built-in",
         "Fits perfectly in a backpack for travel"
       ]'::jsonb),
-      ('starlink-business', 'starlink', 'shop-starlink', 'Starlink Business / High-Performance', 9500.00, ' once', '[
+      ('starlink-business', 'starlink', 'shop-starlink', 'Starlink Business / High-Performance', 9500.00, 2638.89, ' once', '[
         "High-gain flat panel satellite antenna",
         "Double the transmitter power output",
         "Prioritized network priority allocation",
         "Excellent connectivity in extreme weather"
       ]'::jsonb),
-      ('starlink-monthly', 'starlink', 'shop-starlink', 'Starlink Monthly Service Plan', 350.00, '/ month', '[
+      ('starlink-monthly', 'starlink', 'shop-starlink', 'Starlink Monthly Service Plan', 350.00, 97.22, '/ month', '[
         "High-priority data allocation options",
         "Unlimited standard high-speed data",
         "Flexible, commitment-free monthly plans",
@@ -145,9 +150,15 @@ async function initializeDatabase() {
     await client.query(createOrdersTableQuery);
     await client.query(createOrderItemsTableQuery);
     await client.query(createProductsTableQuery);
+
+    // Apply migrations for existing databases to add price_usd, exchange_rate, and total_price_usd if they don't exist
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS price_usd NUMERIC(12, 2);');
+    await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS exchange_rate NUMERIC(12, 4);');
+    await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS total_price_usd NUMERIC(12, 2);');
+
     await client.query(seedProductsQuery);
     client.release();
-    console.log('[Database] inquiries, orders, order_items, and products tables initialized successfully.');
+    console.log('[Database] inquiries, orders, order_items, and products tables initialized successfully with exchange rate columns.');
   } catch (err) {
     console.error('[Database] Failed to initialize database tables:', err);
   }
@@ -444,6 +455,16 @@ async function sendOrderEmail(order, items) {
             <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Grand Total:</td>
             <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${parseFloat(order.total_price).toFixed(2)}</td>
           </tr>
+          ${order.exchange_rate ? `
+          <tr style="font-size: 13px; color: #64748b;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Accounting Base Total (USD):</td>
+            <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">$${parseFloat(order.total_price_usd).toFixed(2)}</td>
+          </tr>
+          <tr style="font-size: 11px; color: #64748b; font-style: italic;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Applied Exchange Rate:</td>
+            <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">1 USD = ${parseFloat(order.exchange_rate).toFixed(4)} PGK</td>
+          </tr>
+          ` : ''}
         </tfoot>
       </table>
 
@@ -503,6 +524,16 @@ async function sendOrderEmail(order, items) {
                   <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Grand Total:</td>
                   <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${parseFloat(order.total_price).toFixed(2)}</td>
                 </tr>
+                ${order.exchange_rate ? `
+                <tr style="font-size: 13px; color: #64748b;">
+                  <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Accounting Base Total (USD):</td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">$${parseFloat(order.total_price_usd).toFixed(2)}</td>
+                </tr>
+                <tr style="font-size: 11px; color: #64748b; font-style: italic;">
+                  <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Applied Exchange Rate:</td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">1 USD = ${parseFloat(order.exchange_rate).toFixed(4)} PGK</td>
+                </tr>
+                ` : ''}
               </tfoot>
             </table>
 
@@ -555,6 +586,16 @@ async function sendOrderEmail(order, items) {
                 <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Grand Total:</td>
                 <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${parseFloat(order.total_price).toFixed(2)}</td>
               </tr>
+              ${order.exchange_rate ? `
+              <tr style="font-size: 13px; color: #64748b;">
+                <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Accounting Base Total (USD):</td>
+                <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">$${parseFloat(order.total_price_usd).toFixed(2)}</td>
+              </tr>
+              <tr style="font-size: 11px; color: #64748b; font-style: italic;">
+                <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Applied Exchange Rate:</td>
+                <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">1 USD = ${parseFloat(order.exchange_rate).toFixed(4)} PGK</td>
+              </tr>
+              ` : ''}
             </tfoot>
           </table>
 
@@ -581,6 +622,15 @@ async function sendOrderEmail(order, items) {
   }
 }
 
+// Exchange Rate API Endpoint
+app.get('/api/exchange-rate', (req, res) => {
+  res.json({
+    base: 'USD',
+    quote: 'PGK',
+    rate: USD_TO_PGK_RATE
+  });
+});
+
 // Products API Endpoint
 app.get('/api/products', async (req, res) => {
   const { provider, category } = req.query;
@@ -591,6 +641,7 @@ app.get('/api/products', async (req, res) => {
         id: 'starlink-standard',
         name: 'Starlink Standard Kit',
         price: 2500.00,
+        price_usd: 694.44,
         billing: ' once',
         features: [
           "High-speed, low-latency satellite internet",
@@ -605,6 +656,7 @@ app.get('/api/products', async (req, res) => {
         id: 'starlink-mini',
         name: 'Starlink Mini Kit',
         price: 1500.00,
+        price_usd: 416.67,
         billing: ' once',
         features: [
           "Ultra-portable high-speed internet design",
@@ -619,6 +671,7 @@ app.get('/api/products', async (req, res) => {
         id: 'starlink-business',
         name: 'Starlink Business / High-Performance',
         price: 9500.00,
+        price_usd: 2638.89,
         billing: ' once',
         features: [
           "High-gain flat panel satellite antenna",
@@ -633,6 +686,7 @@ app.get('/api/products', async (req, res) => {
         id: 'starlink-monthly',
         name: 'Starlink Monthly Service Plan',
         price: 350.00,
+        price_usd: 97.22,
         billing: '/ month',
         features: [
           "High-priority data allocation options",
@@ -654,13 +708,17 @@ app.get('/api/products', async (req, res) => {
     }
 
     return res.json(results.map(p => {
-      const parsedPrice = parseFloat(p.price);
-      const price = isNaN(parsedPrice) ? 0 : parsedPrice;
+      const price_usd = p.price_usd ? parseFloat(p.price_usd) : null;
+      let price = p.price ? parseFloat(p.price) : 0;
+      if (price_usd && !isNaN(price_usd)) {
+        price = Math.round(price_usd * USD_TO_PGK_RATE * 100) / 100;
+      }
       const features = Array.isArray(p.features) ? p.features : (typeof p.features === 'string' ? JSON.parse(p.features) : []);
       return {
         id: p.id,
         name: p.name,
         price,
+        price_usd,
         billing: p.billing,
         features
       };
@@ -668,7 +726,7 @@ app.get('/api/products', async (req, res) => {
   }
 
   try {
-    let query = 'SELECT sku, name, price_pgk, billing, features FROM products WHERE active = true';
+    let query = 'SELECT sku, name, price_pgk, price_usd, billing, features FROM products WHERE active = true';
     const values = [];
     let paramCount = 1;
 
@@ -688,13 +746,17 @@ app.get('/api/products', async (req, res) => {
 
     const result = await pool.query(query, values);
     const mapped = result.rows.map(row => {
-      const parsedPrice = parseFloat(row.price_pgk);
-      const price = isNaN(parsedPrice) ? 0 : parsedPrice;
+      const price_usd = row.price_usd ? parseFloat(row.price_usd) : null;
+      let price = row.price_pgk ? parseFloat(row.price_pgk) : 0;
+      if (price_usd && !isNaN(price_usd)) {
+        price = Math.round(price_usd * USD_TO_PGK_RATE * 100) / 100;
+      }
       const features = Array.isArray(row.features) ? row.features : (typeof row.features === 'string' ? JSON.parse(row.features) : []);
       return {
         id: row.sku,
         name: row.name,
         price,
+        price_usd,
         billing: row.billing,
         features
       };
@@ -709,7 +771,7 @@ app.get('/api/products', async (req, res) => {
 
 // Orders API Endpoint
 app.post('/api/orders', async (req, res) => {
-  const { name, business, email, notes, items, totalItems, totalPrice } = req.body;
+  const { name, business, email, notes, items, totalItems, totalPrice, exchangeRate } = req.body;
 
   // Validation
   if (!name || typeof name !== 'string' || name.trim().length < 2) {
@@ -728,6 +790,10 @@ app.post('/api/orders', async (req, res) => {
     return res.status(400).json({ error: 'Cart items are required.' });
   }
 
+  const finalRate = exchangeRate ? parseFloat(exchangeRate) : USD_TO_PGK_RATE;
+  const computedTotalPgk = totalPrice || items.reduce((acc, cur) => acc + (cur.price * cur.quantity), 0);
+  const totalUsd = Math.round((computedTotalPgk / finalRate) * 100) / 100;
+
   // Handle mock database mode
   if (process.env.DATABASE_URL === 'mock') {
     const mockOrder = {
@@ -736,8 +802,10 @@ app.post('/api/orders', async (req, res) => {
       business: business.trim(),
       email: email.trim(),
       total_items: totalItems || items.reduce((acc, cur) => acc + cur.quantity, 0),
-      total_price: totalPrice || items.reduce((acc, cur) => acc + (cur.price * cur.quantity), 0),
+      total_price: computedTotalPgk,
       notes: notes ? notes.trim() : null,
+      exchange_rate: finalRate,
+      total_price_usd: totalUsd,
       created_at: new Date().toISOString()
     };
 
@@ -758,7 +826,9 @@ app.post('/api/orders', async (req, res) => {
     return res.status(201).json({
       success: true,
       message: 'Order created successfully (mock mode).',
-      orderId: mockOrder.id
+      orderId: mockOrder.id,
+      exchange_rate: finalRate,
+      total_price_usd: totalUsd
     });
   }
 
@@ -770,8 +840,8 @@ app.post('/api/orders', async (req, res) => {
 
     // 1. Insert order
     const insertOrderQuery = `
-      INSERT INTO orders (customer_name, business, email, total_items, total_price, notes)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO orders (customer_name, business, email, total_items, total_price, notes, exchange_rate, total_price_usd)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
     `;
     const orderValues = [
@@ -779,8 +849,10 @@ app.post('/api/orders', async (req, res) => {
       business.trim(),
       email.trim(),
       totalItems || items.reduce((acc, cur) => acc + cur.quantity, 0),
-      totalPrice || items.reduce((acc, cur) => acc + (cur.price * cur.quantity), 0),
-      notes ? notes.trim() : null
+      computedTotalPgk,
+      notes ? notes.trim() : null,
+      finalRate,
+      totalUsd
     ];
 
     const orderResult = await client.query(insertOrderQuery, orderValues);

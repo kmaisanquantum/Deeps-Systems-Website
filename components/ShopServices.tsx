@@ -18,12 +18,13 @@ interface Product {
   id: string;
   name: string;
   price: number;
+  price_usd?: number;
   billing: string;
   features: string[];
 }
 
 const ShopServices: React.FC = () => {
-  const { addToCart, setIsCartOpen } = useCart();
+  const { addToCart, setIsCartOpen, exchangeRate } = useCart();
   const [selectedService, setSelectedService] = useState('');
   const [formData, setFormData] = useState({
     name: '',
@@ -148,6 +149,7 @@ const ShopServices: React.FC = () => {
       id: "office-home-2024",
       name: "Office Home 2024",
       price: 680.00,
+      price_usd: 188.89,
       billing: " once",
       features: [
         "Classic Word, Excel, and PowerPoint",
@@ -160,6 +162,7 @@ const ShopServices: React.FC = () => {
       id: "office-home-business-2024",
       name: "Office Home & Business 2024",
       price: 1080.00,
+      price_usd: 300.00,
       billing: " once",
       features: [
         "Classic apps including Outlook",
@@ -172,6 +175,7 @@ const ShopServices: React.FC = () => {
       id: "m365-personal",
       name: "Microsoft 365 Personal",
       price: 360.00,
+      price_usd: 100.00,
       billing: " / year",
       features: [
         "Premium Word, Excel, and PowerPoint",
@@ -184,6 +188,7 @@ const ShopServices: React.FC = () => {
       id: "m365-family",
       name: "Microsoft 365 Family",
       price: 505.00,
+      price_usd: 140.28,
       billing: " / year",
       features: [
         "Premium Word, Excel, and PowerPoint",
@@ -196,6 +201,7 @@ const ShopServices: React.FC = () => {
       id: "m365-business-basic",
       name: "Microsoft 365 Business Basic",
       price: 25.00,
+      price_usd: 6.94,
       billing: " / user / month",
       features: [
         "Web and mobile apps of Office",
@@ -208,6 +214,7 @@ const ShopServices: React.FC = () => {
       id: "m365-business-standard",
       name: "Microsoft 365 Business Standard",
       price: 51.00,
+      price_usd: 14.17,
       billing: " / user / month",
       features: [
         "Premium desktop apps of Office",
@@ -220,6 +227,7 @@ const ShopServices: React.FC = () => {
       id: "m365-business-premium",
       name: "Microsoft 365 Business Premium",
       price: 80.00,
+      price_usd: 22.22,
       billing: " / user / month",
       features: [
         "Advanced cyberthreat protection",
@@ -230,6 +238,15 @@ const ShopServices: React.FC = () => {
     }
   ];
 
+  // Dynamically compute Kina prices from USD base using the backend exchange rate, with fallback to hardcoded PGK prices
+  const computedMicrosoftServices = microsoftServices.map(service => {
+    if (service.price_usd && exchangeRate) {
+      const computedPrice = Math.round(service.price_usd * exchangeRate * 100) / 100;
+      return { ...service, price: computedPrice };
+    }
+    return service;
+  });
+
   // TODO: confirm real pricing with the site owner before final production release.
   const categories = [
     {
@@ -237,7 +254,7 @@ const ShopServices: React.FC = () => {
       title: "Microsoft Office Applications",
       icon: <Monitor className="w-6 h-6" />,
       pricing_label: "Reseller Licenses — Pricing in PGK",
-      services: microsoftServices
+      services: computedMicrosoftServices
     },
     {
       id: "shop-starlink",
