@@ -142,12 +142,61 @@ const ShopServices: React.FC = () => {
     fetchStarlinkProducts();
   }, []);
 
+  // TODO: confirm real pricing with the site owner before final production release. Prices are approximate PGK conversions to be confirmed.
   const microsoftServices: Product[] = [
     {
-      id: "m365-basic",
+      id: "office-home-2024",
+      name: "Office Home 2024",
+      price: 680.00,
+      billing: " once",
+      features: [
+        "Classic Word, Excel, and PowerPoint",
+        "One-time purchase for 1 PC or Mac",
+        "Includes classic 2024 features",
+        "Authorized local reseller support"
+      ]
+    },
+    {
+      id: "office-home-business-2024",
+      name: "Office Home & Business 2024",
+      price: 1080.00,
+      billing: " once",
+      features: [
+        "Classic apps including Outlook",
+        "One-time purchase for 1 PC or Mac",
+        "Licensed for home and commercial use",
+        "Authorized local reseller support"
+      ]
+    },
+    {
+      id: "m365-personal",
+      name: "Microsoft 365 Personal",
+      price: 360.00,
+      billing: " / year",
+      features: [
+        "Premium Word, Excel, and PowerPoint",
+        "Secure cloud storage (1 TB OneDrive)",
+        "For 1 user across all devices",
+        "Ongoing security and app updates"
+      ]
+    },
+    {
+      id: "m365-family",
+      name: "Microsoft 365 Family",
+      price: 505.00,
+      billing: " / year",
+      features: [
+        "Premium Word, Excel, and PowerPoint",
+        "Up to 6 TB cloud storage (1 TB/person)",
+        "Share with up to 6 family members",
+        "Ongoing security and app updates"
+      ]
+    },
+    {
+      id: "m365-business-basic",
       name: "Microsoft 365 Business Basic",
       price: 25.00,
-      billing: "/ month",
+      billing: " / user / month",
       features: [
         "Web and mobile apps of Office",
         "Teams, Exchange, OneDrive (1 TB)",
@@ -156,10 +205,10 @@ const ShopServices: React.FC = () => {
       ]
     },
     {
-      id: "m365-standard",
+      id: "m365-business-standard",
       name: "Microsoft 365 Business Standard",
-      price: 55.00,
-      billing: "/ month",
+      price: 51.00,
+      billing: " / user / month",
       features: [
         "Premium desktop apps of Office",
         "Webinars with attendee registration",
@@ -168,27 +217,15 @@ const ShopServices: React.FC = () => {
       ]
     },
     {
-      id: "m365-premium",
+      id: "m365-business-premium",
       name: "Microsoft 365 Business Premium",
-      price: 95.00,
-      billing: "/ month",
+      price: 80.00,
+      billing: " / user / month",
       features: [
         "Advanced cyberthreat protection",
         "Comprehensive mobile device management",
         "Secure remote access with Intune",
         "Everything in Business Standard included"
-      ]
-    },
-    {
-      id: "m365-apps",
-      name: "Microsoft 365 Apps for Business",
-      price: 40.00,
-      billing: "/ month",
-      features: [
-        "Desktop apps (Word, Excel, PPT, etc.)",
-        "1 TB secure OneDrive storage per user",
-        "Covers 5 phones, tablets, and PCs/user",
-        "Does not include professional email"
       ]
     }
   ];
