@@ -1,11 +1,16 @@
 import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import ShopServices from '../components/ShopServices';
 import Seo from '../components/Seo';
 
 const ShopPage: React.FC = () => {
+  const { hash } = useLocation();
+
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+    if (!hash) {
+      window.scrollTo(0, 0);
+    }
+  }, [hash]);
 
   return (
     <div className="pt-[64px] sm:pt-[76px]">

@@ -15,6 +15,8 @@ import {
 import { servicesItems, shopItems, advantageItems, ecosystemItems } from './navbarData';
 import { useCart } from './CartContext';
 
+export const NAVBAR_HEIGHT_MOBILE_CLASS = 'pt-[64px]';
+
 const Navbar: React.FC = () => {
   const { totalItems, isCartOpen, setIsCartOpen } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -38,6 +40,18 @@ const Navbar: React.FC = () => {
     setMobileActiveSubmenu(null);
     setActiveDropdown(null);
   }, [location]);
+
+  // Lock background scroll while the mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
 
   // Synchronize theme on mount
   useEffect(() => {
@@ -88,6 +102,9 @@ const Navbar: React.FC = () => {
           element.scrollIntoView({ behavior: 'smooth' });
           (element as HTMLElement).focus();
         }
+      } else {
+        // Different page hash navigation. Let the router handle navigating to the page.
+        // ScrollToTop component will handle the scroll to the correct section.
       }
     }
     setIsMobileMenuOpen(false);
@@ -109,7 +126,7 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${(scrolled || isMobileMenuOpen) ? 'bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-gray-100 dark:border-white/5 py-3' : 'bg-transparent py-5'}`}>
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between relative z-50">
         {/* Logo */}
         <Link
           to="/"
@@ -351,7 +368,12 @@ const Navbar: React.FC = () => {
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMobileMenuOpen}
             className="text-gray-900 dark:text-white p-2 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/10"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            onClick={() => {
+              if (isMobileMenuOpen) {
+                setMobileActiveSubmenu(null);
+              }
+              setIsMobileMenuOpen(!isMobileMenuOpen);
+            }}
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -360,8 +382,8 @@ const Navbar: React.FC = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-0 pt-[68px] bg-white dark:bg-[#0a0a0a] backdrop-blur-3xl z-[45] flex flex-col animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="flex-grow overflow-y-auto px-6 py-8 space-y-4">
+        <div className="md:hidden fixed top-0 left-0 right-0 h-[100dvh] min-h-screen h-screen pt-[64px] bg-white dark:bg-[#0a0a0a] backdrop-blur-3xl z-[45] flex flex-col animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex-grow overflow-y-auto px-6 py-8 pb-[calc(6rem+env(safe-area-inset-bottom))] space-y-4">
             
             {/* Theme Toggle in Mobile */}
             <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/10 mb-2">
@@ -395,7 +417,7 @@ const Navbar: React.FC = () => {
                       key={item.name}
                       to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
                       onClick={(e) => handleLinkClick(e, item.href)}
-                      className="flex items-center gap-4 p-4 bg-white dark:bg-white/2 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
+                      className="flex items-center gap-4 p-4 bg-white dark:bg-white/5 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
                     >
                       <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">{item.icon}</div>
                       <div className="flex flex-col">
@@ -434,7 +456,7 @@ const Navbar: React.FC = () => {
                       key={item.name} 
                       to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
                       onClick={(e) => handleLinkClick(e, item.href)}
-                      className="flex items-center gap-4 p-4 bg-white dark:bg-white/2 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
+                      className="flex items-center gap-4 p-4 bg-white dark:bg-white/5 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
                     >
                       <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">{item.icon}</div>
                       <div className="flex flex-col">
@@ -467,7 +489,7 @@ const Navbar: React.FC = () => {
                       key={item.name} 
                       to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
                       onClick={(e) => handleLinkClick(e, item.href)}
-                      className="flex items-center gap-4 p-4 bg-white dark:bg-white/2 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
+                      className="flex items-center gap-4 p-4 bg-white dark:bg-white/5 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
                     >
                       <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">{item.icon}</div>
                       <div className="flex flex-col">
@@ -501,7 +523,7 @@ const Navbar: React.FC = () => {
                       href={item.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-4 p-4 bg-white dark:bg-white/2 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
+                      className="flex items-center gap-4 p-4 bg-white dark:bg-white/5 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
                     >
                       <div className="p-2 rounded-lg bg-emerald-500/10">{item.icon}</div>
                       <div className="flex flex-col">
