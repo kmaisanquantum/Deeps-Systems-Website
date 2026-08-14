@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getApiUrl } from '../utils/api';
 
 export interface CartItem {
   id: string;
@@ -17,6 +18,7 @@ interface CartContextType {
   totalPrice: number;
   isCartOpen: boolean;
   setIsCartOpen: (isOpen: boolean) => void;
+  exchangeRate: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -31,6 +33,24 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   });
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [exchangeRate, setExchangeRate] = useState<number>(3.6);
+
+  useEffect(() => {
+    const fetchRate = async () => {
+      try {
+        const res = await fetch(getApiUrl('/api/exchange-rate'));
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data.rate === 'number') {
+            setExchangeRate(data.rate);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch exchange rate, using fallback 3.6:', err);
+      }
+    };
+    fetchRate();
+  }, []);
 
   useEffect(() => {
     try {
@@ -86,6 +106,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         totalPrice,
         isCartOpen,
         setIsCartOpen,
+        exchangeRate,
       }}
     >
       {children}

@@ -26,6 +26,7 @@ All configuration is managed securely via environment variables. No secrets are 
 | `MAIL_SALES` | Destination recipient for orders / purchases. | `sales@dspng.tech` |
 | `MAIL_SERVICE` | Destination recipient for shop service / Starlink inquiries. | `service@dspng.tech` |
 | `MAIL_ADMIN` | Catch-all admin recipient that is CC'd on everything. | `wokman@dspng.tech` |
+| `USD_TO_PGK_RATE` | Configurable USD to PGK exchange rate for Kina conversions. | `3.6` |
 
 ---
 
@@ -124,6 +125,20 @@ All submissions from the Contact form, Shop Service Inquiry form, and Checkout C
 - When a valid customer email is provided, an automatic customer-facing confirmation email is sent using the configured sender.
 - **Orders**: A detailed order confirmation echoing the assigned Order ID, item list, and grand total in PGK is generated and sent to the customer.
 - **Inquiries**: An inquiry confirmation acknowledging receipt of the inquiry and detailing the submitter's message is generated and sent to the customer.
+
+### C. USD→PGK Exchange Rate Architecture:
+To enforce accounting consistency, Deeps Systems operates on a single backend-controlled USD→PGK exchange rate (configured via `USD_TO_PGK_RATE`, defaulting to `3.6`).
+- **Currency Paradigm**: Kina (PGK) remains the only primary, charged currency presented to customers on the frontend. USD is utilized exclusively as the underlying accounting and auditing base.
+- **Dynamic Conversions**: Products support a nullable `price_usd` column (extended schema). If `price_usd` is defined, the PGK `price` returned by `GET /api/products` is calculated dynamically as `round(price_usd * rate)`.
+- **Public Rate Route**: The `/api/exchange-rate` endpoint exposes the current active exchange rate in the format:
+  ```json
+  {
+    "base": "USD",
+    "quote": "PGK",
+    "rate": 3.6
+  }
+  ```
+- **Order Auditability & Ledger**: When creating a new order via `POST /api/orders`, the system records the active `exchange_rate` and the calculated USD-equivalent total `total_price_usd` inside the database. The applied rate and calculated USD-equivalent base are also printed on email order receipts.
 
 ### Data Validation Schema:
 * `type`: `'contact'` or `'shop'` (Required)
