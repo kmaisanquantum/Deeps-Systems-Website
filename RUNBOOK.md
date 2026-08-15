@@ -29,10 +29,17 @@ All configuration is managed securely via environment variables. No secrets are 
 | `ADMIN_EMAIL` | Admin authentication email for JWT pricing management login. | `kmaisan@dspng.tech` |
 | `ADMIN_PASSWORD_HASH` | Bcrypt hashed password for admin user authentication. | Default hashed credential in server. |
 | `JWT_SECRET` | Secret key used to sign admin JWT authorization tokens. | `deeps_systems_jwt_secret_key...` |
+| `SMTP_HOST` | Outgoing SMTP mail server hostname used by Nodemailer to send emails. | `localhost` |
+| `SMTP_PORT` | Outgoing SMTP port (587 for STARTTLS submission). | `587` |
+| `SMTP_SECURE` | Whether to use implicit TLS. Set to `false` for port 587 STARTTLS; `true` only for port 465. | `false` |
+| `SMTP_USER` | SMTP authentication username; also used to derive the `from` sender address. | `''` (empty; if unset, emails are logged instead of sent) |
+| `SMTP_PASS` | SMTP authentication password. | `''` (empty; if unset, emails are logged instead of sent) |
 | `USD_TO_PGK_RATE` | Fallback / seed USD to PGK exchange rate when FX provider is offline. | `3.6` |
 | `FX_PROVIDER_URL` | Live FX API endpoint URL for real-time USD->PGK exchange rates. | `https://open.er-api.com/v6/latest/USD` |
 | `FX_REFRESH_MINUTES` | Interval in minutes to refresh live FX rate cache. | `360` (6 hours) |
 | `DEEPS_MARKUP_PERCENT` | Confidential internal margin percentage baked silently into Kina prices. | `10` (10%) |
+
+*Note: In production deployments (e.g., inside Coolify), concrete SMTP credentials (such as `SMTP_HOST=mail.dspng.tech`, `SMTP_PORT=587`, `SMTP_SECURE=false`, `SMTP_USER=wokman@dspng.tech`, and `SMTP_PASS`) are configured securely as environment secrets within Coolify. Sensitive values like `SMTP_PASS` must never be hardcoded or committed to the codebase.*
 
 ---
 
