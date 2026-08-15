@@ -197,14 +197,9 @@ const CartDrawer: React.FC = () => {
         <div className="border-t border-white/10 pt-6 space-y-4 bg-transparent">
           <div className="flex items-center justify-between">
             <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">Subtotal</span>
-            <div className="text-right">
-              <span className="text-xl font-black text-emerald-400 font-montserrat block">
-                K{totalPrice.toFixed(2)}
-              </span>
-              <span className="text-xs text-slate-500 font-semibold block">
-                ~US${(totalPrice / exchangeRate).toFixed(2)}
-              </span>
-            </div>
+            <span className="text-xl font-black text-emerald-400 font-montserrat">
+              K{totalPrice.toFixed(2)}
+            </span>
           </div>
 
           <form onSubmit={handleCheckoutSubmit} className="space-y-3 sm:space-y-4 pt-4 border-t border-white/5">

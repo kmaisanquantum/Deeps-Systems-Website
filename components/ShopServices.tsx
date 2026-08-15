@@ -149,7 +149,7 @@ const ShopServices: React.FC = () => {
       id: "office-home-2024",
       name: "Office Home 2024",
       price: 680.00,
-      price_usd: 188.89,
+      price_usd: 171.72,
       billing: " once",
       features: [
         "Classic Word, Excel, and PowerPoint",
@@ -162,7 +162,7 @@ const ShopServices: React.FC = () => {
       id: "office-home-business-2024",
       name: "Office Home & Business 2024",
       price: 1080.00,
-      price_usd: 300.00,
+      price_usd: 272.73,
       billing: " once",
       features: [
         "Classic apps including Outlook",
@@ -175,7 +175,7 @@ const ShopServices: React.FC = () => {
       id: "m365-personal",
       name: "Microsoft 365 Personal",
       price: 360.00,
-      price_usd: 100.00,
+      price_usd: 90.91,
       billing: " / year",
       features: [
         "Premium Word, Excel, and PowerPoint",
@@ -188,7 +188,7 @@ const ShopServices: React.FC = () => {
       id: "m365-family",
       name: "Microsoft 365 Family",
       price: 505.00,
-      price_usd: 140.28,
+      price_usd: 127.53,
       billing: " / year",
       features: [
         "Premium Word, Excel, and PowerPoint",
@@ -201,7 +201,7 @@ const ShopServices: React.FC = () => {
       id: "m365-business-basic",
       name: "Microsoft 365 Business Basic",
       price: 25.00,
-      price_usd: 6.94,
+      price_usd: 6.31,
       billing: " / user / month",
       features: [
         "Web and mobile apps of Office",
@@ -214,7 +214,7 @@ const ShopServices: React.FC = () => {
       id: "m365-business-standard",
       name: "Microsoft 365 Business Standard",
       price: 51.00,
-      price_usd: 14.17,
+      price_usd: 12.88,
       billing: " / user / month",
       features: [
         "Premium desktop apps of Office",
@@ -227,7 +227,7 @@ const ShopServices: React.FC = () => {
       id: "m365-business-premium",
       name: "Microsoft 365 Business Premium",
       price: 80.00,
-      price_usd: 22.22,
+      price_usd: 20.20,
       billing: " / user / month",
       features: [
         "Advanced cyberthreat protection",
@@ -238,10 +238,11 @@ const ShopServices: React.FC = () => {
     }
   ];
 
-  // Dynamically compute Kina prices from USD base using the backend exchange rate, with fallback to hardcoded PGK prices
+  // Dynamically compute Kina prices from USD base using the backend exchange rate and internal markup (10%), with fallback to hardcoded PGK prices
   const computedMicrosoftServices = microsoftServices.map(service => {
     if (service.price_usd && exchangeRate) {
-      const computedPrice = Math.round(service.price_usd * exchangeRate * 100) / 100;
+      const markupMultiplier = 1.10;
+      const computedPrice = Math.round(service.price_usd * exchangeRate * markupMultiplier * 100) / 100;
       return { ...service, price: computedPrice };
     }
     return service;
