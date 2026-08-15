@@ -32,6 +32,9 @@ All configuration is managed securely via environment variables. No secrets are 
 | `SMTP_HOST` | Outgoing SMTP mail server hostname used by Nodemailer to send emails. | `localhost` |
 | `SMTP_PORT` | Outgoing SMTP port (587 for STARTTLS submission). | `587` |
 | `SMTP_SECURE` | Whether to use implicit TLS. Set to `false` for port 587 STARTTLS; `true` only for port 465. | `false` |
+| `SMTP_REQUIRE_TLS` | Whether to force TLS connection upgrade during STARTTLS handshake. | `false` |
+| `SMTP_TLS_REJECT_UNAUTHORIZED` | Controls TLS certificate validation. Set to `'false'` in Coolify to allow self-signed or unverified certificates. | `'true'` |
+| `SMTP_DEBUG` | Enables verbose Nodemailer connection and socket-level protocol logging. | `false` |
 | `SMTP_USER` | SMTP authentication username; also used to derive the `from` sender address. | `''` (empty; if unset, emails are logged instead of sent) |
 | `SMTP_PASS` | SMTP authentication password. | `''` (empty; if unset, emails are logged instead of sent) |
 | `USD_TO_PGK_RATE` | Fallback / seed USD to PGK exchange rate when FX provider is offline. | `3.6` |

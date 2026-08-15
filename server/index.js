@@ -510,11 +510,28 @@ const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'localhost',
   port: parseInt(process.env.SMTP_PORT || '587', 10),
   secure: process.env.SMTP_SECURE === 'true',
+  requireTLS: process.env.SMTP_REQUIRE_TLS === 'true',
+  tls: {
+    rejectUnauthorized: process.env.SMTP_TLS_REJECT_UNAUTHORIZED !== 'false',
+  },
+  logger: process.env.SMTP_DEBUG === 'true',
+  debug: process.env.SMTP_DEBUG === 'true',
   auth: {
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
   },
 });
+
+// Verify SMTP connection on boot if credentials are configured
+if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+  transporter.verify((error, success) => {
+    if (error) {
+      console.error('[Nodemailer] SMTP verification FAILED:', error);
+    } else {
+      console.log('[Nodemailer] SMTP connection verified successfully.');
+    }
+  });
+}
 
 // Configurable recipient addresses
 const MAIL_SALES = process.env.MAIL_SALES || 'sales@dspng.tech';
@@ -631,7 +648,14 @@ async function sendInquiryEmail(type, data) {
     await transporter.sendMail(mailOptions);
     console.log('[Nodemailer] SMTP notification dispatched successfully.');
   } catch (err) {
-    console.error('[Nodemailer] SMTP notification failed:', err);
+    console.error('[Nodemailer] SMTP notification failed:', {
+      message: err.message,
+      code: err.code,
+      response: err.response,
+      command: err.command,
+      stack: err.stack,
+      err
+    });
   }
 
   // Automated customer confirmation email (sent only when SMTP credentials are present)
@@ -668,7 +692,14 @@ async function sendInquiryEmail(type, data) {
       await transporter.sendMail(customerMailOptions);
       console.log('[Nodemailer] Customer inquiry confirmation dispatched successfully.');
     } catch (custErr) {
-      console.error('[Nodemailer] Customer inquiry confirmation failed:', custErr);
+      console.error('[Nodemailer] Customer inquiry confirmation failed:', {
+        message: custErr.message,
+        code: custErr.code,
+        response: custErr.response,
+        command: custErr.command,
+        stack: custErr.stack,
+        custErr
+      });
     }
   }
 }
@@ -805,7 +836,14 @@ async function sendOrderEmail(order, items) {
     await transporter.sendMail(mailOptions);
     console.log('[Nodemailer] SMTP order notification dispatched successfully.');
   } catch (err) {
-    console.error('[Nodemailer] SMTP order notification failed:', err);
+    console.error('[Nodemailer] SMTP order notification failed:', {
+      message: err.message,
+      code: err.code,
+      response: err.response,
+      command: err.command,
+      stack: err.stack,
+      err
+    });
   }
 
   // Automated customer confirmation email (sent only when SMTP credentials are present)
@@ -857,7 +895,14 @@ async function sendOrderEmail(order, items) {
       await transporter.sendMail(customerMailOptions);
       console.log('[Nodemailer] Customer order confirmation dispatched successfully.');
     } catch (custErr) {
-      console.error('[Nodemailer] Customer order confirmation failed:', custErr);
+      console.error('[Nodemailer] Customer order confirmation failed:', {
+        message: custErr.message,
+        code: custErr.code,
+        response: custErr.response,
+        command: custErr.command,
+        stack: custErr.stack,
+        custErr
+      });
     }
   }
 }
