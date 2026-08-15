@@ -533,6 +533,16 @@ if (process.env.SMTP_USER && process.env.SMTP_PASS) {
   });
 }
 
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // Configurable recipient addresses
 const MAIL_SALES = process.env.MAIL_SALES || 'sales@dspng.tech';
 const MAIL_SERVICE = process.env.MAIL_SERVICE || 'service@dspng.tech';
@@ -564,12 +574,12 @@ async function sendInquiryEmail(type, data) {
     htmlBody = `
       <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
         <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">New Sales Inquiry</h2>
-        <p><strong>Full Name:</strong> ${data.name}</p>
-        <p><strong>Business Name:</strong> ${data.business}</p>
-        <p><strong>Selected Service:</strong> ${data.service}</p>
+        <p><strong>Full Name:</strong> ${escapeHtml(data.name)}</p>
+        <p><strong>Business Name:</strong> ${escapeHtml(data.business)}</p>
+        <p><strong>Selected Service:</strong> ${escapeHtml(data.service)}</p>
         <div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #10b981; margin-top: 20px;">
           <p style="margin: 0; font-weight: bold;">Requirements Message:</p>
-          <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${data.message}</p>
+          <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${escapeHtml(data.message)}</p>
         </div>
         <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
           Sent from Deeps Systems
@@ -581,12 +591,12 @@ async function sendInquiryEmail(type, data) {
     htmlBody = `
       <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
         <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">New Contact Inquiry</h2>
-        <p><strong>Full Name:</strong> ${data.name}</p>
-        <p><strong>Email Address:</strong> ${data.email}</p>
-        <p><strong>Subject:</strong> ${data.subject}</p>
+        <p><strong>Full Name:</strong> ${escapeHtml(data.name)}</p>
+        <p><strong>Email Address:</strong> ${escapeHtml(data.email)}</p>
+        <p><strong>Subject:</strong> ${escapeHtml(data.subject)}</p>
         <div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #10b981; margin-top: 20px;">
           <p style="margin: 0; font-weight: bold;">Inquiry Message:</p>
-          <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${data.message}</p>
+          <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${escapeHtml(data.message)}</p>
         </div>
         <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
           Sent from Deeps Systems
@@ -595,12 +605,17 @@ async function sendInquiryEmail(type, data) {
     `;
   }
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   const mailOptions = {
     from: process.env.SMTP_USER ? `"Deeps Systems" <${process.env.SMTP_USER}>` : '"Deeps Systems" <no-reply@dspng.tech>',
     to: recipient,
     subject: subjectLine,
     html: htmlBody,
   };
+  if (data.email && emailRegex.test(data.email)) {
+    mailOptions.replyTo = data.email;
+  }
   if (ccRecipient) {
     mailOptions.cc = ccRecipient;
   }
@@ -621,14 +636,14 @@ async function sendInquiryEmail(type, data) {
         const customerHtmlBody = `
           <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
             <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">We have received your inquiry</h2>
-            <p>Dear ${data.name},</p>
-            <p>Thank you for reaching out to Deeps Systems. This is a confirmation that we have received your inquiry regarding <strong>"${type === 'shop' ? data.service : data.subject}"</strong>.</p>
+            <p>Dear ${escapeHtml(data.name)},</p>
+            <p>Thank you for reaching out to Deeps Systems. This is a confirmation that we have received your inquiry regarding <strong>"${escapeHtml(type === 'shop' ? data.service : data.subject)}"</strong>.</p>
 
             <p>Our team will review your inquiry and follow up with you as soon as possible.</p>
 
             <div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #10b981; margin-top: 20px;">
               <p style="margin: 0; font-weight: bold;">Your Message:</p>
-              <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${data.message}</p>
+              <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${escapeHtml(data.message)}</p>
             </div>
 
             <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
@@ -665,14 +680,14 @@ async function sendInquiryEmail(type, data) {
       const customerHtmlBody = `
         <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
           <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">We have received your inquiry</h2>
-          <p>Dear ${data.name},</p>
-          <p>Thank you for reaching out to Deeps Systems. This is a confirmation that we have received your inquiry regarding <strong>"${type === 'shop' ? data.service : data.subject}"</strong>.</p>
+          <p>Dear ${escapeHtml(data.name)},</p>
+          <p>Thank you for reaching out to Deeps Systems. This is a confirmation that we have received your inquiry regarding <strong>"${escapeHtml(type === 'shop' ? data.service : data.subject)}"</strong>.</p>
 
           <p>Our team will review your inquiry and follow up with you as soon as possible.</p>
 
           <div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #10b981; margin-top: 20px;">
             <p style="margin: 0; font-weight: bold;">Your Message:</p>
-            <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${data.message}</p>
+            <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${escapeHtml(data.message)}</p>
           </div>
 
           <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
@@ -710,7 +725,7 @@ async function sendOrderEmail(order, items) {
 
   const itemsHtml = items.map(item => `
     <tr>
-      <td style="padding: 8px; border: 1px solid #e2e8f0;">${item.product_name}</td>
+      <td style="padding: 8px; border: 1px solid #e2e8f0;">${escapeHtml(item.product_name)}</td>
       <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${item.quantity}</td>
       <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${parseFloat(item.unit_price || item.price).toFixed(2)}</td>
       <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${(parseFloat(item.unit_price || item.price) * item.quantity).toFixed(2)}</td>
@@ -720,9 +735,9 @@ async function sendOrderEmail(order, items) {
   const htmlBody = `
     <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
       <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">New Order #${order.id}</h2>
-      <p><strong>Customer Name:</strong> ${order.customer_name}</p>
-      <p><strong>Business Name:</strong> ${order.business}</p>
-      <p><strong>Email Address:</strong> ${order.email}</p>
+      <p><strong>Customer Name:</strong> ${escapeHtml(order.customer_name)}</p>
+      <p><strong>Business Name:</strong> ${escapeHtml(order.business)}</p>
+      <p><strong>Email Address:</strong> ${escapeHtml(order.email)}</p>
 
       <h3 style="color: #1e293b; margin-top: 20px;">Ordered Items</h3>
       <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
@@ -762,7 +777,7 @@ async function sendOrderEmail(order, items) {
       ${order.notes ? `
         <div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #10b981; margin-top: 20px;">
           <p style="margin: 0; font-weight: bold;">Customer Notes:</p>
-          <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${order.notes}</p>
+          <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${escapeHtml(order.notes)}</p>
         </div>
       ` : ''}
 
@@ -772,6 +787,8 @@ async function sendOrderEmail(order, items) {
     </div>
   `;
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   const mailOptions = {
     from: process.env.SMTP_USER ? `"Deeps Systems" <${process.env.SMTP_USER}>` : '"Deeps Systems" <no-reply@dspng.tech>',
     to: MAIL_SALES,
@@ -779,6 +796,9 @@ async function sendOrderEmail(order, items) {
     subject: subjectLine,
     html: htmlBody,
   };
+  if (order.email && emailRegex.test(order.email)) {
+    mailOptions.replyTo = order.email;
+  }
 
   try {
     if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
@@ -794,7 +814,7 @@ async function sendOrderEmail(order, items) {
         const customerHtmlBody = `
           <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
             <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">Thank you for your order!</h2>
-            <p>Dear ${order.customer_name},</p>
+            <p>Dear ${escapeHtml(order.customer_name)},</p>
             <p>Thank you for placing an order with Deeps Systems. We have received your order <strong>#${order.id}</strong> and our team will follow up with you shortly.</p>
 
             <h3 style="color: #1e293b; margin-top: 20px;">Order Summary</h3>
@@ -853,7 +873,7 @@ async function sendOrderEmail(order, items) {
       const customerHtmlBody = `
         <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
           <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">Thank you for your order!</h2>
-          <p>Dear ${order.customer_name},</p>
+          <p>Dear ${escapeHtml(order.customer_name)},</p>
           <p>Thank you for placing an order with Deeps Systems. We have received your order <strong>#${order.id}</strong> and our team will follow up with you shortly.</p>
 
           <h3 style="color: #1e293b; margin-top: 20px;">Order Summary</h3>
