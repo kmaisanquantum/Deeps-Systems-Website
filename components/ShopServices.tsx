@@ -572,7 +572,7 @@ const ShopServices: React.FC = () => {
                     <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping"></div>
                   </div>
                   <h3 className="text-3xl font-montserrat font-black uppercase mb-4">Inquiry Received</h3>
-                  <p className="text-slate-300 mb-8 max-w-md mx-auto">Your service inquiry has been securely stored in our database and routed to <span className="text-emerald-500 font-mono">wokman@dspng.tech</span>.</p>
+                  <p className="text-slate-300 mb-8 max-w-md mx-auto">Your sales inquiry has been securely stored in our database and routed to <span className="text-emerald-500 font-mono">wokman@dspng.tech</span>.</p>
                   <button
                     onClick={() => setStatus('idle')}
                     className="px-8 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 transition-all text-white font-bold text-sm uppercase tracking-wider active-click"
@@ -587,7 +587,7 @@ const ShopServices: React.FC = () => {
                        <Mail className="w-12 h-12" />
                     </div>
                     <div className="text-center md:text-left">
-                       <h3 className="text-3xl font-montserrat font-black uppercase mb-2">Service Inquiry</h3>
+                       <h3 className="text-3xl font-montserrat font-black uppercase mb-2">Sales Inquiry</h3>
                        <p className="text-slate-400 font-medium">Ready to transform? Send us your requirements.</p>
                     </div>
                  </div>
