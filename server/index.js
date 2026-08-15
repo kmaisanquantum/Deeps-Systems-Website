@@ -4,6 +4,9 @@ import pg from 'pg';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit';
 
 const { Pool } = pg;
 
@@ -20,11 +23,41 @@ const FX_REFRESH_MINUTES = parseFloat(process.env.FX_REFRESH_MINUTES) || 360;
 const DEEPS_MARKUP_PERCENT = parseFloat(process.env.DEEPS_MARKUP_PERCENT) || 10;
 const markupMultiplier = 1 + (DEEPS_MARKUP_PERCENT / 100);
 
+const JWT_SECRET = process.env.JWT_SECRET || 'deeps_systems_jwt_secret_key_change_me_in_prod';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'kmaisan@dspng.tech';
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || bcrypt.hashSync('DeepsAdmin2026!', 10);
+
 let liveRate = USD_TO_PGK_RATE;
 let lastFetched = 0;
 
 function getRate() {
   return liveRate;
+}
+
+/**
+ * Cost-based pricing helper rule:
+ * - If cost_price_pgk is set and price_verified === true:
+ *   selling = round(cost_price_pgk * (1 + markup_percent/100)) to nearest whole Kina
+ * - Else if legacy price_usd present and positive:
+ *   selling = round(price_usd * getRate() * markupMultiplier) rounded to 2 decimals
+ * - Else (unverified / no cost): return null ("Contact Deeps Systems")
+ */
+function computeSellingPrice(product) {
+  const cost = product.cost_price_pgk !== undefined && product.cost_price_pgk !== null ? parseFloat(product.cost_price_pgk) : null;
+  const isVerified = Boolean(product.price_verified);
+  const markup = product.markup_percent !== undefined && product.markup_percent !== null ? parseFloat(product.markup_percent) : DEEPS_MARKUP_PERCENT;
+
+  if (cost !== null && !isNaN(cost) && isVerified) {
+    const rawSelling = cost * (1 + (markup / 100));
+    return Math.round(rawSelling); // nearest whole Kina for PNG retail rounding
+  }
+
+  const legacyUsd = product.price_usd !== undefined && product.price_usd !== null ? parseFloat(product.price_usd) : null;
+  if (legacyUsd !== null && !isNaN(legacyUsd) && legacyUsd > 0) {
+    return Math.round(legacyUsd * getRate() * (1 + (markup / 100)) * 100) / 100;
+  }
+
+  return null;
 }
 
 async function fetchLiveRate() {
@@ -147,32 +180,135 @@ async function initializeDatabase() {
     );
   `;
   const seedProductsQuery = `
-    INSERT INTO products (sku, provider, category, name, price_pgk, price_usd, billing, features)
+    INSERT INTO products (
+      sku, provider, category, product_type, name, model, description,
+      cost_price_pgk, cost_currency, markup_percent, price_pgk, price_usd,
+      gst_status, stock_status, supplier, supplier_url, supplier_country, source_type,
+      price_verified, last_verified_at, installation_available, billing, features,
+      whats_included, compatibility, tech_specs
+    )
     VALUES
-      ('starlink-standard', 'starlink', 'shop-starlink', 'Starlink Standard Kit', 2500.00, 694.44, ' once', '[
-        "High-speed, low-latency satellite internet",
-        "Easy self-install kit with base & cables",
-        "Ideal for residential & basic SME setups",
-        "All-weather durable performance"
-      ]'::jsonb),
-      ('starlink-mini', 'starlink', 'shop-starlink', 'Starlink Mini Kit', 1500.00, 416.67, ' once', '[
-        "Ultra-portable high-speed internet design",
-        "Low power consumption for field work",
-        "Integrated router and kickstand built-in",
-        "Fits perfectly in a backpack for travel"
-      ]'::jsonb),
-      ('starlink-business', 'starlink', 'shop-starlink', 'Starlink Business / High-Performance', 9500.00, 2638.89, ' once', '[
-        "High-gain flat panel satellite antenna",
-        "Double the transmitter power output",
-        "Prioritized network priority allocation",
-        "Excellent connectivity in extreme weather"
-      ]'::jsonb),
-      ('starlink-monthly', 'starlink', 'shop-starlink', 'Starlink Monthly Service Plan', 350.00, 97.22, '/ month', '[
-        "High-priority data allocation options",
-        "Unlimited standard high-speed data",
-        "Flexible, commitment-free monthly plans",
-        "Authorized local reseller technical support"
-      ]'::jsonb)
+      -- Verified Benchmark Starlink Kits (PNG Benchmarks)
+      (
+        'starlink-mini', 'starlink', 'shop-starlink', 'hardware', 'Starlink Mini Kit', 'Mini Gen 4 / Compact',
+        'Ultra-portable, all-in-one high-speed satellite internet terminal with integrated Wi-Fi router.',
+        1300.00, 'PGK', 10.00, 1430.00, NULL,
+        'GST inclusive', 'in_stock', 'PNG Official Distributor / Verified PNG Reseller', 'https://starlink.com', 'PG', 'png_supplier',
+        true, NOW(), false, ' once',
+        '["Ultra-portable design fits in a backpack", "Integrated Wi-Fi router & kickstand", "Low power consumption (25-40W)", "Direct 12V-48V DC power input capability"]'::jsonb,
+        '["Includes Starlink Mini terminal with kickstand", "Pipe adapter & power supply", "15m DC power cable"]'::jsonb,
+        '["Compatible with Starlink Mini mounts & cables"]'::jsonb,
+        '{"weight": "1.1 kg", "antenna": "Electronic Phased Array", "field_of_view": "110 deg"}'::jsonb
+      ),
+      (
+        'starlink-standard', 'starlink', 'shop-starlink', 'hardware', 'Starlink Standard Kit (Gen 3 / Standard 4X)', 'Standard Gen 3',
+        'High-speed, low-latency satellite internet kit for residential and business installations.',
+        1700.00, 'PGK', 10.00, 1870.00, NULL,
+        'GST inclusive', 'in_stock', 'PNG Official Distributor / Verified PNG Reseller', 'https://starlink.com', 'PG', 'png_supplier',
+        true, NOW(), true, ' once',
+        '["High-performance electronic phased array antenna", "Includes Wi-Fi 6 Router with tri-band support", "All-weather durable IP67 rating", "Ideal for primary corporate & residential broadband"]'::jsonb,
+        '["Starlink Standard Dish", "Gen 3 Router", "15m Starlink Cable", "AC Power Cable & Power Supply"]'::jsonb,
+        '["Compatible with Gen 3 mounts & Gen 3 ethernet adapter"]'::jsonb,
+        '{"weight": "2.9 kg", "field_of_view": "110 deg", "operating_temp": "-30C to 50C"}'::jsonb
+      ),
+      (
+        'starlink-enterprise', 'starlink', 'shop-starlink', 'hardware', 'Starlink Enterprise Kit (Enterprise 4X)', 'Flat High Performance / Enterprise',
+        'Enterprise-grade satellite terminal with high gain and double transmitter power output for enterprise & maritime.',
+        1800.00, 'PGK', 10.00, 1980.00, NULL,
+        'GST inclusive', 'in_stock', 'PNG Official Distributor / Verified PNG Reseller', 'https://starlink.com', 'PG', 'png_supplier',
+        true, NOW(), true, ' once',
+        '["High-gain flat panel antenna for high throughput", "Double the transmitter power output", "Prioritized network connection & SLA", "In-motion and extreme weather rated"]'::jsonb,
+        '["Flat High Performance Starlink Antenna", "Power Supply Unit", "Mounting Bracket & Cables"]'::jsonb,
+        '["Enterprise router & high-performance mounting hardware"]'::jsonb,
+        '{"throughput": "Up to 350+ Mbps", "weather_rating": "IP56 / Extreme weather"}'::jsonb
+      ),
+
+      -- Unverified Mounting Hardware (Price: Contact Deeps Systems)
+      (
+        'starlink-pipe-adapter', 'starlink', 'mounting', 'accessory', 'Starlink Pipe Adapter Mount', 'Gen 3 Pipe Mount',
+        'Heavy-duty pipe adapter designed to clamp onto existing poles or masts.',
+        NULL, 'PGK', 10.00, 0.00, NULL,
+        'GST inclusive', 'in_stock', 'Starlink AU / Overseas Supplier', 'https://starlink.com', 'AU', 'au_supplier',
+        false, NULL, false, ' once',
+        '["Securely clamps to poles up to 2.5 in diameter", "Weatherproof corrosion-resistant finish", "Easy bolt-lock locking mechanism"]'::jsonb,
+        '["Pipe adapter mount bracket", "Stainless steel hardware"]'::jsonb,
+        '["Starlink Standard Gen 3 & Enterprise"]'::jsonb,
+        '{}'::jsonb
+      ),
+      (
+        'starlink-wall-mount', 'starlink', 'mounting', 'accessory', 'Starlink Long Wall Mount', 'Gen 3 Wall Mount',
+        'Extended wall mounting bracket for roof eaves and vertical wall installations.',
+        NULL, 'PGK', 10.00, 0.00, NULL,
+        'GST inclusive', 'in_stock', 'Starlink AU / Overseas Supplier', 'https://starlink.com', 'AU', 'au_supplier',
+        false, NULL, false, ' once',
+        '["Designed for exterior wall or overhang mounting", "Provides maximum overhang clearance", "Heavy-gauge steel powder-coated finish"]'::jsonb,
+        '["Long wall bracket", "Lag bolts & wall anchors"]'::jsonb,
+        '["Starlink Standard Gen 3"]'::jsonb,
+        '{}'::jsonb
+      ),
+
+      -- Unverified Networking Hardware
+      (
+        'starlink-ethernet-adapter', 'starlink', 'networking', 'accessory', 'Starlink Gen 3 Ethernet Adapter', 'Gen 3 RJ45 Adapter',
+        'Provides a dedicated gigabit Ethernet RJ45 port for connecting third-party routers and switches.',
+        NULL, 'PGK', 10.00, 0.00, NULL,
+        'GST inclusive', 'in_stock', 'Starlink AU / Overseas Supplier', 'https://starlink.com', 'AU', 'au_supplier',
+        false, NULL, false, ' once',
+        '["1 Gbps dedicated RJ45 network interface", "Seamless plug-and-play integration", "Bypass mode support for enterprise firewalls"]'::jsonb,
+        '["Ethernet adapter dongle"]'::jsonb,
+        '["Starlink Gen 3 Router & Mini"]'::jsonb,
+        '{}'::jsonb
+      ),
+
+      -- Unverified Cables & Power Accessories
+      (
+        'starlink-cable-30m', 'starlink', 'cables', 'accessory', 'Starlink Replacement Cable (30m / 75ft)', '30m Gen 3 Cable',
+        'Extended length replacement cable for long distance Starlink dish installations.',
+        NULL, 'PGK', 10.00, 0.00, NULL,
+        'GST inclusive', 'in_stock', 'Starlink AU / Overseas Supplier', 'https://starlink.com', 'AU', 'au_supplier',
+        false, NULL, false, ' once',
+        '["High-grade outdoor direct-burial rating", "30 meters (75 feet) total length", "Shielded against EMI/RFI noise"]'::jsonb,
+        '["30m Starlink Cable"]'::jsonb,
+        '["Starlink Standard Gen 3"]'::jsonb,
+        '{}'::jsonb
+      ),
+      (
+        'starlink-dc-power-supply', 'starlink', 'power', 'accessory', 'Starlink Mini 12V/24V DC Power Cable', 'Mini DC Cable',
+        'Custom DC power cable allowing Starlink Mini to run directly from solar batteries or 12V vehicle sockets.',
+        NULL, 'PGK', 10.00, 0.00, NULL,
+        'GST inclusive', 'in_stock', 'Starlink AU / Overseas Supplier', 'https://starlink.com', 'AU', 'au_supplier',
+        false, NULL, false, ' once',
+        '["Converts 12V/24V DC battery power directly", "Built-in inline fuse protection", "Heavy duty 5m length"]'::jsonb,
+        '["12V/24V DC Power Cable with Barrel Plug"]'::jsonb,
+        '["Starlink Mini Kit"]'::jsonb,
+        '{}'::jsonb
+      ),
+
+      -- Unverified Installation & On-Site Engineering Services
+      (
+        'starlink-install-sme', 'starlink', 'installation', 'installation', 'On-Site Professional Installation & Testing', 'SME / Enterprise Turnkey',
+        'On-site physical mounting, cable routing, dish alignment, firewall integration, and speed testing by Deeps Systems engineers.',
+        NULL, 'PGK', 10.00, 0.00, NULL,
+        'GST inclusive', 'in_stock', 'Deeps Systems Engineering', 'https://dspng.tech', 'PG', 'png_supplier',
+        false, NULL, true, ' project',
+        '["Professional roof or mast installation", "Weatherproof cable entry sealing & conduit", "Network router configuration & Wi-Fi coverage mapping", "PNG-wide site deployment support"]'::jsonb,
+        '["On-site engineering labor", "Standard mounting hardware & consumables"]'::jsonb,
+        '["All Starlink Kits & Local LAN environments"]'::jsonb,
+        '{}'::jsonb
+      ),
+
+      -- Unverified Recurring Connectivity Plans
+      (
+        'starlink-plan-priority-50gb', 'starlink', 'recurring', 'recurring', 'Starlink Priority Connectivity Plan (50GB)', 'Priority 50GB Monthly',
+        'High-priority satellite data plan for critical enterprise and SME operations with dedicated bandwidth allocation.',
+        NULL, 'PGK', 10.00, 0.00, NULL,
+        'GST inclusive', 'in_stock', 'Official Starlink / Local Service', 'https://starlink.com', 'PG', 'official_starlink',
+        false, NULL, false, '/ month',
+        '["50GB Priority Data Allocation per month", "Unlimited Standard Data after priority allocation", "Public routable IPv4 IP option", "24/7 Deeps Systems priority support"]'::jsonb,
+        '["Monthly account provisioning & billing management"]'::jsonb,
+        '["Starlink Standard & Enterprise Kits"]'::jsonb,
+        '{}'::jsonb
+      )
     ON CONFLICT (sku) DO NOTHING;
   `;
   try {
@@ -182,15 +318,91 @@ async function initializeDatabase() {
     await client.query(createOrderItemsTableQuery);
     await client.query(createProductsTableQuery);
 
-    // Apply migrations for existing databases to add price_usd, exchange_rate, total_price_usd, and markup_percent if they don't exist
+    // Apply migrations for existing databases to add columns if they don't exist
     await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS price_usd NUMERIC(12, 2);');
     await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS exchange_rate NUMERIC(12, 4);');
     await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS total_price_usd NUMERIC(12, 2);');
     await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS markup_percent NUMERIC(5, 2);');
 
+    // Extended Starlink catalog & supplier schema columns on products
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS model VARCHAR(255);');
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS description TEXT;');
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS image_url TEXT;');
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS whats_included JSONB;');
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS compatibility JSONB;');
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS tech_specs JSONB;');
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS warranty TEXT;');
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS related_accessories JSONB;');
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS cost_price_pgk NUMERIC(12, 2);');
+    await client.query("ALTER TABLE products ADD COLUMN IF NOT EXISTS cost_currency VARCHAR(8) DEFAULT 'PGK';");
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS markup_percent NUMERIC(5, 2) DEFAULT 10;');
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS gst_status VARCHAR(50);');
+    await client.query("ALTER TABLE products ADD COLUMN IF NOT EXISTS stock_status VARCHAR(50) DEFAULT 'in_stock';");
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS supplier VARCHAR(255);');
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS supplier_url TEXT;');
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS supplier_country VARCHAR(8);');
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS source_type VARCHAR(50);');
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS price_verified BOOLEAN DEFAULT false;');
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS last_verified_at TIMESTAMP WITH TIME ZONE;');
+    await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS installation_available BOOLEAN DEFAULT false;');
+    await client.query("ALTER TABLE products ADD COLUMN IF NOT EXISTS product_type VARCHAR(50) DEFAULT 'hardware';");
+
+    // New tables: suppliers, product_price_history, bundles, bundle_items, admin_users
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS suppliers (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        url TEXT,
+        country VARCHAR(8),
+        notes TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS product_price_history (
+        id SERIAL PRIMARY KEY,
+        product_sku VARCHAR(100) NOT NULL,
+        cost_price_pgk NUMERIC(12, 2),
+        markup_percent NUMERIC(5, 2),
+        selling_price_pgk NUMERIC(12, 2),
+        source_type VARCHAR(50),
+        supplier VARCHAR(255),
+        verified_at TIMESTAMP WITH TIME ZONE,
+        changed_by VARCHAR(255),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS bundles (
+        id SERIAL PRIMARY KEY,
+        sku VARCHAR(100) UNIQUE NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS bundle_items (
+        id SERIAL PRIMARY KEY,
+        bundle_id INT REFERENCES bundles(id) ON DELETE CASCADE,
+        product_sku VARCHAR(100) NOT NULL,
+        quantity INT DEFAULT 1
+      );
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS admin_users (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        role VARCHAR(50) DEFAULT 'admin',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     await client.query(seedProductsQuery);
     client.release();
-    console.log('[Database] inquiries, orders, order_items, and products tables initialized successfully with exchange rate columns.');
+    console.log('[Database] Database tables initialized and migrated successfully.');
   } catch (err) {
     console.error('[Database] Failed to initialize database tables:', err);
   }
@@ -651,145 +863,784 @@ app.get('/api/exchange-rate', (req, res) => {
   });
 });
 
-// Products API Endpoint
+// Rate limiter for admin login
+const adminLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 requests per windowMs
+  message: { error: 'Too many login attempts from this IP, please try again after 15 minutes.' }
+});
+
+// Admin Authentication Middleware
+function requireAdmin(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Access denied. Authorization token missing or malformed.' });
+  }
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.adminUser = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid or expired authorization token.' });
+  }
+}
+
+// In-Memory store fallback for Mock Mode (Products, Suppliers, Price History, Bundles)
+let mockProductsCatalogue = [
+  {
+    sku: 'starlink-mini',
+    provider: 'starlink',
+    category: 'shop-starlink',
+    product_type: 'hardware',
+    name: 'Starlink Mini Kit',
+    model: 'Mini Gen 4 / Compact',
+    description: 'Ultra-portable, all-in-one high-speed satellite internet terminal with integrated Wi-Fi router.',
+    cost_price_pgk: 1300.00,
+    cost_currency: 'PGK',
+    markup_percent: 10.00,
+    price_pgk: 1430.00,
+    price_usd: null,
+    gst_status: 'GST inclusive',
+    stock_status: 'in_stock',
+    supplier: 'PNG Official Distributor / Verified PNG Reseller',
+    supplier_url: 'https://starlink.com',
+    supplier_country: 'PG',
+    source_type: 'png_supplier',
+    price_verified: true,
+    last_verified_at: new Date().toISOString(),
+    installation_available: false,
+    billing: ' once',
+    features: [
+      "Ultra-portable design fits in a backpack",
+      "Integrated Wi-Fi router & kickstand",
+      "Low power consumption (25-40W)",
+      "Direct 12V-48V DC power input capability"
+    ],
+    whats_included: ["Includes Starlink Mini terminal with kickstand", "Pipe adapter & power supply", "15m DC power cable"],
+    compatibility: ["Compatible with Starlink Mini mounts & cables"],
+    tech_specs: { weight: "1.1 kg", antenna: "Electronic Phased Array", field_of_view: "110 deg" },
+    warranty: "1 Year Reseller Warranty",
+    active: true
+  },
+  {
+    sku: 'starlink-standard',
+    provider: 'starlink',
+    category: 'shop-starlink',
+    product_type: 'hardware',
+    name: 'Starlink Standard Kit (Gen 3 / Standard 4X)',
+    model: 'Standard Gen 3',
+    description: 'High-speed, low-latency satellite internet kit for residential and business installations.',
+    cost_price_pgk: 1700.00,
+    cost_currency: 'PGK',
+    markup_percent: 10.00,
+    price_pgk: 1870.00,
+    price_usd: null,
+    gst_status: 'GST inclusive',
+    stock_status: 'in_stock',
+    supplier: 'PNG Official Distributor / Verified PNG Reseller',
+    supplier_url: 'https://starlink.com',
+    supplier_country: 'PG',
+    source_type: 'png_supplier',
+    price_verified: true,
+    last_verified_at: new Date().toISOString(),
+    installation_available: true,
+    billing: ' once',
+    features: [
+      "High-performance electronic phased array antenna",
+      "Includes Wi-Fi 6 Router with tri-band support",
+      "All-weather durable IP67 rating",
+      "Ideal for primary corporate & residential broadband"
+    ],
+    whats_included: ["Starlink Standard Dish", "Gen 3 Router", "15m Starlink Cable", "AC Power Cable & Power Supply"],
+    compatibility: ["Compatible with Gen 3 mounts & Gen 3 ethernet adapter"],
+    tech_specs: { weight: "2.9 kg", field_of_view: "110 deg", operating_temp: "-30C to 50C" },
+    warranty: "1 Year Reseller Warranty",
+    active: true
+  },
+  {
+    sku: 'starlink-enterprise',
+    provider: 'starlink',
+    category: 'shop-starlink',
+    product_type: 'hardware',
+    name: 'Starlink Enterprise Kit (Enterprise 4X)',
+    model: 'Flat High Performance / Enterprise',
+    description: 'Enterprise-grade satellite terminal with high gain and double transmitter power output for enterprise & maritime.',
+    cost_price_pgk: 1800.00,
+    cost_currency: 'PGK',
+    markup_percent: 10.00,
+    price_pgk: 1980.00,
+    price_usd: null,
+    gst_status: 'GST inclusive',
+    stock_status: 'in_stock',
+    supplier: 'PNG Official Distributor / Verified PNG Reseller',
+    supplier_url: 'https://starlink.com',
+    supplier_country: 'PG',
+    source_type: 'png_supplier',
+    price_verified: true,
+    last_verified_at: new Date().toISOString(),
+    installation_available: true,
+    billing: ' once',
+    features: [
+      "High-gain flat panel antenna for high throughput",
+      "Double the transmitter power output",
+      "Prioritized network connection & SLA",
+      "In-motion and extreme weather rated"
+    ],
+    whats_included: ["Flat High Performance Starlink Antenna", "Power Supply Unit", "Mounting Bracket & Cables"],
+    compatibility: ["Enterprise router & high-performance mounting hardware"],
+    tech_specs: { throughput: "Up to 350+ Mbps", weather_rating: "IP56 / Extreme weather" },
+    warranty: "1 Year Reseller Warranty",
+    active: true
+  },
+  {
+    sku: 'starlink-pipe-adapter',
+    provider: 'starlink',
+    category: 'mounting',
+    product_type: 'accessory',
+    name: 'Starlink Pipe Adapter Mount',
+    model: 'Gen 3 Pipe Mount',
+    description: 'Heavy-duty pipe adapter designed to clamp onto existing poles or masts.',
+    cost_price_pgk: null,
+    cost_currency: 'PGK',
+    markup_percent: 10.00,
+    price_pgk: 0.00,
+    price_usd: null,
+    gst_status: 'GST inclusive',
+    stock_status: 'in_stock',
+    supplier: 'Starlink AU / Overseas Supplier',
+    supplier_url: 'https://starlink.com',
+    supplier_country: 'AU',
+    source_type: 'au_supplier',
+    price_verified: false,
+    last_verified_at: null,
+    installation_available: false,
+    billing: ' once',
+    features: [
+      "Securely clamps to poles up to 2.5 in diameter",
+      "Weatherproof corrosion-resistant finish",
+      "Easy bolt-lock locking mechanism"
+    ],
+    whats_included: ["Pipe adapter mount bracket", "Stainless steel hardware"],
+    compatibility: ["Starlink Standard Gen 3 & Enterprise"],
+    tech_specs: {},
+    warranty: "Standard Reseller Warranty",
+    active: true
+  },
+  {
+    sku: 'starlink-ethernet-adapter',
+    provider: 'starlink',
+    category: 'networking',
+    product_type: 'accessory',
+    name: 'Starlink Gen 3 Ethernet Adapter',
+    model: 'Gen 3 RJ45 Adapter',
+    description: 'Provides a dedicated gigabit Ethernet RJ45 port for connecting third-party routers and switches.',
+    cost_price_pgk: null,
+    cost_currency: 'PGK',
+    markup_percent: 10.00,
+    price_pgk: 0.00,
+    price_usd: null,
+    gst_status: 'GST inclusive',
+    stock_status: 'in_stock',
+    supplier: 'Starlink AU / Overseas Supplier',
+    supplier_url: 'https://starlink.com',
+    supplier_country: 'AU',
+    source_type: 'au_supplier',
+    price_verified: false,
+    last_verified_at: null,
+    installation_available: false,
+    billing: ' once',
+    features: [
+      "1 Gbps dedicated RJ45 network interface",
+      "Seamless plug-and-play integration",
+      "Bypass mode support for enterprise firewalls"
+    ],
+    whats_included: ["Ethernet adapter dongle"],
+    compatibility: ["Starlink Gen 3 Router & Mini"],
+    tech_specs: {},
+    warranty: "Standard Reseller Warranty",
+    active: true
+  },
+  {
+    sku: 'starlink-cable-30m',
+    provider: 'starlink',
+    category: 'cables',
+    product_type: 'accessory',
+    name: 'Starlink Replacement Cable (30m / 75ft)',
+    model: '30m Gen 3 Cable',
+    description: 'Extended length replacement cable for long distance Starlink dish installations.',
+    cost_price_pgk: null,
+    cost_currency: 'PGK',
+    markup_percent: 10.00,
+    price_pgk: 0.00,
+    price_usd: null,
+    gst_status: 'GST inclusive',
+    stock_status: 'in_stock',
+    supplier: 'Starlink AU / Overseas Supplier',
+    supplier_url: 'https://starlink.com',
+    supplier_country: 'AU',
+    source_type: 'au_supplier',
+    price_verified: false,
+    last_verified_at: null,
+    installation_available: false,
+    billing: ' once',
+    features: [
+      "High-grade outdoor direct-burial rating",
+      "30 meters (75 feet) total length",
+      "Shielded against EMI/RFI noise"
+    ],
+    whats_included: ["30m Starlink Cable"],
+    compatibility: ["Starlink Standard Gen 3"],
+    tech_specs: {},
+    warranty: "Standard Reseller Warranty",
+    active: true
+  },
+  {
+    sku: 'starlink-dc-power-supply',
+    provider: 'starlink',
+    category: 'power',
+    product_type: 'accessory',
+    name: 'Starlink Mini 12V/24V DC Power Cable',
+    model: 'Mini DC Cable',
+    description: 'Custom DC power cable allowing Starlink Mini to run directly from solar batteries or 12V vehicle sockets.',
+    cost_price_pgk: null,
+    cost_currency: 'PGK',
+    markup_percent: 10.00,
+    price_pgk: 0.00,
+    price_usd: null,
+    gst_status: 'GST inclusive',
+    stock_status: 'in_stock',
+    supplier: 'Starlink AU / Overseas Supplier',
+    supplier_url: 'https://starlink.com',
+    supplier_country: 'AU',
+    source_type: 'au_supplier',
+    price_verified: false,
+    last_verified_at: null,
+    installation_available: false,
+    billing: ' once',
+    features: [
+      "Converts 12V/24V DC battery power directly",
+      "Built-in inline fuse protection",
+      "Heavy duty 5m length"
+    ],
+    whats_included: ["12V/24V DC Power Cable with Barrel Plug"],
+    compatibility: ["Starlink Mini Kit"],
+    tech_specs: {},
+    warranty: "Standard Reseller Warranty",
+    active: true
+  },
+  {
+    sku: 'starlink-install-sme',
+    provider: 'starlink',
+    category: 'installation',
+    product_type: 'installation',
+    name: 'On-Site Professional Installation & Testing',
+    model: 'SME / Enterprise Turnkey',
+    description: 'On-site physical mounting, cable routing, dish alignment, firewall integration, and speed testing by Deeps Systems engineers.',
+    cost_price_pgk: null,
+    cost_currency: 'PGK',
+    markup_percent: 10.00,
+    price_pgk: 0.00,
+    price_usd: null,
+    gst_status: 'GST inclusive',
+    stock_status: 'in_stock',
+    supplier: 'Deeps Systems Engineering',
+    supplier_url: 'https://dspng.tech',
+    supplier_country: 'PG',
+    source_type: 'png_supplier',
+    price_verified: false,
+    last_verified_at: null,
+    installation_available: true,
+    billing: ' project',
+    features: [
+      "Professional roof or mast installation",
+      "Weatherproof cable entry sealing & conduit",
+      "Network router configuration & Wi-Fi coverage mapping",
+      "PNG-wide site deployment support"
+    ],
+    whats_included: ["On-site engineering labor", "Standard mounting hardware & consumables"],
+    compatibility: ["All Starlink Kits & Local LAN environments"],
+    tech_specs: {},
+    warranty: "90 Day Workmanship Guarantee",
+    active: true
+  },
+  {
+    sku: 'starlink-plan-priority-50gb',
+    provider: 'starlink',
+    category: 'recurring',
+    product_type: 'recurring',
+    name: 'Starlink Priority Connectivity Plan (50GB)',
+    model: 'Priority 50GB Monthly',
+    description: 'High-priority satellite data plan for critical enterprise and SME operations with dedicated bandwidth allocation.',
+    cost_price_pgk: null,
+    cost_currency: 'PGK',
+    markup_percent: 10.00,
+    price_pgk: 0.00,
+    price_usd: null,
+    gst_status: 'GST inclusive',
+    stock_status: 'in_stock',
+    supplier: 'Official Starlink / Local Service',
+    supplier_url: 'https://starlink.com',
+    supplier_country: 'PG',
+    source_type: 'official_starlink',
+    price_verified: false,
+    last_verified_at: null,
+    installation_available: false,
+    billing: '/ month',
+    features: [
+      "50GB Priority Data Allocation per month",
+      "Unlimited Standard Data after priority allocation",
+      "Public routable IPv4 IP option",
+      "24/7 Deeps Systems priority support"
+    ],
+    whats_included: ["Monthly account provisioning & billing management"],
+    compatibility: ["Starlink Standard & Enterprise Kits"],
+    tech_specs: {},
+    warranty: "Service Level Agreement",
+    active: true
+  }
+];
+
+let mockSuppliers = [
+  { id: 1, name: 'PNG Official Distributor / Verified PNG Reseller', url: 'https://starlink.com', country: 'PG', notes: 'PNG benchmark supplier', created_at: new Date().toISOString() },
+  { id: 2, name: 'Starlink AU / Overseas Supplier', url: 'https://starlink.com', country: 'AU', notes: 'Australia benchmark supplier', created_at: new Date().toISOString() }
+];
+
+let mockPriceHistory = [];
+let mockBundles = [];
+
+// Public Products API Endpoint
 app.get('/api/products', async (req, res) => {
-  const { provider, category } = req.query;
+  const { provider, category, product_type } = req.query;
+
+  let rawProducts = [];
 
   if (process.env.DATABASE_URL === 'mock') {
-    const mockProducts = [
-      {
-        id: 'starlink-standard',
-        name: 'Starlink Standard Kit',
-        price: 2500.00,
-        price_usd: 694.44,
-        billing: ' once',
-        features: [
-          "High-speed, low-latency satellite internet",
-          "Easy self-install kit with base & cables",
-          "Ideal for residential & basic SME setups",
-          "All-weather durable performance"
-        ],
-        provider: 'starlink',
-        category: 'shop-starlink'
-      },
-      {
-        id: 'starlink-mini',
-        name: 'Starlink Mini Kit',
-        price: 1500.00,
-        price_usd: 416.67,
-        billing: ' once',
-        features: [
-          "Ultra-portable high-speed internet design",
-          "Low power consumption for field work",
-          "Integrated router and kickstand built-in",
-          "Fits perfectly in a backpack for travel"
-        ],
-        provider: 'starlink',
-        category: 'shop-starlink'
-      },
-      {
-        id: 'starlink-business',
-        name: 'Starlink Business / High-Performance',
-        price: 9500.00,
-        price_usd: 2638.89,
-        billing: ' once',
-        features: [
-          "High-gain flat panel satellite antenna",
-          "Double the transmitter power output",
-          "Prioritized network priority allocation",
-          "Excellent connectivity in extreme weather"
-        ],
-        provider: 'starlink',
-        category: 'shop-starlink'
-      },
-      {
-        id: 'starlink-monthly',
-        name: 'Starlink Monthly Service Plan',
-        price: 350.00,
-        price_usd: 97.22,
-        billing: '/ month',
-        features: [
-          "High-priority data allocation options",
-          "Unlimited standard high-speed data",
-          "Flexible, commitment-free monthly plans",
-          "Authorized local reseller technical support"
-        ],
-        provider: 'starlink',
-        category: 'shop-starlink'
-      }
-    ];
+    rawProducts = mockProductsCatalogue;
+  } else {
+    try {
+      let query = `
+        SELECT
+          sku, provider, category, product_type, name, model, description,
+          cost_price_pgk, cost_currency, markup_percent, price_pgk, price_usd,
+          gst_status, stock_status, supplier, supplier_url, supplier_country, source_type,
+          price_verified, last_verified_at, installation_available, billing, features,
+          whats_included, compatibility, tech_specs, warranty
+        FROM products
+        WHERE active = true
+      `;
+      const values = [];
+      let paramCount = 1;
 
-    let results = mockProducts;
-    if (provider) {
-      results = results.filter(p => p.provider === provider);
-    }
-    if (category) {
-      results = results.filter(p => p.category === category);
-    }
-
-    return res.json(results.map(p => {
-      const price_usd = p.price_usd ? parseFloat(p.price_usd) : null;
-      let price = p.price ? parseFloat(p.price) : 0;
-      if (price_usd && !isNaN(price_usd)) {
-        price = Math.round(price_usd * getRate() * markupMultiplier * 100) / 100;
-      } else {
-        price = Math.round(price * markupMultiplier * 100) / 100;
+      if (provider) {
+        query += ` AND provider = $${paramCount}`;
+        values.push(provider);
+        paramCount++;
       }
-      const features = Array.isArray(p.features) ? p.features : (typeof p.features === 'string' ? JSON.parse(p.features) : []);
-      return {
-        id: p.id,
-        name: p.name,
-        price,
-        price_usd,
-        billing: p.billing,
-        features
-      };
-    }));
+      if (category) {
+        query += ` AND category = $${paramCount}`;
+        values.push(category);
+        paramCount++;
+      }
+      if (product_type) {
+        query += ` AND product_type = $${paramCount}`;
+        values.push(product_type);
+        paramCount++;
+      }
+
+      query += ' ORDER BY id ASC';
+      const result = await pool.query(query, values);
+      rawProducts = result.rows;
+    } catch (err) {
+      console.error('[API] Error fetching products from DB:', err);
+      return res.status(500).json({ error: 'An internal server error occurred while retrieving products.' });
+    }
+  }
+
+  // Filter in mock mode if query params present
+  if (process.env.DATABASE_URL === 'mock') {
+    if (provider) rawProducts = rawProducts.filter(p => p.provider === provider);
+    if (category) rawProducts = rawProducts.filter(p => p.category === category);
+    if (product_type) rawProducts = rawProducts.filter(p => p.product_type === product_type);
+  }
+
+  // Map to PUBLIC schema (EXCLUDE cost_price_pgk, markup_percent, and markup amounts)
+  const mapped = rawProducts.map(p => {
+    const features = Array.isArray(p.features) ? p.features : (typeof p.features === 'string' ? JSON.parse(p.features || '[]') : []);
+    const whats_included = Array.isArray(p.whats_included) ? p.whats_included : (typeof p.whats_included === 'string' ? JSON.parse(p.whats_included || '[]') : []);
+    const compatibility = Array.isArray(p.compatibility) ? p.compatibility : (typeof p.compatibility === 'string' ? JSON.parse(p.compatibility || '[]') : []);
+    const tech_specs = typeof p.tech_specs === 'object' && p.tech_specs !== null ? p.tech_specs : (typeof p.tech_specs === 'string' ? JSON.parse(p.tech_specs || '{}') : {});
+
+    const computedSelling = computeSellingPrice(p);
+
+    return {
+      id: p.sku || p.id,
+      sku: p.sku,
+      name: p.name,
+      model: p.model || null,
+      category: p.category,
+      product_type: p.product_type || 'hardware',
+      description: p.description || null,
+      image_url: p.image_url || null,
+      whats_included,
+      compatibility,
+      tech_specs,
+      price: computedSelling, // Computed selling price (or null if unverified/no cost)
+      gst_status: p.gst_status || 'GST inclusive',
+      stock_status: p.stock_status || 'in_stock',
+      currency: 'PGK',
+      supplier: p.supplier || null,
+      source_type: p.source_type || 'unverified',
+      source_url: p.supplier_url || null,
+      last_verified_at: p.last_verified_at || null,
+      price_verified: Boolean(p.price_verified),
+      warranty: p.warranty || null,
+      installation_available: Boolean(p.installation_available),
+      billing: p.billing || '',
+      features
+    };
+  });
+
+  res.json(mapped);
+});
+
+// Admin Login Endpoint
+app.post('/api/admin/login', adminLoginLimiter, async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required.' });
+  }
+
+  let user = null;
+
+  if (process.env.DATABASE_URL === 'mock') {
+    if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && bcrypt.compareSync(password, ADMIN_PASSWORD_HASH)) {
+      user = { id: 1, email: ADMIN_EMAIL, role: 'admin' };
+    }
+  } else {
+    try {
+      const result = await pool.query('SELECT * FROM admin_users WHERE email = $1', [email.trim().toLowerCase()]);
+      if (result.rows.length > 0) {
+        const dbUser = result.rows[0];
+        if (bcrypt.compareSync(password, dbUser.password_hash)) {
+          user = { id: dbUser.id, email: dbUser.email, role: dbUser.role || 'admin' };
+        }
+      } else if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase() && bcrypt.compareSync(password, ADMIN_PASSWORD_HASH)) {
+        user = { id: 1, email: ADMIN_EMAIL, role: 'admin' };
+      }
+    } catch (err) {
+      console.error('[Admin API] Error querying admin_users:', err);
+      return res.status(500).json({ error: 'Internal server error during authentication.' });
+    }
+  }
+
+  if (!user) {
+    return res.status(401).json({ error: 'Invalid admin email or password.' });
+  }
+
+  const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
+  return res.json({ success: true, token, user: { email: user.email, role: user.role } });
+});
+
+// Admin Pricing Dashboard Aggregates & Ledger
+app.get('/api/admin/pricing-dashboard', requireAdmin, async (req, res) => {
+  let products = [];
+
+  if (process.env.DATABASE_URL === 'mock') {
+    products = mockProductsCatalogue;
+  } else {
+    try {
+      const result = await pool.query('SELECT * FROM products ORDER BY id ASC');
+      products = result.rows;
+    } catch (err) {
+      console.error('[Admin API] Error fetching pricing dashboard products:', err);
+      return res.status(500).json({ error: 'Failed to fetch pricing dashboard data.' });
+    }
+  }
+
+  const totalProducts = products.length;
+  const verifiedCount = products.filter(p => Boolean(p.price_verified)).length;
+  const needingVerificationCount = totalProducts - verifiedCount;
+  const verifiedDates = products.map(p => p.last_verified_at).filter(Boolean);
+  const lastUpdate = verifiedDates.length > 0 ? new Date(Math.max(...verifiedDates.map(d => new Date(d).getTime()))).toISOString() : null;
+
+  const productLedger = products.map(p => {
+    const cost = p.cost_price_pgk !== null && p.cost_price_pgk !== undefined ? parseFloat(p.cost_price_pgk) : null;
+    const markupPercent = p.markup_percent !== null && p.markup_percent !== undefined ? parseFloat(p.markup_percent) : DEEPS_MARKUP_PERCENT;
+    const sellingPrice = computeSellingPrice(p);
+    const markupAmount = (cost !== null && sellingPrice !== null) ? Math.round(sellingPrice - cost) : null;
+
+    return {
+      sku: p.sku,
+      name: p.name,
+      category: p.category,
+      product_type: p.product_type,
+      cost_price_pgk: cost,
+      cost_currency: p.cost_currency || 'PGK',
+      markup_percent: markupPercent,
+      selling_price_pgk: sellingPrice,
+      markup_amount_pgk: markupAmount,
+      stock_status: p.stock_status || 'in_stock',
+      source_type: p.source_type || 'unverified',
+      supplier: p.supplier || null,
+      price_verified: Boolean(p.price_verified),
+      last_verified_at: p.last_verified_at || null
+    };
+  });
+
+  res.json({
+    summary: {
+      total_products: totalProducts,
+      verified_count: verifiedCount,
+      needing_verification_count: needingVerificationCount,
+      last_update: lastUpdate
+    },
+    products: productLedger
+  });
+});
+
+// Admin Products CRUD Endpoints
+app.get('/api/admin/products', requireAdmin, async (req, res) => {
+  if (process.env.DATABASE_URL === 'mock') {
+    return res.json(mockProductsCatalogue);
+  }
+  try {
+    const result = await pool.query('SELECT * FROM products ORDER BY id ASC');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch admin products.' });
+  }
+});
+
+app.post('/api/admin/products', requireAdmin, async (req, res) => {
+  const p = req.body;
+  if (!p.sku || !p.name || !p.category) {
+    return res.status(400).json({ error: 'sku, name, and category are required.' });
+  }
+
+  const cost_price_pgk = p.cost_price_pgk !== undefined && p.cost_price_pgk !== null ? parseFloat(p.cost_price_pgk) : null;
+  const markup_percent = p.markup_percent !== undefined && p.markup_percent !== null ? parseFloat(p.markup_percent) : DEEPS_MARKUP_PERCENT;
+  const price_verified = Boolean(p.price_verified);
+  const selling_price_pgk = computeSellingPrice({ cost_price_pgk, price_verified, markup_percent, price_usd: p.price_usd });
+
+  if (process.env.DATABASE_URL === 'mock') {
+    const newProduct = { ...p, cost_price_pgk, markup_percent, price_verified, price_pgk: selling_price_pgk || 0 };
+    mockProductsCatalogue.push(newProduct);
+    if (cost_price_pgk !== null) {
+      mockPriceHistory.push({
+        id: mockPriceHistory.length + 1,
+        product_sku: p.sku,
+        cost_price_pgk,
+        markup_percent,
+        selling_price_pgk,
+        source_type: p.source_type || 'unverified',
+        supplier: p.supplier || null,
+        verified_at: price_verified ? new Date().toISOString() : null,
+        changed_by: req.adminUser.email,
+        created_at: new Date().toISOString()
+      });
+    }
+    return res.status(201).json({ success: true, product: newProduct });
   }
 
   try {
-    let query = 'SELECT sku, name, price_pgk, price_usd, billing, features FROM products WHERE active = true';
-    const values = [];
-    let paramCount = 1;
-
-    if (provider) {
-      query += ` AND provider = $${paramCount}`;
-      values.push(provider);
-      paramCount++;
-    }
-
-    if (category) {
-      query += ` AND category = $${paramCount}`;
-      values.push(category);
-      paramCount++;
-    }
-
-    query += ' ORDER BY id ASC';
-
+    const query = `
+      INSERT INTO products (
+        sku, provider, category, product_type, name, model, description,
+        cost_price_pgk, cost_currency, markup_percent, price_pgk, price_usd,
+        gst_status, stock_status, supplier, supplier_url, supplier_country, source_type,
+        price_verified, last_verified_at, installation_available, billing, features,
+        whats_included, compatibility, tech_specs, warranty
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27)
+      RETURNING *
+    `;
+    const values = [
+      p.sku, p.provider || 'starlink', p.category, p.product_type || 'hardware', p.name, p.model || null, p.description || null,
+      cost_price_pgk, p.cost_currency || 'PGK', markup_percent, selling_price_pgk || 0, p.price_usd || null,
+      p.gst_status || 'GST inclusive', p.stock_status || 'in_stock', p.supplier || null, p.supplier_url || null, p.supplier_country || null, p.source_type || 'unverified',
+      price_verified, price_verified ? new Date() : null, Boolean(p.installation_available), p.billing || '',
+      JSON.stringify(p.features || []), JSON.stringify(p.whats_included || []), JSON.stringify(p.compatibility || []), JSON.stringify(p.tech_specs || {}), p.warranty || null
+    ];
     const result = await pool.query(query, values);
-    const mapped = result.rows.map(row => {
-      const price_usd = row.price_usd ? parseFloat(row.price_usd) : null;
-      let price = row.price_pgk ? parseFloat(row.price_pgk) : 0;
-      if (price_usd && !isNaN(price_usd)) {
-        price = Math.round(price_usd * getRate() * markupMultiplier * 100) / 100;
-      } else {
-        price = Math.round(price * markupMultiplier * 100) / 100;
-      }
-      const features = Array.isArray(row.features) ? row.features : (typeof row.features === 'string' ? JSON.parse(row.features) : []);
-      return {
-        id: row.sku,
-        name: row.name,
-        price,
-        price_usd,
-        billing: row.billing,
-        features
-      };
-    });
 
-    res.json(mapped);
+    // Record price history
+    if (cost_price_pgk !== null) {
+      await pool.query(`
+        INSERT INTO product_price_history (product_sku, cost_price_pgk, markup_percent, selling_price_pgk, source_type, supplier, verified_at, changed_by)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `, [p.sku, cost_price_pgk, markup_percent, selling_price_pgk, p.source_type || 'unverified', p.supplier || null, price_verified ? new Date() : null, req.adminUser.email]);
+    }
+
+    res.status(201).json({ success: true, product: result.rows[0] });
   } catch (err) {
-    console.error('[API] Error fetching products:', err);
-    res.status(500).json({ error: 'An internal server error occurred while retrieving products.' });
+    console.error('[Admin API] Error creating product:', err);
+    res.status(500).json({ error: 'Failed to create product.' });
+  }
+});
+
+app.put('/api/admin/products/:sku', requireAdmin, async (req, res) => {
+  const { sku } = req.params;
+  const updates = req.body;
+
+  if (process.env.DATABASE_URL === 'mock') {
+    const idx = mockProductsCatalogue.findIndex(p => p.sku === sku);
+    if (idx === -1) return res.status(404).json({ error: 'Product not found.' });
+
+    const existing = mockProductsCatalogue[idx];
+    const cost_price_pgk = updates.cost_price_pgk !== undefined ? (updates.cost_price_pgk !== null ? parseFloat(updates.cost_price_pgk) : null) : existing.cost_price_pgk;
+    const markup_percent = updates.markup_percent !== undefined ? (updates.markup_percent !== null ? parseFloat(updates.markup_percent) : DEEPS_MARKUP_PERCENT) : existing.markup_percent;
+    const price_verified = updates.price_verified !== undefined ? Boolean(updates.price_verified) : existing.price_verified;
+    const selling_price_pgk = computeSellingPrice({ cost_price_pgk, price_verified, markup_percent, price_usd: updates.price_usd !== undefined ? updates.price_usd : existing.price_usd });
+
+    mockProductsCatalogue[idx] = {
+      ...existing,
+      ...updates,
+      cost_price_pgk,
+      markup_percent,
+      price_verified,
+      price_pgk: selling_price_pgk || 0,
+      last_verified_at: price_verified ? new Date().toISOString() : existing.last_verified_at
+    };
+
+    if (cost_price_pgk !== null && (cost_price_pgk !== existing.cost_price_pgk || markup_percent !== existing.markup_percent)) {
+      mockPriceHistory.push({
+        id: mockPriceHistory.length + 1,
+        product_sku: sku,
+        cost_price_pgk,
+        markup_percent,
+        selling_price_pgk,
+        source_type: updates.source_type || existing.source_type,
+        supplier: updates.supplier || existing.supplier,
+        verified_at: price_verified ? new Date().toISOString() : null,
+        changed_by: req.adminUser.email,
+        created_at: new Date().toISOString()
+      });
+    }
+    return res.json({ success: true, product: mockProductsCatalogue[idx] });
+  }
+
+  try {
+    const existingRes = await pool.query('SELECT * FROM products WHERE sku = $1', [sku]);
+    if (existingRes.rows.length === 0) return res.status(404).json({ error: 'Product not found.' });
+    const existing = existingRes.rows[0];
+
+    const cost_price_pgk = updates.cost_price_pgk !== undefined ? (updates.cost_price_pgk !== null ? parseFloat(updates.cost_price_pgk) : null) : (existing.cost_price_pgk !== null ? parseFloat(existing.cost_price_pgk) : null);
+    const markup_percent = updates.markup_percent !== undefined ? (updates.markup_percent !== null ? parseFloat(updates.markup_percent) : DEEPS_MARKUP_PERCENT) : (existing.markup_percent !== null ? parseFloat(existing.markup_percent) : DEEPS_MARKUP_PERCENT);
+    const price_verified = updates.price_verified !== undefined ? Boolean(updates.price_verified) : Boolean(existing.price_verified);
+    const selling_price_pgk = computeSellingPrice({ cost_price_pgk, price_verified, markup_percent, price_usd: updates.price_usd !== undefined ? updates.price_usd : existing.price_usd });
+
+    const lastVerified = price_verified ? new Date() : existing.last_verified_at;
+    const query = `
+      UPDATE products SET
+        name = COALESCE($1, name),
+        model = COALESCE($2, model),
+        description = COALESCE($3, description),
+        cost_price_pgk = $4,
+        markup_percent = $5,
+        price_pgk = $6,
+        gst_status = COALESCE($7, gst_status),
+        stock_status = COALESCE($8, stock_status),
+        supplier = COALESCE($9, supplier),
+        source_type = COALESCE($10, source_type),
+        price_verified = $11,
+        last_verified_at = $12
+      WHERE sku = $13
+      RETURNING *
+    `;
+    const values = [
+      updates.name || null, updates.model || null, updates.description || null,
+      cost_price_pgk, markup_percent, selling_price_pgk || 0,
+      updates.gst_status || null, updates.stock_status || null, updates.supplier || null, updates.source_type || null,
+      price_verified, lastVerified, sku
+    ];
+    const result = await pool.query(query, values);
+
+    // Record price history on pricing updates
+    if (cost_price_pgk !== null) {
+      await pool.query(`
+        INSERT INTO product_price_history (product_sku, cost_price_pgk, markup_percent, selling_price_pgk, source_type, supplier, verified_at, changed_by)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `, [sku, cost_price_pgk, markup_percent, selling_price_pgk, updates.source_type || existing.source_type, updates.supplier || existing.supplier, lastVerified, req.adminUser.email]);
+    }
+
+    res.json({ success: true, product: result.rows[0] });
+  } catch (err) {
+    console.error('[Admin API] Error updating product:', err);
+    res.status(500).json({ error: 'Failed to update product.' });
+  }
+});
+
+// Admin Suppliers CRUD Endpoints
+app.get('/api/admin/suppliers', requireAdmin, async (req, res) => {
+  if (process.env.DATABASE_URL === 'mock') {
+    return res.json(mockSuppliers);
+  }
+  try {
+    const result = await pool.query('SELECT * FROM suppliers ORDER BY id ASC');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch suppliers.' });
+  }
+});
+
+app.post('/api/admin/suppliers', requireAdmin, async (req, res) => {
+  const { name, url, country, notes } = req.body;
+  if (!name) return res.status(400).json({ error: 'Supplier name is required.' });
+
+  if (process.env.DATABASE_URL === 'mock') {
+    const newSup = { id: mockSuppliers.length + 1, name, url, country, notes, created_at: new Date().toISOString() };
+    mockSuppliers.push(newSup);
+    return res.status(201).json({ success: true, supplier: newSup });
+  }
+
+  try {
+    const result = await pool.query(
+      'INSERT INTO suppliers (name, url, country, notes) VALUES ($1, $2, $3, $4) RETURNING *',
+      [name, url || null, country || null, notes || null]
+    );
+    res.status(201).json({ success: true, supplier: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create supplier.' });
+  }
+});
+
+// Admin Bundles CRUD Endpoints
+app.get('/api/admin/bundles', requireAdmin, async (req, res) => {
+  if (process.env.DATABASE_URL === 'mock') {
+    return res.json(mockBundles);
+  }
+  try {
+    const result = await pool.query('SELECT * FROM bundles ORDER BY id ASC');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch bundles.' });
+  }
+});
+
+app.post('/api/admin/bundles', requireAdmin, async (req, res) => {
+  const { sku, name, description, items } = req.body;
+  if (!sku || !name) return res.status(400).json({ error: 'Bundle sku and name are required.' });
+
+  if (process.env.DATABASE_URL === 'mock') {
+    const newBundle = { id: mockBundles.length + 1, sku, name, description, items: items || [], active: true, created_at: new Date().toISOString() };
+    mockBundles.push(newBundle);
+    return res.status(201).json({ success: true, bundle: newBundle });
+  }
+
+  try {
+    const result = await pool.query(
+      'INSERT INTO bundles (sku, name, description) VALUES ($1, $2, $3) RETURNING *',
+      [sku, name, description || null]
+    );
+    const bundle = result.rows[0];
+    if (Array.isArray(items) && items.length > 0) {
+      for (const item of items) {
+        await pool.query('INSERT INTO bundle_items (bundle_id, product_sku, quantity) VALUES ($1, $2, $3)', [bundle.id, item.product_sku, item.quantity || 1]);
+      }
+    }
+    res.status(201).json({ success: true, bundle });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create bundle.' });
   }
 });
 

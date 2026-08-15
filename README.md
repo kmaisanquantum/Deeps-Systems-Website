@@ -15,7 +15,7 @@ View your app in AI Studio: https://ai.studio/apps/drive/1132mN6IMYsoKhS_C5SYqGv
 Deeps Systems runs as a unified fullstack monolithic application in a single container.
 
 * **Vite + React SPA**: Statically built into `/dist` and served securely by the Node.js Express server.
-* **Express REST APIs**: Under `/api` (for inquiries, health, and status checks).
+* **Express REST APIs**: Under `/api` (for inquiries, health, status checks, public products, and JWT-secured admin pricing dashboard management).
 * **SMTP Nodemailer Support**: Triggers direct HTML email notifications using configurable intent-based routing to Sales, Service, or Admin mailboxes, and automatically generates customer confirmations.
 * **SPA Catch-All Route**: Rewrites any deep-linked routes back to `index.html` to avoid 404s.
 

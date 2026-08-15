@@ -18,9 +18,9 @@ async def verify_shop():
             else:
                 print("FAILURE: Starlink products NOT found!")
 
-            # Verify price of Starlink Standard Kit is formatted as expected
-            if "K2500.00" in content:
-                print("SUCCESS: Starlink price rendered correctly as K2500.00.")
+            # Verify price of Starlink Standard Kit is formatted as expected (K1,870 benchmark selling price)
+            if "K1,870" in content:
+                print("SUCCESS: Starlink price rendered correctly as K1,870.")
             else:
                 print("FAILURE: Price formatting not correct!")
 

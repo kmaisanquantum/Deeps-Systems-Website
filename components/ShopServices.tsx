@@ -16,11 +16,26 @@ import { getApiUrl } from '../utils/api';
 
 interface Product {
   id: string;
+  sku?: string;
   name: string;
-  price: number;
+  price: number | null;
   price_usd?: number;
   billing: string;
   features: string[];
+  model?: string;
+  description?: string;
+  image_url?: string;
+  whats_included?: string[];
+  compatibility?: string[];
+  tech_specs?: Record<string, any>;
+  gst_status?: string;
+  stock_status?: string;
+  supplier?: string;
+  source_type?: string;
+  price_verified?: boolean;
+  last_verified_at?: string | null;
+  category?: string;
+  product_type?: string;
 }
 
 const ShopServices: React.FC = () => {
@@ -104,9 +119,11 @@ const ShopServices: React.FC = () => {
         const data = await res.json();
         if (Array.isArray(data)) {
           const normalized = data.map((p: any) => {
-            const rawPrice = p.price !== undefined ? p.price : p.price_pgk;
-            const parsedPrice = Number(rawPrice);
-            const price = isNaN(parsedPrice) ? 0 : parsedPrice;
+            let price: number | null = null;
+            if (p.price !== undefined && p.price !== null) {
+              const parsed = Number(p.price);
+              if (!isNaN(parsed)) price = parsed;
+            }
 
             let features: string[] = [];
             if (Array.isArray(p.features)) {
@@ -114,18 +131,41 @@ const ShopServices: React.FC = () => {
             } else if (typeof p.features === 'string') {
               try {
                 const parsed = JSON.parse(p.features);
-                if (Array.isArray(parsed)) {
-                  features = parsed;
-                }
+                if (Array.isArray(parsed)) features = parsed;
+              } catch (_) {}
+            }
+
+            let whats_included: string[] = [];
+            if (Array.isArray(p.whats_included)) {
+              whats_included = p.whats_included;
+            } else if (typeof p.whats_included === 'string') {
+              try {
+                const parsed = JSON.parse(p.whats_included);
+                if (Array.isArray(parsed)) whats_included = parsed;
               } catch (_) {}
             }
 
             return {
               id: String(p.sku || p.id || ''),
+              sku: String(p.sku || p.id || ''),
               name: String(p.name || ''),
               price,
               billing: String(p.billing || ''),
-              features
+              features,
+              model: p.model ? String(p.model) : undefined,
+              description: p.description ? String(p.description) : undefined,
+              image_url: p.image_url ? String(p.image_url) : undefined,
+              whats_included,
+              compatibility: Array.isArray(p.compatibility) ? p.compatibility : [],
+              tech_specs: typeof p.tech_specs === 'object' && p.tech_specs !== null ? p.tech_specs : {},
+              gst_status: p.gst_status || 'GST inclusive',
+              stock_status: p.stock_status || 'in_stock',
+              supplier: p.supplier ? String(p.supplier) : undefined,
+              source_type: p.source_type ? String(p.source_type) : undefined,
+              price_verified: Boolean(p.price_verified),
+              last_verified_at: p.last_verified_at || null,
+              category: p.category ? String(p.category) : 'shop-starlink',
+              product_type: p.product_type ? String(p.product_type) : 'hardware'
             };
           });
           setStarlinkProducts(normalized);
@@ -183,21 +223,62 @@ const ShopServices: React.FC = () => {
     return service;
   });
 
-  // TODO: confirm real pricing with the site owner before final production release.
+  const activeStarlinkList = starlinkProducts.length > 0 ? starlinkProducts : (isLoadingStarlink ? [] : fallbackStarlinkProducts);
+
+  // Group Starlink products into structured categories/subgroups
+  const starlinkSubgroups = [
+    {
+      title: "Starlink Terminal Kits & Hardware",
+      description: "Official satellite terminals and user kits for PNG residential, business, and field deployments.",
+      services: activeStarlinkList.filter(p => (p.category === 'shop-starlink' || p.product_type === 'hardware') && p.category !== 'mounting' && p.category !== 'networking' && p.category !== 'cables' && p.category !== 'power' && p.category !== 'installation' && p.category !== 'recurring')
+    },
+    {
+      title: "Mounting Adapters & Brackets",
+      description: "Corrosion-resistant pole adapters, pipe mounts, and wall brackets for secure installation.",
+      services: activeStarlinkList.filter(p => p.category === 'mounting')
+    },
+    {
+      title: "Networking Hardware",
+      description: "Ethernet adapters and network integration modules for direct router/switch connection.",
+      services: activeStarlinkList.filter(p => p.category === 'networking')
+    },
+    {
+      title: "Cables & Power Accessories",
+      description: "Replacement extension cables, 12V/24V DC vehicle power supplies, and accessories.",
+      services: activeStarlinkList.filter(p => p.category === 'cables' || p.category === 'power')
+    },
+    {
+      title: "On-Site Installation & Engineering Services",
+      description: "Turnkey physical installation, cable routing, dish alignment, and firewall integration in PNG.",
+      services: activeStarlinkList.filter(p => p.category === 'installation' || p.product_type === 'installation')
+    },
+    {
+      title: "Connectivity Plans & Subscriptions",
+      description: "High-priority satellite data packages and account management for enterprise continuity.",
+      services: activeStarlinkList.filter(p => p.category === 'recurring' || p.product_type === 'recurring')
+    }
+  ].filter(group => group.services.length > 0);
+
   const categories = [
     {
       id: "shop-microsoft",
       title: "Microsoft Office Applications",
       icon: <Monitor className="w-6 h-6" />,
       pricing_label: "Perpetual Reseller Licenses — Pricing in PGK",
-      services: computedMicrosoftServices
+      subgroups: [
+        {
+          title: "Microsoft 365 / Office Reseller Licenses",
+          description: "Authorized reseller perpetual office software licenses.",
+          services: computedMicrosoftServices
+        }
+      ]
     },
     {
       id: "shop-starlink",
-      title: "Starlink Kits",
+      title: "Starlink Satellite Catalogue & Services",
       icon: <Rocket className="w-6 h-6" />,
-      pricing_label: "Hardware & Subscriptions — Pricing in PGK",
-      services: starlinkProducts.length > 0 ? starlinkProducts : (isLoadingStarlink ? [] : fallbackStarlinkProducts)
+      pricing_label: "Cost-Based 10% Markup Benchmark Pricing in PGK",
+      subgroups: starlinkSubgroups
     }
   ];
 
@@ -315,106 +396,164 @@ const ShopServices: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                {category.id === "shop-starlink" && isLoadingStarlink && (
-                  <div className="col-span-full py-12 flex flex-col items-center justify-center text-slate-400 gap-3">
-                    <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
-                    <p className="text-sm font-medium">Loading Starlink products from catalog...</p>
-                  </div>
-                )}
+              {category.id === "shop-starlink" && isLoadingStarlink && (
+                <div className="py-12 flex flex-col items-center justify-center text-slate-400 gap-3">
+                  <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+                  <p className="text-sm font-medium">Loading Starlink products from catalog...</p>
+                </div>
+              )}
 
-                {category.id === "shop-starlink" && starlinkError && (
-                  <div className="col-span-full p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-semibold mb-4">
-                    Notice: Failed to load real-time catalog ({starlinkError}). Showing locally cached product specifications.
-                  </div>
-                )}
+              {category.id === "shop-starlink" && starlinkError && (
+                <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-semibold mb-4">
+                  Notice: Failed to load real-time catalog ({starlinkError}). Showing locally cached product specifications.
+                </div>
+              )}
 
-                {category.services.map((service, srvIdx) => {
-                  const qty = quantities[service.id] || 1;
-                  const isAdded = addedFeedback[service.id];
-                  return (
-                    <div
-                      key={srvIdx}
-                      className="group p-6 bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 hover:border-emerald-500/50 transition-all duration-500 hover:bg-white/10 flex flex-col shadow-2xl relative overflow-hidden"
-                    >
-                      <h4 className="text-lg font-bold mb-2 group-hover:text-emerald-400 transition-colors line-clamp-2 min-h-[3.5rem] flex items-center">{service.name}</h4>
-
-                      {/* Price Tag */}
-                      <div className="mb-4">
-                        <span className="text-2xl font-black text-emerald-400">
-                          K{Number(service.price || 0).toFixed(2)}
-                        </span>
-                        <span className="text-xs text-slate-400">{service.billing}</span>
-                      </div>
-
-                      <ul className="space-y-3 mb-6 flex-grow">
-                        {(Array.isArray(service.features) ? service.features : []).map((feature, fIdx) => (
-                          <li key={fIdx} className="flex items-start gap-2.5 text-xs text-slate-400">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-
-                      {/* Quantity Stepper */}
-                      <div className="flex items-center justify-between gap-2 mb-4 p-2 bg-white/5 rounded-xl border border-white/10">
-                        <span className="text-xs text-slate-400 font-bold uppercase tracking-wider pl-2">Qty</span>
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => handleQuantityChange(service.id, qty - 1)}
-                            className="p-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 transition-colors"
-                            aria-label="Decrease quantity"
-                          >
-                            <Minus className="w-3.5 h-3.5" />
-                          </button>
-                          <input
-                            type="number"
-                            min="1"
-                            value={qty}
-                            onChange={(e) => handleQuantityChange(service.id, parseInt(e.target.value) || 1)}
-                            className="w-10 bg-transparent text-center text-sm font-bold outline-none border-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          />
-                          <button
-                            onClick={() => handleQuantityChange(service.id, qty + 1)}
-                            className="p-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 transition-colors"
-                            aria-label="Increase quantity"
-                          >
-                            <Plus className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Add to Cart CTA */}
-                      <button
-                        onClick={() => handleAddToCartClick(service)}
-                        className={`w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 group/btn active-click ${
-                          isAdded
-                            ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                            : 'bg-white/5 border border-white/10 text-white hover:bg-emerald-600 hover:border-emerald-500'
-                        }`}
-                      >
-                        {isAdded ? (
-                          <>
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            Added!
-                          </>
-                        ) : (
-                          <>
-                            <ShoppingCart className="w-3.5 h-3.5" />
-                            Add to Cart
-                          </>
-                        )}
-                      </button>
-
-                      <button
-                        onClick={() => handleRequestService(service.name)}
-                        className="mt-2 w-full py-2 rounded-lg text-[10px] uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
-                      >
-                        or request quote
-                      </button>
+              <div className="space-y-10">
+                {category.subgroups.map((subgroup, subIdx) => (
+                  <div key={subIdx} className="space-y-4">
+                    <div className="border-l-2 border-emerald-500 pl-4 py-1">
+                      <h4 className="text-xl font-bold uppercase tracking-wider text-white">{subgroup.title}</h4>
+                      <p className="text-xs text-slate-400 font-medium">{subgroup.description}</p>
                     </div>
-                  );
-                })}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                      {subgroup.services.map((service, srvIdx) => {
+                        const qty = quantities[service.id] || 1;
+                        const isAdded = addedFeedback[service.id];
+                        const hasPrice = service.price !== null && service.price !== undefined && typeof service.price === 'number' && service.price > 0;
+
+                        return (
+                          <div
+                            key={srvIdx}
+                            className="group p-6 bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 hover:border-emerald-500/50 transition-all duration-500 hover:bg-white/10 flex flex-col shadow-2xl relative overflow-hidden"
+                          >
+                            <h5 className="text-lg font-bold mb-2 group-hover:text-emerald-400 transition-colors line-clamp-2 min-h-[3.5rem] flex items-center">
+                              {service.name}
+                            </h5>
+
+                            {/* Badges: Verified / GST / Stock */}
+                            <div className="flex flex-wrap gap-1.5 mb-3">
+                              {service.price_verified && service.last_verified_at && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                                  Verified {new Date(service.last_verified_at).toLocaleDateString()}
+                                </span>
+                              )}
+                              {service.gst_status && (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/5 text-slate-300 border border-white/10">
+                                  {service.gst_status}
+                                </span>
+                              )}
+                              {service.stock_status && (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                  {service.stock_status === 'in_stock' ? 'In Stock' : service.stock_status}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Price Tag */}
+                            <div className="mb-4">
+                              {hasPrice ? (
+                                <div>
+                                  <span className="text-2xl font-black text-emerald-400">
+                                    K{Number(service.price).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                  </span>
+                                  <span className="text-xs text-slate-400">{service.billing}</span>
+                                </div>
+                              ) : (
+                                <div>
+                                  <span className="text-lg font-bold text-amber-400">
+                                    Price: Contact Deeps Systems
+                                  </span>
+                                  <p className="text-[10px] text-slate-400 font-medium mt-0.5">Custom procurement & pricing available on request.</p>
+                                </div>
+                              )}
+                            </div>
+
+                            <ul className="space-y-2.5 mb-6 flex-grow">
+                              {(Array.isArray(service.features) ? service.features : []).map((feature, fIdx) => (
+                                <li key={fIdx} className="flex items-start gap-2 text-xs text-slate-400">
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                                  <span>{feature}</span>
+                                </li>
+                              ))}
+                            </ul>
+
+                            {hasPrice ? (
+                              <>
+                                {/* Quantity Stepper */}
+                                <div className="flex items-center justify-between gap-2 mb-4 p-2 bg-white/5 rounded-xl border border-white/10">
+                                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wider pl-2">Qty</span>
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      onClick={() => handleQuantityChange(service.id, qty - 1)}
+                                      className="p-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 transition-colors"
+                                      aria-label="Decrease quantity"
+                                    >
+                                      <Minus className="w-3.5 h-3.5" />
+                                    </button>
+                                    <input
+                                      type="number"
+                                      min="1"
+                                      value={qty}
+                                      onChange={(e) => handleQuantityChange(service.id, parseInt(e.target.value) || 1)}
+                                      className="w-10 bg-transparent text-center text-sm font-bold outline-none border-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    />
+                                    <button
+                                      onClick={() => handleQuantityChange(service.id, qty + 1)}
+                                      className="p-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 transition-colors"
+                                      aria-label="Increase quantity"
+                                    >
+                                      <Plus className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* Add to Cart CTA */}
+                                <button
+                                  onClick={() => handleAddToCartClick({ id: service.id, name: service.name, price: service.price! })}
+                                  className={`w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 group/btn active-click ${
+                                    isAdded
+                                      ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
+                                      : 'bg-white/5 border border-white/10 text-white hover:bg-emerald-600 hover:border-emerald-500'
+                                  }`}
+                                >
+                                  {isAdded ? (
+                                    <>
+                                      <CheckCircle2 className="w-3.5 h-3.5" />
+                                      Added!
+                                    </>
+                                  ) : (
+                                    <>
+                                      <ShoppingCart className="w-3.5 h-3.5" />
+                                      Add to Cart
+                                    </>
+                                  )}
+                                </button>
+
+                                <button
+                                  onClick={() => handleRequestService(service.name)}
+                                  className="mt-2 w-full py-2 rounded-lg text-[10px] uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
+                                >
+                                  or request quote
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                onClick={() => handleRequestService(service.name)}
+                                className="w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-widest bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 active-click"
+                              >
+                                <Mail className="w-4 h-4" />
+                                Request Quote
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
@@ -490,8 +629,8 @@ const ShopServices: React.FC = () => {
                          className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-emerald-500/50 transition-all text-white font-medium appearance-none"
                        >
                           <option value="" disabled className="bg-gray-900">Choose a service</option>
-                          {categories.flatMap(cat => cat.services).map(srv => (
-                            <option key={srv.name} value={srv.name} className="bg-gray-900">{srv.name}</option>
+                          {categories.flatMap(cat => cat.subgroups.flatMap(sg => sg.services)).map(srv => (
+                            <option key={srv.id || srv.name} value={srv.name} className="bg-gray-900">{srv.name}</option>
                           ))}
                        </select>
                     </div>
