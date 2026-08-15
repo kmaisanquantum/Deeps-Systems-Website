@@ -170,71 +170,6 @@ const ShopServices: React.FC = () => {
         "Licensed for home and commercial use",
         "Authorized local reseller support"
       ]
-    },
-    {
-      id: "m365-personal",
-      name: "Microsoft 365 Personal",
-      price: 360.00,
-      price_usd: 90.91,
-      billing: " / year",
-      features: [
-        "Premium Word, Excel, and PowerPoint",
-        "Secure cloud storage (1 TB OneDrive)",
-        "For 1 user across all devices",
-        "Ongoing security and app updates"
-      ]
-    },
-    {
-      id: "m365-family",
-      name: "Microsoft 365 Family",
-      price: 505.00,
-      price_usd: 127.53,
-      billing: " / year",
-      features: [
-        "Premium Word, Excel, and PowerPoint",
-        "Up to 6 TB cloud storage (1 TB/person)",
-        "Share with up to 6 family members",
-        "Ongoing security and app updates"
-      ]
-    },
-    {
-      id: "m365-business-basic",
-      name: "Microsoft 365 Business Basic",
-      price: 25.00,
-      price_usd: 6.31,
-      billing: " / user / month",
-      features: [
-        "Web and mobile apps of Office",
-        "Teams, Exchange, OneDrive (1 TB)",
-        "Basic cloud security & compliance",
-        "Professional business email included"
-      ]
-    },
-    {
-      id: "m365-business-standard",
-      name: "Microsoft 365 Business Standard",
-      price: 51.00,
-      price_usd: 12.88,
-      billing: " / user / month",
-      features: [
-        "Premium desktop apps of Office",
-        "Webinars with attendee registration",
-        "1 TB secure cloud storage per user",
-        "Advanced Teams collaboration features"
-      ]
-    },
-    {
-      id: "m365-business-premium",
-      name: "Microsoft 365 Business Premium",
-      price: 80.00,
-      price_usd: 20.20,
-      billing: " / user / month",
-      features: [
-        "Advanced cyberthreat protection",
-        "Comprehensive mobile device management",
-        "Secure remote access with Intune",
-        "Everything in Business Standard included"
-      ]
     }
   ];
 
@@ -254,7 +189,7 @@ const ShopServices: React.FC = () => {
       id: "shop-microsoft",
       title: "Microsoft Office Applications",
       icon: <Monitor className="w-6 h-6" />,
-      pricing_label: "Reseller Licenses — Pricing in PGK",
+      pricing_label: "Perpetual Reseller Licenses — Pricing in PGK",
       services: computedMicrosoftServices
     },
     {
