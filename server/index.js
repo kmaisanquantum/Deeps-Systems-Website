@@ -572,7 +572,7 @@ async function sendInquiryEmail(type, data) {
           <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${data.message}</p>
         </div>
         <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
-          Sent from Deeps Systems Monolith
+          Sent from Deeps Systems
         </p>
       </div>
     `;
@@ -589,14 +589,14 @@ async function sendInquiryEmail(type, data) {
           <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${data.message}</p>
         </div>
         <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
-          Sent from Deeps Systems Monolith
+          Sent from Deeps Systems
         </p>
       </div>
     `;
   }
 
   const mailOptions = {
-    from: process.env.SMTP_USER ? `"Deeps Systems Monolith" <${process.env.SMTP_USER}>` : '"Deeps Systems Monolith" <no-reply@dspng.tech>',
+    from: process.env.SMTP_USER ? `"Deeps Systems" <${process.env.SMTP_USER}>` : '"Deeps Systems" <no-reply@dspng.tech>',
     to: recipient,
     subject: subjectLine,
     html: htmlBody,
@@ -632,7 +632,7 @@ async function sendInquiryEmail(type, data) {
             </div>
 
             <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
-              Deeps Systems Monolith
+              Deeps Systems
             </p>
           </div>
         `;
@@ -676,13 +676,13 @@ async function sendInquiryEmail(type, data) {
           </div>
 
           <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
-            Deeps Systems Monolith
+            Deeps Systems
           </p>
         </div>
       `;
 
       const customerMailOptions = {
-        from: `"Deeps Systems Monolith" <${process.env.SMTP_USER}>`,
+        from: `"Deeps Systems" <${process.env.SMTP_USER}>`,
         to: data.email,
         subject: customerSubjectLine,
         html: customerHtmlBody,
@@ -767,13 +767,13 @@ async function sendOrderEmail(order, items) {
       ` : ''}
 
       <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
-        Sent from Deeps Systems Monolith
+        Sent from Deeps Systems
       </p>
     </div>
   `;
 
   const mailOptions = {
-    from: process.env.SMTP_USER ? `"Deeps Systems Monolith" <${process.env.SMTP_USER}>` : '"Deeps Systems Monolith" <no-reply@dspng.tech>',
+    from: process.env.SMTP_USER ? `"Deeps Systems" <${process.env.SMTP_USER}>` : '"Deeps Systems" <no-reply@dspng.tech>',
     to: MAIL_SALES,
     cc: MAIL_ADMIN,
     subject: subjectLine,
@@ -820,7 +820,7 @@ async function sendOrderEmail(order, items) {
 
             <p style="margin-top: 20px;">If you have any questions, please feel free to reply to this email.</p>
             <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
-              Deeps Systems Monolith
+              Deeps Systems
             </p>
           </div>
         `;
@@ -879,13 +879,13 @@ async function sendOrderEmail(order, items) {
 
           <p style="margin-top: 20px;">If you have any questions, please feel free to reply to this email.</p>
           <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
-            Deeps Systems Monolith
+            Deeps Systems
           </p>
         </div>
       `;
 
       const customerMailOptions = {
-        from: `"Deeps Systems Monolith" <${process.env.SMTP_USER}>`,
+        from: `"Deeps Systems" <${process.env.SMTP_USER}>`,
         to: order.email,
         subject: customerSubjectLine,
         html: customerHtmlBody,
