@@ -10,6 +10,20 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3000,
         host: '0.0.0.0',
+        proxy: {
+          '/api': {
+            target: process.env.VITE_BACKEND_URL || 'http://localhost:3000',
+            changeOrigin: true,
+          },
+          '/health': {
+            target: process.env.VITE_BACKEND_URL || 'http://localhost:3000',
+            changeOrigin: true,
+          },
+          '/status': {
+            target: process.env.VITE_BACKEND_URL || 'http://localhost:3000',
+            changeOrigin: true,
+          },
+        },
       },
       preview: {
         allowedHosts: ['www.dspng.tech', 'dspng.tech'],

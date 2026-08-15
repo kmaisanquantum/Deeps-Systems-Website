@@ -4,6 +4,6 @@
  */
 export const getApiUrl = (path: string): string => {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  const base = import.meta.env.DEV ? 'http://localhost:3001' : '';
+  const base = '';
   return `${base}${cleanPath}`;
 };
