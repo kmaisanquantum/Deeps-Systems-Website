@@ -26,6 +26,9 @@ All configuration is managed securely via environment variables. No secrets are 
 | `MAIL_SALES` | Destination recipient for orders / purchases. | `sales@dspng.tech` |
 | `MAIL_SERVICE` | Destination recipient for shop service / Starlink inquiries. | `service@dspng.tech` |
 | `MAIL_ADMIN` | Catch-all admin recipient that is CC'd on everything. | `wokman@dspng.tech` |
+| `ADMIN_EMAIL` | Admin authentication email for JWT pricing management login. | `kmaisan@dspng.tech` |
+| `ADMIN_PASSWORD_HASH` | Bcrypt hashed password for admin user authentication. | Default hashed credential in server. |
+| `JWT_SECRET` | Secret key used to sign admin JWT authorization tokens. | `deeps_systems_jwt_secret_key...` |
 | `USD_TO_PGK_RATE` | Fallback / seed USD to PGK exchange rate when FX provider is offline. | `3.6` |
 | `FX_PROVIDER_URL` | Live FX API endpoint URL for real-time USD->PGK exchange rates. | `https://open.er-api.com/v6/latest/USD` |
 | `FX_REFRESH_MINUTES` | Interval in minutes to refresh live FX rate cache. | `360` (6 hours) |
@@ -157,7 +160,44 @@ To enforce accounting consistency, Deeps Systems operates on a single backend-co
 
 ---
 
-## 7. Troubleshooting "Failed to submit inquiry"
+## 7. Starlink Catalogue Architecture & Cost-Based Pricing Engine (Phase 1)
+
+### A. Database Schema Extensions & Migration
+The existing `products` table is extended using safe `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` migration statements:
+- `model`, `description`, `image_url`, `whats_included` (JSONB), `compatibility` (JSONB), `tech_specs` (JSONB), `warranty`, `related_accessories` (JSONB)
+- `cost_price_pgk` (NUMERIC(12,2)), `cost_currency` (VARCHAR(8) DEFAULT 'PGK'), `markup_percent` (NUMERIC(5,2) DEFAULT 10)
+- `gst_status` (e.g. 'GST inclusive'), `stock_status` ('in_stock')
+- `supplier`, `supplier_url`, `supplier_country`, `source_type` ('official_starlink', 'png_supplier', 'au_supplier', 'other_verified', 'unverified')
+- `price_verified` (BOOLEAN DEFAULT false), `last_verified_at` (TIMESTAMP WITH TIME ZONE), `installation_available` (BOOLEAN), `product_type` ('hardware', 'accessory', 'installation', 'recurring', 'bundle')
+
+New relational tables created using `CREATE TABLE IF NOT EXISTS`:
+- `suppliers (id, name, url, country, notes, created_at)`
+- `product_price_history (id, product_sku, cost_price_pgk, markup_percent, selling_price_pgk, source_type, supplier, verified_at, changed_by, created_at)`: Audits price/cost changes.
+- `bundles (id, sku UNIQUE, name, description, active, created_at)` and `bundle_items (id, bundle_id FK, product_sku, quantity)`
+- `admin_users (id, email UNIQUE, password_hash, role, created_at)`
+
+### B. Cost-Based Pricing Helper (`computeSellingPrice`)
+- **Verified Kina Acquisition Rule**: If `cost_price_pgk` is set and `price_verified === true`: `selling = Math.round(cost_price_pgk * (1 + markup_percent / 100))` (PNG retail rounding to nearest whole Kina).
+- **Legacy USD Fallback**: If legacy `price_usd` is present: `Math.round(price_usd * getRate() * markupMultiplier * 100) / 100`.
+- **Unverified / Contact Rule**: If `price_verified === false` or cost is missing: returns `null`. The public frontend displays "Price: Contact Deeps Systems" with a Request Quote button. No price is ever invented.
+- **Confidentiality Guard**: Public `/api/products` never exposes `cost_price_pgk`, `markup_percent`, or markup amounts. Cost/markup visibility is strictly reserved for authenticated admin endpoints (`/api/admin/pricing-dashboard`).
+
+### C. Verified Starlink PNG Benchmarks
+- **Starlink Mini Kit** (`starlink-mini`): Cost K1,300 -> Selling K1,430 (source_type='png_supplier', verified=true)
+- **Starlink Standard Kit Gen 3** (`starlink-standard`): Cost K1,700 -> Selling K1,870
+- **Starlink Enterprise Kit** (`starlink-enterprise`): Cost K1,800 -> Selling K1,980
+- **Accessories / Installations / Subscriptions**: Seeded as unverified (`price: null`) with proper `category` and `product_type`.
+
+### D. Admin Authentication & Management APIs
+- `POST /api/admin/login`: Rate-limited endpoint verifying admin credentials (bcrypt) and returning a JWT token (24h expiry).
+- `requireAdmin` Middleware: Validates Bearer JWT header on protected routes.
+- `GET /api/admin/pricing-dashboard`: Admin-only ledger returning totals, verified counts, last update timestamp, and per-product cost/markup/selling breakdowns.
+- `GET / POST / PUT /api/admin/products`: CRUD endpoint for products. Cost or markup modifications automatically write an audit entry to `product_price_history`.
+- `GET / POST /api/admin/suppliers` & `GET / POST /api/admin/bundles`: Management endpoints for suppliers and product bundles.
+
+---
+
+## 8. Troubleshooting "Failed to submit inquiry"
 
 If a user reports a submission error:
 1. **Check the Client UI**: The UI will extract and print the exact, specific diagnostic error message returned from the backend instead of showing a generic text.
