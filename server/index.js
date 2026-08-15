@@ -544,7 +544,7 @@ async function sendInquiryEmail(type, data) {
   let ccRecipient = null;
 
   if (type === 'shop') {
-    recipient = MAIL_SERVICE;
+    recipient = MAIL_SALES;
     ccRecipient = MAIL_ADMIN;
   } else {
     // contact inquiry: default to MAIL_ADMIN, but route to MAIL_SALES if purchase intent detected
@@ -560,10 +560,10 @@ async function sendInquiryEmail(type, data) {
   let htmlBody = '';
 
   if (type === 'shop') {
-    subjectLine = `New Shop Service Inquiry: ${data.service}`;
+    subjectLine = `New Shop Sales Inquiry: ${data.service}`;
     htmlBody = `
       <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
-        <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">New Service Inquiry</h2>
+        <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">New Sales Inquiry</h2>
         <p><strong>Full Name:</strong> ${data.name}</p>
         <p><strong>Business Name:</strong> ${data.business}</p>
         <p><strong>Selected Service:</strong> ${data.service}</p>
