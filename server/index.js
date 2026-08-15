@@ -15,6 +15,36 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const USD_TO_PGK_RATE = parseFloat(process.env.USD_TO_PGK_RATE) || 3.6;
+const FX_PROVIDER_URL = process.env.FX_PROVIDER_URL || 'https://open.er-api.com/v6/latest/USD';
+const FX_REFRESH_MINUTES = parseFloat(process.env.FX_REFRESH_MINUTES) || 360;
+const DEEPS_MARKUP_PERCENT = parseFloat(process.env.DEEPS_MARKUP_PERCENT) || 10;
+const markupMultiplier = 1 + (DEEPS_MARKUP_PERCENT / 100);
+
+let liveRate = USD_TO_PGK_RATE;
+let lastFetched = 0;
+
+function getRate() {
+  return liveRate;
+}
+
+async function fetchLiveRate() {
+  try {
+    const res = await fetch(FX_PROVIDER_URL);
+    if (!res.ok) {
+      throw new Error(`FX Provider returned status ${res.status}`);
+    }
+    const data = await res.json();
+    if (data && data.rates && typeof data.rates.PGK === 'number' && !isNaN(data.rates.PGK) && data.rates.PGK > 0) {
+      liveRate = data.rates.PGK;
+      lastFetched = Date.now();
+      console.log(`[FX Provider] Live USD->PGK exchange rate updated to: ${liveRate}`);
+    } else {
+      throw new Error('Invalid or missing PGK rate in FX provider response');
+    }
+  } catch (err) {
+    console.warn(`[FX Provider] Failed to fetch live rate from ${FX_PROVIDER_URL}: ${err.message}. Maintaining cached/fallback rate (${liveRate}).`);
+  }
+}
 
 // Database Configuration (Supports 'mock' mode for local verification)
 let pool;
@@ -87,6 +117,7 @@ async function initializeDatabase() {
       notes TEXT,
       exchange_rate NUMERIC(12, 4),
       total_price_usd NUMERIC(12, 2),
+      markup_percent NUMERIC(5, 2),
       created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
   `;
@@ -151,10 +182,11 @@ async function initializeDatabase() {
     await client.query(createOrderItemsTableQuery);
     await client.query(createProductsTableQuery);
 
-    // Apply migrations for existing databases to add price_usd, exchange_rate, and total_price_usd if they don't exist
+    // Apply migrations for existing databases to add price_usd, exchange_rate, total_price_usd, and markup_percent if they don't exist
     await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS price_usd NUMERIC(12, 2);');
     await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS exchange_rate NUMERIC(12, 4);');
     await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS total_price_usd NUMERIC(12, 2);');
+    await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS markup_percent NUMERIC(5, 2);');
 
     await client.query(seedProductsQuery);
     client.release();
@@ -165,6 +197,10 @@ async function initializeDatabase() {
 }
 
 initializeDatabase();
+
+// Fetch initial live FX rate at startup and schedule background interval refreshes
+fetchLiveRate();
+setInterval(fetchLiveRate, FX_REFRESH_MINUTES * 60 * 1000);
 
 // CORS Configuration
 const allowedOrigins = [
@@ -452,17 +488,21 @@ async function sendOrderEmail(order, items) {
         </tbody>
         <tfoot>
           <tr style="font-weight: bold;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Grand Total:</td>
+            <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Grand Total (Charged PGK):</td>
             <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${parseFloat(order.total_price).toFixed(2)}</td>
           </tr>
           ${order.exchange_rate ? `
-          <tr style="font-size: 13px; color: #64748b;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Accounting Base Total (USD):</td>
+          <tr style="font-size: 12px; color: #475569;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Supplier Cost Base (USD):</td>
             <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">$${parseFloat(order.total_price_usd).toFixed(2)}</td>
           </tr>
           <tr style="font-size: 11px; color: #64748b; font-style: italic;">
-            <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Applied Exchange Rate:</td>
+            <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Applied Base FX Rate:</td>
             <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">1 USD = ${parseFloat(order.exchange_rate).toFixed(4)} PGK</td>
+          </tr>
+          <tr style="font-size: 11px; color: #64748b; font-style: italic;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Internal Markup Applied:</td>
+            <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">${parseFloat(order.markup_percent || DEEPS_MARKUP_PERCENT).toFixed(2)}%</td>
           </tr>
           ` : ''}
         </tfoot>
@@ -524,16 +564,6 @@ async function sendOrderEmail(order, items) {
                   <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Grand Total:</td>
                   <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${parseFloat(order.total_price).toFixed(2)}</td>
                 </tr>
-                ${order.exchange_rate ? `
-                <tr style="font-size: 13px; color: #64748b;">
-                  <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Accounting Base Total (USD):</td>
-                  <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">$${parseFloat(order.total_price_usd).toFixed(2)}</td>
-                </tr>
-                <tr style="font-size: 11px; color: #64748b; font-style: italic;">
-                  <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Applied Exchange Rate:</td>
-                  <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">1 USD = ${parseFloat(order.exchange_rate).toFixed(4)} PGK</td>
-                </tr>
-                ` : ''}
               </tfoot>
             </table>
 
@@ -586,16 +616,6 @@ async function sendOrderEmail(order, items) {
                 <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Grand Total:</td>
                 <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${parseFloat(order.total_price).toFixed(2)}</td>
               </tr>
-              ${order.exchange_rate ? `
-              <tr style="font-size: 13px; color: #64748b;">
-                <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Accounting Base Total (USD):</td>
-                <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">$${parseFloat(order.total_price_usd).toFixed(2)}</td>
-              </tr>
-              <tr style="font-size: 11px; color: #64748b; font-style: italic;">
-                <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Applied Exchange Rate:</td>
-                <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">1 USD = ${parseFloat(order.exchange_rate).toFixed(4)} PGK</td>
-              </tr>
-              ` : ''}
             </tfoot>
           </table>
 
@@ -627,7 +647,7 @@ app.get('/api/exchange-rate', (req, res) => {
   res.json({
     base: 'USD',
     quote: 'PGK',
-    rate: USD_TO_PGK_RATE
+    rate: getRate()
   });
 });
 
@@ -711,7 +731,9 @@ app.get('/api/products', async (req, res) => {
       const price_usd = p.price_usd ? parseFloat(p.price_usd) : null;
       let price = p.price ? parseFloat(p.price) : 0;
       if (price_usd && !isNaN(price_usd)) {
-        price = Math.round(price_usd * USD_TO_PGK_RATE * 100) / 100;
+        price = Math.round(price_usd * getRate() * markupMultiplier * 100) / 100;
+      } else {
+        price = Math.round(price * markupMultiplier * 100) / 100;
       }
       const features = Array.isArray(p.features) ? p.features : (typeof p.features === 'string' ? JSON.parse(p.features) : []);
       return {
@@ -749,7 +771,9 @@ app.get('/api/products', async (req, res) => {
       const price_usd = row.price_usd ? parseFloat(row.price_usd) : null;
       let price = row.price_pgk ? parseFloat(row.price_pgk) : 0;
       if (price_usd && !isNaN(price_usd)) {
-        price = Math.round(price_usd * USD_TO_PGK_RATE * 100) / 100;
+        price = Math.round(price_usd * getRate() * markupMultiplier * 100) / 100;
+      } else {
+        price = Math.round(price * markupMultiplier * 100) / 100;
       }
       const features = Array.isArray(row.features) ? row.features : (typeof row.features === 'string' ? JSON.parse(row.features) : []);
       return {
@@ -790,9 +814,9 @@ app.post('/api/orders', async (req, res) => {
     return res.status(400).json({ error: 'Cart items are required.' });
   }
 
-  const finalRate = exchangeRate ? parseFloat(exchangeRate) : USD_TO_PGK_RATE;
+  const finalRate = exchangeRate ? parseFloat(exchangeRate) : getRate();
   const computedTotalPgk = totalPrice || items.reduce((acc, cur) => acc + (cur.price * cur.quantity), 0);
-  const totalUsd = Math.round((computedTotalPgk / finalRate) * 100) / 100;
+  const totalUsdCost = Math.round((computedTotalPgk / (finalRate * markupMultiplier)) * 100) / 100;
 
   // Handle mock database mode
   if (process.env.DATABASE_URL === 'mock') {
@@ -805,7 +829,8 @@ app.post('/api/orders', async (req, res) => {
       total_price: computedTotalPgk,
       notes: notes ? notes.trim() : null,
       exchange_rate: finalRate,
-      total_price_usd: totalUsd,
+      total_price_usd: totalUsdCost,
+      markup_percent: DEEPS_MARKUP_PERCENT,
       created_at: new Date().toISOString()
     };
 
@@ -827,8 +852,7 @@ app.post('/api/orders', async (req, res) => {
       success: true,
       message: 'Order created successfully (mock mode).',
       orderId: mockOrder.id,
-      exchange_rate: finalRate,
-      total_price_usd: totalUsd
+      exchange_rate: finalRate
     });
   }
 
@@ -840,8 +864,8 @@ app.post('/api/orders', async (req, res) => {
 
     // 1. Insert order
     const insertOrderQuery = `
-      INSERT INTO orders (customer_name, business, email, total_items, total_price, notes, exchange_rate, total_price_usd)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      INSERT INTO orders (customer_name, business, email, total_items, total_price, notes, exchange_rate, total_price_usd, markup_percent)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *
     `;
     const orderValues = [
@@ -852,7 +876,8 @@ app.post('/api/orders', async (req, res) => {
       computedTotalPgk,
       notes ? notes.trim() : null,
       finalRate,
-      totalUsd
+      totalUsdCost,
+      DEEPS_MARKUP_PERCENT
     ];
 
     const orderResult = await client.query(insertOrderQuery, orderValues);

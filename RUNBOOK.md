@@ -26,7 +26,10 @@ All configuration is managed securely via environment variables. No secrets are 
 | `MAIL_SALES` | Destination recipient for orders / purchases. | `sales@dspng.tech` |
 | `MAIL_SERVICE` | Destination recipient for shop service / Starlink inquiries. | `service@dspng.tech` |
 | `MAIL_ADMIN` | Catch-all admin recipient that is CC'd on everything. | `wokman@dspng.tech` |
-| `USD_TO_PGK_RATE` | Configurable USD to PGK exchange rate for Kina conversions. | `3.6` |
+| `USD_TO_PGK_RATE` | Fallback / seed USD to PGK exchange rate when FX provider is offline. | `3.6` |
+| `FX_PROVIDER_URL` | Live FX API endpoint URL for real-time USD->PGK exchange rates. | `https://open.er-api.com/v6/latest/USD` |
+| `FX_REFRESH_MINUTES` | Interval in minutes to refresh live FX rate cache. | `360` (6 hours) |
+| `DEEPS_MARKUP_PERCENT` | Confidential internal margin percentage baked silently into Kina prices. | `10` (10%) |
 
 ---
 
@@ -126,11 +129,12 @@ All submissions from the Contact form, Shop Service Inquiry form, and Checkout C
 - **Orders**: A detailed order confirmation echoing the assigned Order ID, item list, and grand total in PGK is generated and sent to the customer.
 - **Inquiries**: An inquiry confirmation acknowledging receipt of the inquiry and detailing the submitter's message is generated and sent to the customer.
 
-### C. USD→PGK Exchange Rate Architecture:
-To enforce accounting consistency, Deeps Systems operates on a single backend-controlled USD→PGK exchange rate (configured via `USD_TO_PGK_RATE`, defaulting to `3.6`).
-- **Currency Paradigm**: Kina (PGK) remains the only primary, charged currency presented to customers on the frontend. USD is utilized exclusively as the underlying accounting and auditing base.
-- **Dynamic Conversions**: Products support a nullable `price_usd` column (extended schema). If `price_usd` is defined, the PGK `price` returned by `GET /api/products` is calculated dynamically as `round(price_usd * rate)`.
-- **Public Rate Route**: The `/api/exchange-rate` endpoint exposes the current active exchange rate in the format:
+### C. USD→PGK Exchange Rate Architecture & Confidential Margin:
+To enforce accounting consistency, Deeps Systems operates on a single backend-controlled USD→PGK exchange rate backed by a live FX provider (`FX_PROVIDER_URL`) with fallback to `USD_TO_PGK_RATE`.
+- **Live Rate Caching**: The server queries `open.er-api.com` on startup and refreshes every 6 hours (`FX_REFRESH_MINUTES`). On network or provider errors, it silently maintains the cached/fallback rate without crashing.
+- **Confidential Server-Side Markup**: A confidential profit margin (`DEEPS_MARKUP_PERCENT`, defaulting to 10%) is applied strictly inside backend pricing calculations (`price = round(price_usd * liveRate * markupMultiplier)`). The markup is NEVER exposed to customers, returned in public API payloads, or rendered on the public frontend.
+- **Currency Paradigm**: Kina (PGK) remains the only primary, charged currency presented to customers on the public frontend. USD is utilized exclusively as the underlying supplier cost base.
+- **Public Rate Route**: The `/api/exchange-rate` endpoint exposes the honest base exchange rate (without markup) in the format:
   ```json
   {
     "base": "USD",
@@ -138,7 +142,7 @@ To enforce accounting consistency, Deeps Systems operates on a single backend-co
     "rate": 3.6
   }
   ```
-- **Order Auditability & Ledger**: When creating a new order via `POST /api/orders`, the system records the active `exchange_rate` and the calculated USD-equivalent total `total_price_usd` inside the database. The applied rate and calculated USD-equivalent base are also printed on email order receipts.
+- **Order Auditability & Ledger**: When creating a new order via `POST /api/orders`, the system records the active `exchange_rate`, true supplier USD cost base `total_price_usd`, and `markup_percent` inside the `orders` database table. Internal sales notifications (`MAIL_SALES`) receive full ledger breakdown including USD cost base and markup percentage, while customer confirmation emails show Kina totals only.
 
 ### Data Validation Schema:
 * `type`: `'contact'` or `'shop'` (Required)
