@@ -556,6 +556,9 @@ async function sendInquiryEmail(type, data) {
   if (type === 'shop') {
     recipient = MAIL_SALES;
     ccRecipient = MAIL_ADMIN;
+  } else if (type === 'service') {
+    recipient = MAIL_SERVICE;
+    ccRecipient = MAIL_ADMIN;
   } else {
     // contact inquiry: default to MAIL_ADMIN, but route to MAIL_SALES if purchase intent detected
     const textToAnalyze = `${data.subject || ''} ${data.message || ''}`.toLowerCase();
@@ -579,6 +582,24 @@ async function sendInquiryEmail(type, data) {
         <p><strong>Selected Service:</strong> ${escapeHtml(data.service)}</p>
         <div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #10b981; margin-top: 20px;">
           <p style="margin: 0; font-weight: bold;">Requirements Message:</p>
+          <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${escapeHtml(data.message)}</p>
+        </div>
+        <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+          Sent from Deeps Systems
+        </p>
+      </div>
+    `;
+  } else if (type === 'service') {
+    subjectLine = `New After-Sales Support Request: ${data.subject}`;
+    htmlBody = `
+      <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">After-Sales Support Request</h2>
+        <p><strong>Full Name:</strong> ${escapeHtml(data.name)}</p>
+        <p><strong>Email Address:</strong> ${escapeHtml(data.email)}</p>
+        ${data.reference ? `<p><strong>Order / Reference #:</strong> ${escapeHtml(data.reference)}</p>` : ''}
+        <p><strong>Issue Subject:</strong> ${escapeHtml(data.subject)}</p>
+        <div style="background-color: #f8fafc; padding: 15px; border-left: 4px solid #10b981; margin-top: 20px;">
+          <p style="margin: 0; font-weight: bold;">Problem Message:</p>
           <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${escapeHtml(data.message)}</p>
         </div>
         <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
@@ -1858,10 +1879,10 @@ app.post('/api/orders', async (req, res) => {
 
 // Inquiries API Endpoint
 app.post('/api/inquiries', async (req, res) => {
-  const { type, name, email, business, subject, service, message } = req.body;
+  const { type, name, email, business, subject, service, message, reference } = req.body;
 
   // Validation
-  if (!type || !['contact', 'shop'].includes(type)) {
+  if (!type || !['contact', 'shop', 'service'].includes(type)) {
     return res.status(400).json({ error: 'Invalid or missing inquiry type.' });
   }
 
@@ -1891,6 +1912,17 @@ app.post('/api/inquiries', async (req, res) => {
     }
   }
 
+  if (type === 'service') {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: 'Valid email address is required for support request.' });
+    }
+    if (!subject || typeof subject !== 'string' || subject.trim().length < 4) {
+      return res.status(400).json({ error: 'Subject must be at least 4 characters.' });
+    }
+  }
+
+  const trimmedReference = reference && typeof reference === 'string' && reference.trim().length > 0 ? reference.trim() : null;
+
   try {
     // 1. Source of Truth: Save to PostgreSQL
     const insertQuery = `
@@ -1901,9 +1933,9 @@ app.post('/api/inquiries', async (req, res) => {
     const values = [
       type,
       name.trim(),
-      type === 'contact' ? email.trim() : null,
-      type === 'shop' ? business.trim() : null,
-      type === 'contact' ? subject.trim() : null,
+      (type === 'contact' || type === 'service') ? email.trim() : null,
+      type === 'shop' ? business.trim() : (type === 'service' ? trimmedReference : null),
+      (type === 'contact' || type === 'service') ? subject.trim() : null,
       type === 'shop' ? service.trim() : null,
       message.trim(),
     ];
@@ -1914,9 +1946,14 @@ app.post('/api/inquiries', async (req, res) => {
     console.log(`[Database] Inquiry persisted successfully with ID: ${persistedInquiry.id}`);
 
     // 2. Best-Effort Notification: Send direct SMTP notification asynchronously in background
-    const emailPayload = type === 'contact'
-      ? { name, email, subject, message }
-      : { name, business, service, message };
+    let emailPayload;
+    if (type === 'contact') {
+      emailPayload = { name, email, subject, message };
+    } else if (type === 'service') {
+      emailPayload = { name, email, subject, message, reference: trimmedReference };
+    } else {
+      emailPayload = { name, business, service, message };
+    }
 
     // Trigger in the background so we don't delay client response
     sendInquiryEmail(type, emailPayload);
