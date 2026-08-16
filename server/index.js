@@ -149,6 +149,7 @@ async function initializeDatabase() {
       delivery_address TEXT,
       total_items INT NOT NULL,
       total_price NUMERIC(12, 2) NOT NULL,
+      tax_amount NUMERIC(12, 2),
       notes TEXT,
       exchange_rate NUMERIC(12, 4),
       total_price_usd NUMERIC(12, 2),
@@ -327,6 +328,7 @@ async function initializeDatabase() {
     await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS markup_percent NUMERIC(5, 2);');
     await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS phone VARCHAR(50);');
     await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_address TEXT;');
+    await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS tax_amount NUMERIC(12, 2);');
 
     // Extended Starlink catalog & supplier schema columns on products
     await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS model VARCHAR(255);');
@@ -726,6 +728,10 @@ async function sendInquiryEmail(type, data) {
 async function sendOrderEmail(order, items) {
   const subjectLine = `New Order #${order.id} from ${order.customer_name}`;
 
+  const subtotal = parseFloat(order.total_price || 0);
+  const tax = order.tax_amount !== undefined && order.tax_amount !== null ? parseFloat(order.tax_amount) : Math.round(subtotal * 0.10 * 100) / 100;
+  const grandTotal = subtotal + tax;
+
   const itemsHtml = items.map(item => `
     <tr>
       <td style="padding: 8px; border: 1px solid #e2e8f0;">${escapeHtml(item.product_name)}</td>
@@ -758,9 +764,17 @@ async function sendOrderEmail(order, items) {
           ${itemsHtml}
         </tbody>
         <tfoot>
-          <tr style="font-weight: bold;">
+          <tr>
+            <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Subtotal (PGK):</td>
+            <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${subtotal.toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Tax (10% GST):</td>
+            <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${tax.toFixed(2)}</td>
+          </tr>
+          <tr style="font-weight: bold; background-color: #f8fafc;">
             <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Grand Total (Charged PGK):</td>
-            <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${parseFloat(order.total_price).toFixed(2)}</td>
+            <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${grandTotal.toFixed(2)}</td>
           </tr>
           ${order.exchange_rate ? `
           <tr style="font-size: 12px; color: #475569;">
@@ -836,9 +850,17 @@ async function sendOrderEmail(order, items) {
                 ${itemsHtml}
               </tbody>
               <tfoot>
-                <tr style="font-weight: bold;">
+                <tr>
+                  <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Subtotal:</td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${subtotal.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Tax (10% GST):</td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${tax.toFixed(2)}</td>
+                </tr>
+                <tr style="font-weight: bold; background-color: #f8fafc;">
                   <td colspan="3" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">Grand Total:</td>
-                  <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${parseFloat(order.total_price).toFixed(2)}</td>
+                  <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: right;">K${grandTotal.toFixed(2)}</td>
                 </tr>
               </tfoot>
             </table>
@@ -1782,6 +1804,7 @@ app.post('/api/orders', async (req, res) => {
       });
     }
 
+    const taxAmount = Math.round(computedTotalPgk * 0.10 * 100) / 100;
     const totalUsdCost = Math.round((computedTotalPgk / (finalRate * markupMultiplier)) * 100) / 100;
 
     const mockOrder = {
@@ -1793,6 +1816,7 @@ app.post('/api/orders', async (req, res) => {
       delivery_address: address.trim(),
       total_items: totalItems || validatedItems.reduce((acc, cur) => acc + cur.quantity, 0),
       total_price: computedTotalPgk,
+      tax_amount: taxAmount,
       notes: notes ? notes.trim() : null,
       exchange_rate: finalRate,
       total_price_usd: totalUsdCost,
@@ -1854,12 +1878,13 @@ app.post('/api/orders', async (req, res) => {
       });
     }
 
+    const taxAmount = Math.round(computedTotalPgk * 0.10 * 100) / 100;
     const totalUsdCost = Math.round((computedTotalPgk / (finalRate * markupMultiplier)) * 100) / 100;
 
     // 1. Insert order
     const insertOrderQuery = `
-      INSERT INTO orders (customer_name, business, email, phone, delivery_address, total_items, total_price, notes, exchange_rate, total_price_usd, markup_percent)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      INSERT INTO orders (customer_name, business, email, phone, delivery_address, total_items, total_price, tax_amount, notes, exchange_rate, total_price_usd, markup_percent)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING *
     `;
     const orderValues = [
@@ -1870,6 +1895,7 @@ app.post('/api/orders', async (req, res) => {
       address.trim(),
       totalItems || validatedItems.reduce((acc, cur) => acc + cur.quantity, 0),
       computedTotalPgk,
+      taxAmount,
       notes ? notes.trim() : null,
       finalRate,
       totalUsdCost,
