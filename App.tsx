@@ -11,7 +11,6 @@ import AdvantagePage from './pages/AdvantagePage';
 import InsightsPage from './pages/InsightsPage';
 import ContactPage from './pages/ContactPage';
 import ShopPage from './pages/ShopPage';
-import ServicePage from './pages/ServicePage';
 import NotFound from './pages/NotFound';
 import { CartProvider } from './components/CartContext';
 import { HelmetProvider } from 'react-helmet-async';
@@ -39,7 +38,6 @@ const App: React.FC = () => {
             <Route path="/advantage" element={<AdvantagePage />} />
             <Route path="/insights" element={<InsightsPage />} />
             <Route path="/shop" element={<ShopPage />} />
-            <Route path="/service" element={<ServicePage />} />
             <Route path="/contact" element={<ContactPage />} />
           </Routes>
         </main>
