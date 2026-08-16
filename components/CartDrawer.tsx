@@ -29,6 +29,8 @@ const CartDrawer: React.FC = () => {
     name: '',
     business: '',
     email: '',
+    phone: '',
+    address: '',
     message: ''
   });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -43,8 +45,8 @@ const CartDrawer: React.FC = () => {
 
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.business.trim() || !formData.email.trim()) {
-      setSubmitError("Name, Business Name, and Email are required.");
+    if (!formData.name.trim() || !formData.business.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.address.trim()) {
+      setSubmitError("Name, Business Name, Email, Phone, and Delivery Address are required.");
       setStatus('error');
       return;
     }
@@ -69,6 +71,8 @@ const CartDrawer: React.FC = () => {
           name: formData.name,
           business: formData.business,
           email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
           notes: formData.message.trim() || null,
           items: cart.map(item => ({
             id: item.id,
@@ -85,7 +89,7 @@ const CartDrawer: React.FC = () => {
       if (response.ok) {
         setStatus('success');
         clearCart();
-        setFormData({ name: '', business: '', email: '', message: '' });
+        setFormData({ name: '', business: '', email: '', phone: '', address: '', message: '' });
       } else {
         let errMsg = "Server returned error status.";
         try {
@@ -113,7 +117,7 @@ const CartDrawer: React.FC = () => {
           </div>
           <h4 className="text-2xl font-bold uppercase tracking-wide text-white font-montserrat">Order Sent!</h4>
           <p className="text-sm text-slate-400 max-w-xs mx-auto">
-            Your cart order has been submitted successfully and routed to our technical support team at <span className="text-emerald-400 font-semibold">wokman@dspng.tech</span>.
+            Your order has been submitted successfully and routed to our sales team. We'll follow up with you shortly.
           </p>
           <button
             onClick={() => {
@@ -250,6 +254,36 @@ const CartDrawer: React.FC = () => {
                 placeholder="john@example.com"
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-emerald-500/50 transition-all text-white text-sm font-medium min-h-[44px]"
               />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                required
+                value={formData.phone}
+                onChange={handleInputChange}
+                placeholder="+675 7000 0000"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-emerald-500/50 transition-all text-white text-sm font-medium min-h-[44px]"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2">
+                Delivery Address
+              </label>
+              <textarea
+                name="address"
+                rows={2}
+                required
+                value={formData.address}
+                onChange={handleInputChange}
+                placeholder="Section 45, Lot 12, Port Moresby, NCD"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-emerald-500/50 transition-all text-white text-xs resize-none font-medium min-h-[50px]"
+              ></textarea>
             </div>
 
             <div className="space-y-1">

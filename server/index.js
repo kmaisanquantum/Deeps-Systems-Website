@@ -145,6 +145,8 @@ async function initializeDatabase() {
       customer_name VARCHAR(255) NOT NULL,
       business VARCHAR(255) NOT NULL,
       email VARCHAR(255) NOT NULL,
+      phone VARCHAR(50),
+      delivery_address TEXT,
       total_items INT NOT NULL,
       total_price NUMERIC(12, 2) NOT NULL,
       notes TEXT,
@@ -323,6 +325,8 @@ async function initializeDatabase() {
     await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS exchange_rate NUMERIC(12, 4);');
     await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS total_price_usd NUMERIC(12, 2);');
     await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS markup_percent NUMERIC(5, 2);');
+    await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS phone VARCHAR(50);');
+    await client.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_address TEXT;');
 
     // Extended Starlink catalog & supplier schema columns on products
     await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS model VARCHAR(255);');
@@ -737,6 +741,8 @@ async function sendOrderEmail(order, items) {
       <p><strong>Customer Name:</strong> ${escapeHtml(order.customer_name)}</p>
       <p><strong>Business Name:</strong> ${escapeHtml(order.business)}</p>
       <p><strong>Email Address:</strong> ${escapeHtml(order.email)}</p>
+      ${order.phone ? `<p><strong>Phone Number:</strong> ${escapeHtml(order.phone)}</p>` : ''}
+      ${order.delivery_address ? `<p><strong>Delivery Address:</strong> ${escapeHtml(order.delivery_address)}</p>` : ''}
 
       <h3 style="color: #1e293b; margin-top: 20px;">Ordered Items</h3>
       <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
@@ -1718,7 +1724,7 @@ app.post('/api/admin/bundles', requireAdmin, async (req, res) => {
 
 // Orders API Endpoint
 app.post('/api/orders', async (req, res) => {
-  const { name, business, email, notes, items, totalItems, totalPrice, exchangeRate } = req.body;
+  const { name, business, email, phone, address, notes, items, totalItems, exchangeRate } = req.body;
 
   // Validation
   if (!name || typeof name !== 'string' || name.trim().length < 2) {
@@ -1733,22 +1739,59 @@ app.post('/api/orders', async (req, res) => {
     return res.status(400).json({ error: 'Valid email address is required.' });
   }
 
+  if (!phone || typeof phone !== 'string' || phone.trim().length === 0) {
+    return res.status(400).json({ error: 'Phone number is required.' });
+  }
+
+  if (!address || typeof address !== 'string' || address.trim().length === 0) {
+    return res.status(400).json({ error: 'Delivery address is required.' });
+  }
+
   if (!Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ error: 'Cart items are required.' });
   }
 
   const finalRate = exchangeRate ? parseFloat(exchangeRate) : getRate();
-  const computedTotalPgk = totalPrice || items.reduce((acc, cur) => acc + (cur.price * cur.quantity), 0);
-  const totalUsdCost = Math.round((computedTotalPgk / (finalRate * markupMultiplier)) * 100) / 100;
 
   // Handle mock database mode
   if (process.env.DATABASE_URL === 'mock') {
+    let computedTotalPgk = 0;
+    const validatedItems = [];
+
+    for (const item of items) {
+      const itemSku = String(item.id || item.sku || '');
+      const product = mockProductsCatalogue.find(p => p.sku === itemSku && p.active !== false);
+
+      if (!product) {
+        return res.status(400).json({ error: `Product "${item.name || itemSku}" is not available.` });
+      }
+
+      const trustedPrice = computeSellingPrice(product);
+      if (trustedPrice === null || isNaN(trustedPrice)) {
+        return res.status(400).json({ error: `Product "${product.name}" requires custom pricing. Please request a quote.` });
+      }
+
+      const qty = parseInt(item.quantity, 10) || 1;
+      computedTotalPgk += trustedPrice * qty;
+
+      validatedItems.push({
+        product_id: product.sku,
+        product_name: product.name,
+        unit_price: trustedPrice,
+        quantity: qty
+      });
+    }
+
+    const totalUsdCost = Math.round((computedTotalPgk / (finalRate * markupMultiplier)) * 100) / 100;
+
     const mockOrder = {
       id: Math.floor(Math.random() * 10000) + 1,
       customer_name: name.trim(),
       business: business.trim(),
       email: email.trim(),
-      total_items: totalItems || items.reduce((acc, cur) => acc + cur.quantity, 0),
+      phone: phone.trim(),
+      delivery_address: address.trim(),
+      total_items: totalItems || validatedItems.reduce((acc, cur) => acc + cur.quantity, 0),
       total_price: computedTotalPgk,
       notes: notes ? notes.trim() : null,
       exchange_rate: finalRate,
@@ -1757,19 +1800,12 @@ app.post('/api/orders', async (req, res) => {
       created_at: new Date().toISOString()
     };
 
-    const mockItems = items.map(item => ({
-      product_id: item.id,
-      product_name: item.name,
-      unit_price: item.price,
-      quantity: item.quantity
-    }));
-
     console.log('[Mock DB] Creating order in transaction:');
     console.log('[Mock DB] Order payload:', mockOrder);
-    console.log('[Mock DB] Order items payload:', mockItems);
+    console.log('[Mock DB] Order items payload:', validatedItems);
 
     // Send email notification asynchronously in background
-    sendOrderEmail(mockOrder, mockItems);
+    sendOrderEmail(mockOrder, validatedItems);
 
     return res.status(201).json({
       success: true,
@@ -1785,17 +1821,54 @@ app.post('/api/orders', async (req, res) => {
     client = await pool.connect();
     await client.query('BEGIN');
 
+    let computedTotalPgk = 0;
+    const validatedItems = [];
+
+    for (const item of items) {
+      const itemSku = String(item.id || item.sku || '');
+      const prodRes = await client.query('SELECT * FROM products WHERE sku = $1 AND active = true', [itemSku]);
+
+      if (prodRes.rows.length === 0) {
+        await client.query('ROLLBACK');
+        client.release();
+        return res.status(400).json({ error: `Product "${item.name || itemSku}" is not available.` });
+      }
+
+      const product = prodRes.rows[0];
+      const trustedPrice = computeSellingPrice(product);
+
+      if (trustedPrice === null || isNaN(trustedPrice)) {
+        await client.query('ROLLBACK');
+        client.release();
+        return res.status(400).json({ error: `Product "${product.name}" requires custom pricing. Please request a quote.` });
+      }
+
+      const qty = parseInt(item.quantity, 10) || 1;
+      computedTotalPgk += trustedPrice * qty;
+
+      validatedItems.push({
+        product_id: product.sku,
+        product_name: product.name,
+        unit_price: trustedPrice,
+        quantity: qty
+      });
+    }
+
+    const totalUsdCost = Math.round((computedTotalPgk / (finalRate * markupMultiplier)) * 100) / 100;
+
     // 1. Insert order
     const insertOrderQuery = `
-      INSERT INTO orders (customer_name, business, email, total_items, total_price, notes, exchange_rate, total_price_usd, markup_percent)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      INSERT INTO orders (customer_name, business, email, phone, delivery_address, total_items, total_price, notes, exchange_rate, total_price_usd, markup_percent)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING *
     `;
     const orderValues = [
       name.trim(),
       business.trim(),
       email.trim(),
-      totalItems || items.reduce((acc, cur) => acc + cur.quantity, 0),
+      phone.trim(),
+      address.trim(),
+      totalItems || validatedItems.reduce((acc, cur) => acc + cur.quantity, 0),
       computedTotalPgk,
       notes ? notes.trim() : null,
       finalRate,
@@ -1808,7 +1881,7 @@ app.post('/api/orders', async (req, res) => {
 
     // 2. Insert order items
     const insertedItems = [];
-    for (const item of items) {
+    for (const vItem of validatedItems) {
       const insertItemQuery = `
         INSERT INTO order_items (order_id, product_id, product_name, unit_price, quantity)
         VALUES ($1, $2, $3, $4, $5)
@@ -1816,10 +1889,10 @@ app.post('/api/orders', async (req, res) => {
       `;
       const itemValues = [
         order.id,
-        item.id,
-        item.name,
-        item.price,
-        item.quantity
+        vItem.product_id,
+        vItem.product_name,
+        vItem.unit_price,
+        vItem.quantity
       ];
       const itemResult = await client.query(insertItemQuery, itemValues);
       insertedItems.push(itemResult.rows[0]);

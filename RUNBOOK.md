@@ -132,7 +132,7 @@ The monolith provides two distinct diagnostic endpoints:
 All submissions from the Contact form, Shop Service Inquiry form, and Checkout Cart write directly to the database as the source of truth, then trigger background, best-effort direct emails via Nodemailer with intent-based routing and customer-facing confirmations.
 
 ### A. Intent-Based Routing Rules:
-- **Orders/Purchases (`POST /api/orders`)**: Routed directly to `MAIL_SALES`, with `cc: MAIL_ADMIN` included automatically.
+- **Orders/Purchases (`POST /api/orders`)**: Routed directly to `MAIL_SALES`, with `cc: MAIL_ADMIN` included automatically. Recomputes authoritative product item prices server-side from the database / product catalog (client-submitted prices are ignored) and requires `phone` and `delivery_address`.
 - **Shop Sales Inquiries (`POST /api/inquiries` where `type === 'shop'`)**: Routed directly to `MAIL_SALES`, with `cc: MAIL_ADMIN` included automatically.
 - **General Contact Inquiries (`POST /api/inquiries` where `type === 'contact'`)**: Routed by default to `MAIL_ADMIN`. However, if purchase intent is detected (keywords like `buy`, `purchase`, `order`, `price`, `quote`, `cost`, `sales` in subject/message), the message is routed to `MAIL_SALES`.
 
@@ -154,7 +154,7 @@ To enforce accounting consistency, Deeps Systems operates on a single backend-co
     "rate": 3.6
   }
   ```
-- **Order Auditability & Ledger**: When creating a new order via `POST /api/orders`, the system records the active `exchange_rate`, true supplier USD cost base `total_price_usd`, and `markup_percent` inside the `orders` database table. Internal sales notifications (`MAIL_SALES`) receive full ledger breakdown including USD cost base and markup percentage, while customer confirmation emails show Kina totals only.
+- **Order Auditability & Ledger**: When creating a new order via `POST /api/orders`, the system records the active `exchange_rate`, true supplier USD cost base `total_price_usd`, and `markup_percent` inside the `orders` database table. Internal sales notifications (`MAIL_SALES`) receive full ledger breakdown including USD cost base, markup percentage, customer phone number, and physical delivery address, while customer confirmation emails show Kina totals only.
 
 ### Data Validation Schema:
 * `type`: `'contact'` or `'shop'` (Required)
