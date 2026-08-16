@@ -3,7 +3,6 @@ import Hero from '../components/Hero';
 import BriefIntroduction from '../components/BriefIntroduction';
 import SaaSSlider from '../components/SaaSSlider';
 import OnlineStorePreview from '../components/OnlineStorePreview';
-import ClientLogos from '../components/ClientLogos';
 import Seo from '../components/Seo';
 
 const Home: React.FC = () => {
@@ -14,7 +13,6 @@ const Home: React.FC = () => {
       <BriefIntroduction />
       <SaaSSlider />
       <OnlineStorePreview />
-      <ClientLogos />
     </>
   );
 };
