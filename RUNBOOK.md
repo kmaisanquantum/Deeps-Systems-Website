@@ -134,8 +134,9 @@ All submissions from the Contact form, Shop Service Inquiry form, and Checkout C
 
 ### A. Intent-Based Routing Rules:
 - **Orders/Purchases (`POST /api/orders`)**: Routed directly to `MAIL_SALES`, with `cc: MAIL_ADMIN` included automatically.
-- **Service Inquiries (`POST /api/inquiries` where `type === 'shop'`)**: Routed directly to `MAIL_SERVICE`, with `cc: MAIL_ADMIN` included automatically.
-- **Contact Inquiries (`POST /api/inquiries` where `type === 'contact'`)**: Routed by default to `MAIL_ADMIN`. However, if purchase intent is detected (keywords like `buy`, `purchase`, `order`, `price`, `quote`, `cost`, `sales` in subject/message), the message is routed to `MAIL_SALES`.
+- **Shop Sales Inquiries (`POST /api/inquiries` where `type === 'shop'`)**: Routed directly to `MAIL_SALES`, with `cc: MAIL_ADMIN` included automatically.
+- **After-Sales Support Requests (`POST /api/inquiries` where `type === 'service'`)**: Routed directly to `MAIL_SERVICE` (`service@dspng.tech`), with `cc: MAIL_ADMIN` included automatically. The customer's optional Order / Reference number is stored in the `business` database column.
+- **General Contact Inquiries (`POST /api/inquiries` where `type === 'contact'`)**: Routed by default to `MAIL_ADMIN`. However, if purchase intent is detected (keywords like `buy`, `purchase`, `order`, `price`, `quote`, `cost`, `sales` in subject/message), the message is routed to `MAIL_SALES`.
 
 ### B. Automated Customer Confirmations:
 - When a valid customer email is provided, an automatic customer-facing confirmation email is sent using the configured sender.
@@ -158,7 +159,7 @@ To enforce accounting consistency, Deeps Systems operates on a single backend-co
 - **Order Auditability & Ledger**: When creating a new order via `POST /api/orders`, the system records the active `exchange_rate`, true supplier USD cost base `total_price_usd`, and `markup_percent` inside the `orders` database table. Internal sales notifications (`MAIL_SALES`) receive full ledger breakdown including USD cost base and markup percentage, while customer confirmation emails show Kina totals only.
 
 ### Data Validation Schema:
-* `type`: `'contact'` or `'shop'` (Required)
+* `type`: `'contact'`, `'shop'`, or `'service'` (Required)
 * `name`: string, min length 2 characters (Required)
 * `message`: string, min length 10 characters (Required)
 * **Conditional Contact Fields**:
