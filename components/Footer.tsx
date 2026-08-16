@@ -115,7 +115,7 @@ const Footer: React.FC = () => {
             © {currentYear} Deeps Systems. All rights reserved.
           </p>
           <a
-            href="http://webmail.dspng.tech/"
+            href="https://mail.dspng.tech:2096/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-600 dark:text-slate-400 text-xs hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-2"
