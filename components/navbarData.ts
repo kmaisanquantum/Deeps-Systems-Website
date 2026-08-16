@@ -37,7 +37,6 @@ export const servicesItems = [
 export const shopItems = [
   { name: 'Microsoft Office', icon: React.createElement(Monitor, { className: "w-5 h-5" }), href: '/shop#shop-microsoft', desc: 'Microsoft 365 licensing (reseller).' },
   { name: 'Starlink Kits', icon: React.createElement(Rocket, { className: "w-5 h-5" }), href: '/shop#shop-starlink', desc: 'Satellite internet hardware (reseller).' },
-  { name: 'After-Sales Support', icon: React.createElement(LifeBuoy, { className: "w-5 h-5" }), href: '/service', desc: 'Report issues or claim warranty.' },
 ];
 
 export const advantageItems = [

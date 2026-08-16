@@ -24,7 +24,6 @@ All configuration is managed securely via environment variables. No secrets are 
 | `DATABASE_URL` | PostgreSQL connection string or `'mock'` for simulated offline mode. | Uses standard PG credentials or local. |
 | `FORMSPREE_URL` | Destination endpoint for best-effort email notification. | `https://formspree.io/f/mqakppov` |
 | `MAIL_SALES` | Destination recipient for orders / purchases. | `sales@dspng.tech` |
-| `MAIL_SERVICE` | Destination recipient for shop service / Starlink inquiries. | `service@dspng.tech` |
 | `MAIL_ADMIN` | Catch-all admin recipient that is CC'd on everything. | `wokman@dspng.tech` |
 | `ADMIN_EMAIL` | Admin authentication email for JWT pricing management login. | `kmaisan@dspng.tech` |
 | `ADMIN_PASSWORD_HASH` | Bcrypt hashed password for admin user authentication. | Default hashed credential in server. |
@@ -135,7 +134,6 @@ All submissions from the Contact form, Shop Service Inquiry form, and Checkout C
 ### A. Intent-Based Routing Rules:
 - **Orders/Purchases (`POST /api/orders`)**: Routed directly to `MAIL_SALES`, with `cc: MAIL_ADMIN` included automatically.
 - **Shop Sales Inquiries (`POST /api/inquiries` where `type === 'shop'`)**: Routed directly to `MAIL_SALES`, with `cc: MAIL_ADMIN` included automatically.
-- **After-Sales Support Requests (`POST /api/inquiries` where `type === 'service'`)**: Routed directly to `MAIL_SERVICE` (`service@dspng.tech`), with `cc: MAIL_ADMIN` included automatically. The customer's optional Order / Reference number is stored in the `business` database column.
 - **General Contact Inquiries (`POST /api/inquiries` where `type === 'contact'`)**: Routed by default to `MAIL_ADMIN`. However, if purchase intent is detected (keywords like `buy`, `purchase`, `order`, `price`, `quote`, `cost`, `sales` in subject/message), the message is routed to `MAIL_SALES`.
 
 ### B. Automated Customer Confirmations:
@@ -159,7 +157,7 @@ To enforce accounting consistency, Deeps Systems operates on a single backend-co
 - **Order Auditability & Ledger**: When creating a new order via `POST /api/orders`, the system records the active `exchange_rate`, true supplier USD cost base `total_price_usd`, and `markup_percent` inside the `orders` database table. Internal sales notifications (`MAIL_SALES`) receive full ledger breakdown including USD cost base and markup percentage, while customer confirmation emails show Kina totals only.
 
 ### Data Validation Schema:
-* `type`: `'contact'`, `'shop'`, or `'service'` (Required)
+* `type`: `'contact'` or `'shop'` (Required)
 * `name`: string, min length 2 characters (Required)
 * `message`: string, min length 10 characters (Required)
 * **Conditional Contact Fields**:
