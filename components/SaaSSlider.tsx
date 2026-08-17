@@ -9,10 +9,9 @@ import {
   ShieldCheck,
   Wallet,
   Monitor,
-  ExternalLink,
   ChevronLeft,
   ChevronRight,
-  Radio
+  Clock
 } from 'lucide-react';
 
 const saasSystems = [
@@ -161,15 +160,15 @@ const SaaSSlider: React.FC = () => {
         <div className="flex flex-col md:flex-row items-center gap-4 mb-10">
            <div className="flex items-center gap-3 shrink-0">
               <div className="flex items-center gap-2 px-4 py-2 bg-emerald-600 rounded-lg shadow-[0_0_20px_rgba(16,185,129,0.5)] animate-pulse border border-emerald-400/20">
-                 <Radio className="w-4 h-4 text-white" />
-                 <span className="text-white font-black text-xs uppercase tracking-tighter">Live Status Update</span>
+                 <Clock className="w-4 h-4 text-white" />
+                 <span className="text-white font-black text-xs uppercase tracking-tighter">Coming Soon</span>
               </div>
               <div className="h-8 w-px bg-white/10 hidden md:block"></div>
            </div>
 
            <div className="flex-grow text-center md:text-left">
               <h2 className="text-xl md:text-3xl font-montserrat font-black text-white leading-tight uppercase tracking-tight">
-                 Active <span className="text-emerald-500 underline decoration-emerald-500/30 decoration-4 underline-offset-8">BITC</span> Ecosystem Deployments
+                 <span className="text-emerald-500 underline decoration-emerald-500/30 decoration-4 underline-offset-8">BITC</span> Ecosystem Deployments
               </h2>
            </div>
 
@@ -198,29 +197,23 @@ const SaaSSlider: React.FC = () => {
       >
         <div className="flex whitespace-nowrap">
           {extendedSystems.map((system, idx) => (
-            <a
+            <div
               key={idx}
-              href={system.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex flex-col w-72 md:w-80 mx-4 p-8 bg-white/5 backdrop-blur-md rounded-[2.5rem] border border-white/10 hover:border-emerald-500/50 transition-all duration-700 group/card active-click whitespace-normal shadow-2xl hover:bg-white/[0.08] hover:scale-[1.02]"
+              className="inline-flex flex-col w-72 md:w-80 mx-4 p-8 bg-white/5 backdrop-blur-md rounded-[2.5rem] border border-white/10 hover:border-emerald-500/50 transition-all duration-700 group/card whitespace-normal shadow-2xl hover:bg-white/[0.08] hover:scale-[1.02] select-none"
             >
               <div className="flex items-center justify-between mb-8">
                 <div className={`p-5 rounded-2xl bg-white/5 ${system.color} group-hover/card:scale-110 group-hover/card:bg-emerald-500/10 transition-all duration-500 shadow-inner`}>
                   {system.icon}
                 </div>
                 <div className="flex items-center gap-2">
-                   <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Active</span>
-                   <div className="p-2 rounded-xl bg-white/5 group-hover/card:bg-emerald-500/20 transition-colors border border-white/10">
-                     <ExternalLink className="w-4 h-4 text-white/40 group-hover/card:text-white transition-colors" />
-                   </div>
+                   <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">Online Soon</span>
                 </div>
               </div>
 
               <div className="mb-4">
-                 <h4 className="text-white font-black text-lg mb-2 group-hover/card:text-emerald-400 transition-colors flex items-center gap-2">
+                 <h3 className="text-white font-black text-lg mb-2 group-hover/card:text-emerald-400 transition-colors flex items-center gap-2">
                     {system.name}
-                 </h4>
+                 </h3>
                  <div className="h-1 w-12 bg-emerald-500 rounded-full group-hover/card:w-full transition-all duration-700"></div>
               </div>
 
@@ -235,7 +228,7 @@ const SaaSSlider: React.FC = () => {
                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
                  </div>
               </div>
-            </a>
+            </div>
           ))}
         </div>
       </div>
