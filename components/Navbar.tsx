@@ -301,8 +301,6 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
-          <Link to="/insights" aria-current={location.pathname === "/insights" ? "page" : undefined} className="px-3 py-2 text-sm font-medium text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white transition-all">Insights</Link>
-          
           <div className="ml-1 pl-2 lg:ml-2 lg:pl-4 border-l border-gray-100 dark:border-white/10 flex items-center gap-2 lg:gap-4">
             {/* Desktop Basket Toggle */}
             <button
@@ -508,8 +506,6 @@ const Navbar: React.FC = () => {
                 </div>
               )}
             </div>
-
-            <Link to="/insights" aria-current={location.pathname === "/insights" ? "page" : undefined} className="block w-full p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-900 dark:text-white font-bold text-sm uppercase tracking-widest border border-gray-100 dark:border-white/10">Insights</Link>
 
             <div className="pt-8">
               <Link
