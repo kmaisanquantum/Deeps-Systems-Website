@@ -10,7 +10,9 @@ import {
   ArrowRight,
   Globe,
   Sun,
-  Moon
+  Moon,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { servicesItems, shopItems, advantageItems, ecosystemItems } from './navbarData';
 import { useCart } from './CartContext';
@@ -26,6 +28,8 @@ const Navbar: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const location = useLocation();
   const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const desktopEcosystemScrollRef = useRef<HTMLDivElement>(null);
+  const mobileEcosystemScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -122,6 +126,15 @@ const Navbar: React.FC = () => {
     } else if (e.key === 'Escape') {
       setActiveDropdown(null);
     }
+  };
+
+  const scrollEcosystemDropdown = (ref: React.RefObject<HTMLDivElement | null>, direction: 'left' | 'right') => {
+    if (!ref.current) return;
+    const scrollAmount = 240;
+    ref.current.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth'
+    });
   };
 
   return (
@@ -234,28 +247,56 @@ const Navbar: React.FC = () => {
             </button>
             {activeDropdown === 'ecosystem' && (
               <div
-                className="absolute top-full right-0 lg:left-1/2 lg:-translate-x-1/2 lg:right-auto pt-2 w-[480px] max-w-[calc(100vw-2rem)] z-50"
+                className="absolute top-full right-0 lg:left-1/2 lg:-translate-x-1/2 lg:right-auto pt-2 w-[520px] max-w-[calc(100vw-2rem)] z-50"
                 role="menu"
               >
-                <div className="bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-5 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="flex items-center justify-between mb-3 px-1">
+                    <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <span>Ecosystem Platforms</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => scrollEcosystemDropdown(desktopEcosystemScrollRef, 'left')}
+                        className="p-1 rounded-lg bg-gray-100 dark:bg-white/5 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-gray-600 dark:text-slate-300 transition-colors"
+                        aria-label="Scroll ecosystem left"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => scrollEcosystemDropdown(desktopEcosystemScrollRef, 'right')}
+                        className="p-1 rounded-lg bg-gray-100 dark:bg-white/5 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-gray-600 dark:text-slate-300 transition-colors"
+                        aria-label="Scroll ecosystem right"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div
+                    ref={desktopEcosystemScrollRef}
+                    className="flex overflow-x-auto no-scrollbar gap-3 pb-2 scroll-smooth"
+                  >
                     {ecosystemItems.map((item) => (
-                      <a
+                      <div
                         key={item.name}
-                        href={item.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
+                        className="shrink-0 w-64 p-3.5 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 flex flex-col justify-between select-none"
                         role="menuitem"
                       >
-                        <div className="p-2 rounded-lg bg-emerald-500/10 group-hover/item:scale-110 transition-all">
-                          {item.icon}
-                        </div>
                         <div>
-                          <div className="text-sm font-bold text-gray-900 dark:text-white group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
-                          <div className="text-xs text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="p-2 rounded-lg bg-emerald-500/10">
+                              {item.icon}
+                            </div>
+                            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                              Online Soon
+                            </span>
+                          </div>
+                          <div className="text-sm font-bold text-gray-900 dark:text-white mb-1">{item.name}</div>
+                          <div className="text-xs text-gray-600 dark:text-slate-400 leading-snug line-clamp-2">{item.desc}</div>
                         </div>
-                      </a>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -516,22 +557,45 @@ const Navbar: React.FC = () => {
               </button>
 
               {mobileActiveSubmenu === 'ecosystem' && (
-                <div className="grid grid-cols-1 gap-2 pt-2 px-1">
-                  {ecosystemItems.map(item => (
-                    <a
-                      key={item.name}
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-4 p-4 bg-white dark:bg-white/5 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
+                <div className="pt-2 px-1">
+                  <div className="flex items-center justify-end gap-1 mb-2">
+                    <button
+                      onClick={() => scrollEcosystemDropdown(mobileEcosystemScrollRef, 'left')}
+                      className="p-1 rounded-lg bg-gray-100 dark:bg-white/5 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-gray-600 dark:text-slate-300 transition-colors"
+                      aria-label="Scroll mobile ecosystem left"
                     >
-                      <div className="p-2 rounded-lg bg-emerald-500/10">{item.icon}</div>
-                      <div className="flex flex-col">
-                        <span className="font-bold text-sm">{item.name}</span>
-                        <span className="text-xs text-gray-600 dark:text-slate-400">{item.desc}</span>
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => scrollEcosystemDropdown(mobileEcosystemScrollRef, 'right')}
+                      className="p-1 rounded-lg bg-gray-100 dark:bg-white/5 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-gray-600 dark:text-slate-300 transition-colors"
+                      aria-label="Scroll mobile ecosystem right"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div
+                    ref={mobileEcosystemScrollRef}
+                    className="flex overflow-x-auto no-scrollbar gap-3 pb-2 scroll-smooth"
+                  >
+                    {ecosystemItems.map(item => (
+                      <div
+                        key={item.name}
+                        className="shrink-0 w-64 p-4 bg-white dark:bg-white/5 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10 flex flex-col justify-between select-none"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="p-2 rounded-lg bg-emerald-500/10">{item.icon}</div>
+                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                            Online Soon
+                          </span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-bold text-sm mb-1">{item.name}</span>
+                          <span className="text-xs text-gray-600 dark:text-slate-400 leading-snug line-clamp-2">{item.desc}</span>
+                        </div>
                       </div>
-                    </a>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
