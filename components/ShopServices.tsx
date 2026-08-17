@@ -650,7 +650,7 @@ const ShopServices: React.FC = () => {
 
                     {status === 'error' && (
                       <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-semibold flex items-center gap-3 animate-in fade-in duration-300">
-                        Failed to submit inquiry: {submitError || "Unknown connection error."} Please complete all fields and verify your network, or email us at wokman@dspng.tech.
+                        Failed to submit inquiry: {submitError || "Unknown connection error."} Please complete all fields and verify your network, or email us at sales@dspng.tech.
                       </div>
                     )}
 
@@ -676,7 +676,7 @@ const ShopServices: React.FC = () => {
              )}
 
              <p className="text-center mt-10 text-slate-500 text-xs font-medium">
-                Alternatively, email us directly at <a href="mailto:wokman@dspng.tech" className="text-emerald-500 hover:underline">wokman@dspng.tech</a>
+                Alternatively, email us directly at <a href="mailto:sales@dspng.tech" className="text-emerald-500 hover:underline">sales@dspng.tech</a>
              </p>
           </div>
         </div>
