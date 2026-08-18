@@ -8,13 +8,11 @@ import {
   Rocket,
   Cloud,
   ArrowRight,
-  Globe,
   Sun,
   Moon
 } from 'lucide-react';
 import { servicesItems, shopItems, advantageItems } from './navbarData';
 import { useCart } from './CartContext';
-import EcosystemMiniSlider from './EcosystemMiniSlider';
 
 export const NAVBAR_HEIGHT_MOBILE_CLASS = 'pt-[64px]';
 
@@ -219,32 +217,6 @@ const Navbar: React.FC = () => {
                       </Link>
                     ))}
                   </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Ecosystem Dropdown */}
-          <div className="relative group" onMouseEnter={() => handleMouseEnter('ecosystem')} onMouseLeave={handleMouseLeave}>
-            <button
-              aria-expanded={activeDropdown === 'ecosystem'}
-              aria-haspopup="true"
-              onKeyDown={(e) => handleKeyDown(e, 'ecosystem')}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${activeDropdown === 'ecosystem' ? 'text-emerald-600' : 'text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white'}`}
-            >
-              Ecosystem <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'ecosystem' ? 'rotate-180' : ''}`} />
-            </button>
-            {activeDropdown === 'ecosystem' && (
-              <div
-                className="absolute top-full right-0 lg:left-1/2 lg:-translate-x-1/2 lg:right-auto pt-2 w-[480px] max-w-[calc(100vw-2rem)] z-50"
-                role="menu"
-              >
-                <div className="bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-5 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-3 flex items-center gap-1.5 px-1">
-                    <Globe className="w-4 h-4" />
-                    <span>Ecosystem Platforms</span>
-                  </div>
-                  <EcosystemMiniSlider />
                 </div>
               </div>
             )}
@@ -483,26 +455,6 @@ const Navbar: React.FC = () => {
                       </div>
                     </Link>
                   ))}
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <button
-                onClick={() => toggleMobileSubmenu('ecosystem')}
-                aria-expanded={mobileActiveSubmenu === 'ecosystem'}
-                className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
-              >
-                <div className="flex items-center gap-3">
-                   <Globe className="w-5 h-5 text-emerald-600" />
-                   <span className="font-bold text-sm uppercase tracking-widest">Ecosystem</span>
-                </div>
-                <ChevronDown className={`w-5 h-5 transition-transform ${mobileActiveSubmenu === 'ecosystem' ? 'rotate-180' : ''}`} />
-              </button>
-
-              {mobileActiveSubmenu === 'ecosystem' && (
-                <div className="pt-2 px-1">
-                  <EcosystemMiniSlider />
                 </div>
               )}
             </div>
