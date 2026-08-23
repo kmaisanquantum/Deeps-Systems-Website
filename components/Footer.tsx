@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, MapPin, ShoppingBag } from 'lucide-react';
+import { Building2, Mail, MapPin, ShoppingBag } from 'lucide-react';
 import { storeItem } from './navbarData';
 
 const Footer: React.FC = () => {
@@ -114,15 +114,26 @@ const Footer: React.FC = () => {
           <p className="text-gray-600 dark:text-slate-400 text-xs text-center md:text-left">
             © {currentYear} Deeps Systems. All rights reserved.
           </p>
-          <a
-            href="https://mail.dspng.tech:2096/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-600 dark:text-slate-400 text-xs hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-2"
-          >
-            <Mail className="w-4 h-4" />
-            Staff Webmail
-          </a>
+          <div className="flex items-center gap-6">
+            <a
+              href="https://www.dspng.space"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-600 dark:text-slate-400 text-xs hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-2"
+            >
+              <Building2 className="w-4 h-4" />
+              Head Office
+            </a>
+            <a
+              href="https://mail.dspng.tech:2096/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-600 dark:text-slate-400 text-xs hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-2"
+            >
+              <Mail className="w-4 h-4" />
+              Staff Webmail
+            </a>
+          </div>
         </div>
       </div>
     </footer>
