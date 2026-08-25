@@ -9,7 +9,8 @@ import {
   Cloud,
   ArrowRight,
   Sun,
-  Moon
+  Moon,
+  BookOpen
 } from 'lucide-react';
 import { servicesItems, shopItems, advantageItems } from './navbarData';
 import { useCart } from './CartContext';
@@ -222,6 +223,16 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
+          {/* Insights Link */}
+          <Link
+            to="/insights"
+            aria-current={location.pathname === '/insights' ? 'page' : undefined}
+            onClick={(e) => handleLinkClick(e, '/insights')}
+            className={`px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${location.pathname === '/insights' ? 'text-emerald-600' : 'text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white'}`}
+          >
+            Insights
+          </Link>
+
           {/* Shop Dropdown */}
           <div className="relative group" onMouseEnter={() => handleMouseEnter('shop')} onMouseLeave={handleMouseLeave}>
             <button
@@ -356,45 +367,6 @@ const Navbar: React.FC = () => {
 
             <div className="space-y-2">
               <button
-                onClick={() => toggleMobileSubmenu('shop')}
-                aria-expanded={mobileActiveSubmenu === 'shop'}
-                className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-emerald-600 border border-gray-100 dark:border-white/10"
-              >
-                <div className="flex items-center gap-3">
-                   <ShoppingBag className="w-5 h-5 text-emerald-600" />
-                   <span className="font-bold text-sm uppercase tracking-widest">Online Shop</span>
-                </div>
-                <ChevronDown className={`w-5 h-5 transition-transform ${mobileActiveSubmenu === 'shop' ? 'rotate-180' : ''}`} />
-              </button>
-
-              {mobileActiveSubmenu === 'shop' && (
-                <div className="grid grid-cols-1 gap-2 pt-2 px-1">
-                  {shopItems.map(item => (
-                    <Link
-                      key={item.name}
-                      to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
-                      onClick={(e) => handleLinkClick(e, item.href)}
-                      className="flex items-center gap-4 p-4 bg-white dark:bg-white/5 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
-                    >
-                      <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">{item.icon}</div>
-                      <div className="flex flex-col">
-                        <span className="font-bold text-sm">{item.name}</span>
-                        <span className="text-xs text-gray-600 dark:text-slate-400">{item.desc}</span>
-                      </div>
-                    </Link>
-                  ))}
-                  <Link
-                    to="/shop"
-                    className="flex items-center justify-center gap-2 p-4 bg-emerald-600 text-white rounded-xl font-bold text-sm uppercase tracking-widest"
-                  >
-                    Browse All Services <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <button 
                 onClick={() => toggleMobileSubmenu('advantages')}
                 aria-expanded={mobileActiveSubmenu === 'advantages'}
                 className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
@@ -405,12 +377,12 @@ const Navbar: React.FC = () => {
                 </div>
                 <ChevronDown className={`w-5 h-5 transition-transform ${mobileActiveSubmenu === 'advantages' ? 'rotate-180' : ''}`} />
               </button>
-              
+
               {mobileActiveSubmenu === 'advantages' && (
                 <div className="grid grid-cols-1 gap-2 pt-2 px-1">
                   {advantageItems.map(item => (
                     <Link
-                      key={item.name} 
+                      key={item.name}
                       to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
                       onClick={(e) => handleLinkClick(e, item.href)}
                       className="flex items-center gap-4 p-4 bg-white dark:bg-white/5 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
@@ -455,6 +427,59 @@ const Navbar: React.FC = () => {
                       </div>
                     </Link>
                   ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Link
+                to="/insights"
+                aria-current={location.pathname === '/insights' ? 'page' : undefined}
+                onClick={(e) => handleLinkClick(e, '/insights')}
+                className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10 hover:text-emerald-600 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                   <BookOpen className="w-5 h-5 text-emerald-600" />
+                   <span className="font-bold text-sm uppercase tracking-widest">Insights</span>
+                </div>
+              </Link>
+            </div>
+
+            <div className="space-y-2">
+              <button
+                onClick={() => toggleMobileSubmenu('shop')}
+                aria-expanded={mobileActiveSubmenu === 'shop'}
+                className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
+              >
+                <div className="flex items-center gap-3">
+                   <ShoppingBag className="w-5 h-5 text-emerald-600" />
+                   <span className="font-bold text-sm uppercase tracking-widest">Online Shop</span>
+                </div>
+                <ChevronDown className={`w-5 h-5 transition-transform ${mobileActiveSubmenu === 'shop' ? 'rotate-180' : ''}`} />
+              </button>
+
+              {mobileActiveSubmenu === 'shop' && (
+                <div className="grid grid-cols-1 gap-2 pt-2 px-1">
+                  {shopItems.map(item => (
+                    <Link
+                      key={item.name}
+                      to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
+                      onClick={(e) => handleLinkClick(e, item.href)}
+                      className="flex items-center gap-4 p-4 bg-white dark:bg-white/5 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
+                    >
+                      <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">{item.icon}</div>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-sm">{item.name}</span>
+                        <span className="text-xs text-gray-600 dark:text-slate-400">{item.desc}</span>
+                      </div>
+                    </Link>
+                  ))}
+                  <Link
+                    to="/shop"
+                    className="flex items-center justify-center gap-2 p-4 bg-emerald-600 text-white rounded-xl font-bold text-sm uppercase tracking-widest"
+                  >
+                    Browse All Services <ArrowRight className="w-4 h-4" />
+                  </Link>
                 </div>
               )}
             </div>

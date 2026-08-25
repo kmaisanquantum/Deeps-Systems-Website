@@ -6,15 +6,25 @@ interface SeoProps {
   description?: string;
   canonicalUrl: string;
   robots?: string;
+  imageUrl?: string;
+  type?: string;
+  schema?: object | string;
 }
 
 const Seo: React.FC<SeoProps> = ({
   title = "Deeps Systems | Digital Transformation & Optimization",
   description = "Deeps Systems: Born-in-the-Cloud (BITC) optimization for PNG SMEs, finance, and logistics. High-performance digital outcomes.",
   canonicalUrl,
-  robots = "index, follow"
+  robots = "index, follow",
+  imageUrl = "https://dspng.tech/assets/logo.jpg",
+  type = "website",
+  schema
 }) => {
-  const imageUrl = "https://dspng.tech/assets/logo.jpg";
+  const schemaString = schema
+    ? typeof schema === 'string'
+      ? schema
+      : JSON.stringify(schema)
+    : null;
 
   return (
     <Helmet>
@@ -25,7 +35,7 @@ const Seo: React.FC<SeoProps> = ({
       <meta name="robots" content={robots} />
 
       {/* Open Graph / Facebook */}
-      <meta property="og:type" content="website" />
+      <meta property="og:type" content={type} />
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
@@ -37,6 +47,13 @@ const Seo: React.FC<SeoProps> = ({
       <meta property="twitter:title" content={title} />
       <meta property="twitter:description" content={description} />
       <meta property="twitter:image" content={imageUrl} />
+
+      {/* Structured Data (JSON-LD) */}
+      {schemaString && (
+        <script type="application/ld+json">
+          {schemaString}
+        </script>
+      )}
     </Helmet>
   );
 };
