@@ -17,7 +17,8 @@ import {
   BookOpen,
   ShoppingBag,
   Rocket,
-  Loader2
+  Loader2,
+  ExternalLink
 } from 'lucide-react';
 import Seo from '../components/Seo';
 import { getApiUrl } from '../utils/api';
@@ -44,6 +45,7 @@ export interface ArticleData {
   cta_label: string | null;
   cta_href: string | null;
   is_featured: boolean;
+  external_url?: string | null;
   created_at: string;
 }
 
@@ -352,9 +354,16 @@ const InsightsPage: React.FC = () => {
                         </div>
 
                         <h2 className="text-2xl sm:text-3xl font-montserrat font-bold mb-4 group-hover:text-emerald-600 transition-colors leading-tight">
-                          <Link to={`/insights/${featuredArticle.category}/${featuredArticle.slug}`}>
-                            {featuredArticle.title}
-                          </Link>
+                          {featuredArticle.external_url ? (
+                            <a href={featuredArticle.external_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-emerald-600">
+                              {featuredArticle.title}
+                              <ExternalLink className="w-5 h-5 shrink-0 opacity-70 group-hover:opacity-100" />
+                            </a>
+                          ) : (
+                            <Link to={`/insights/${featuredArticle.category}/${featuredArticle.slug}`}>
+                              {featuredArticle.title}
+                            </Link>
+                          )}
                         </h2>
 
                         <p className="text-gray-600 dark:text-slate-300 text-sm sm:text-base font-medium line-clamp-3 mb-8">
@@ -375,13 +384,25 @@ const InsightsPage: React.FC = () => {
                           </div>
                         </div>
 
-                        <Link
-                          to={`/insights/${featuredArticle.category}/${featuredArticle.slug}`}
-                          className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all active-click shadow-md shadow-emerald-600/20"
-                        >
-                          Read Insight
-                          <ArrowRight className="w-4 h-4" />
-                        </Link>
+                        {featuredArticle.external_url ? (
+                          <a
+                            href={featuredArticle.external_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all active-click shadow-md shadow-emerald-600/20"
+                          >
+                            Read Insight
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        ) : (
+                          <Link
+                            to={`/insights/${featuredArticle.category}/${featuredArticle.slug}`}
+                            className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all active-click shadow-md shadow-emerald-600/20"
+                          >
+                            Read Insight
+                            <ArrowRight className="w-4 h-4" />
+                          </Link>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -431,9 +452,16 @@ const InsightsPage: React.FC = () => {
                           </div>
 
                           <h4 className="text-xl font-bold mb-3 group-hover:text-emerald-600 transition-colors leading-snug text-gray-900 dark:text-white">
-                            <Link to={`/insights/${article.category}/${article.slug}`}>
-                              {article.title}
-                            </Link>
+                            {article.external_url ? (
+                              <a href={article.external_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:text-emerald-600">
+                                {article.title}
+                                <ExternalLink className="w-4 h-4 shrink-0 opacity-70 group-hover:opacity-100" />
+                              </a>
+                            ) : (
+                              <Link to={`/insights/${article.category}/${article.slug}`}>
+                                {article.title}
+                              </Link>
+                            )}
                           </h4>
 
                           <p className="text-gray-600 dark:text-slate-300 text-xs sm:text-sm mb-6 line-clamp-3 font-medium leading-relaxed">
@@ -442,13 +470,25 @@ const InsightsPage: React.FC = () => {
                         </div>
 
                         <div className="pt-6 border-t border-gray-100 dark:border-white/5 flex items-center justify-between">
-                          <Link
-                            to={`/insights/${article.category}/${article.slug}`}
-                            className="flex items-center gap-2 text-xs font-bold text-gray-900 dark:text-white hover:text-emerald-600 transition-colors group/read active-click px-4 py-2 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10"
-                          >
-                            Read Article
-                            <ArrowRight className="w-3.5 h-3.5 group-hover/read:translate-x-1 transition-transform" />
-                          </Link>
+                          {article.external_url ? (
+                            <a
+                              href={article.external_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 text-xs font-bold text-gray-900 dark:text-white hover:text-emerald-600 transition-colors group/read active-click px-4 py-2 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10"
+                            >
+                              Read Article
+                              <ExternalLink className="w-3.5 h-3.5 group-hover/read:translate-x-1 transition-transform" />
+                            </a>
+                          ) : (
+                            <Link
+                              to={`/insights/${article.category}/${article.slug}`}
+                              className="flex items-center gap-2 text-xs font-bold text-gray-900 dark:text-white hover:text-emerald-600 transition-colors group/read active-click px-4 py-2 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10"
+                            >
+                              Read Article
+                              <ArrowRight className="w-3.5 h-3.5 group-hover/read:translate-x-1 transition-transform" />
+                            </Link>
+                          )}
 
                           <button
                             onClick={() => setActiveShareArticle(article)}
