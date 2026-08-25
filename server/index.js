@@ -405,6 +405,55 @@ async function initializeDatabase() {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
     `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS articles (
+        id SERIAL PRIMARY KEY,
+        slug VARCHAR(255) UNIQUE NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        excerpt TEXT,
+        body TEXT,
+        featured_image_url TEXT,
+        category VARCHAR(100),
+        author_name VARCHAR(255),
+        author_title VARCHAR(255),
+        author_image_url TEXT,
+        tags JSONB,
+        date VARCHAR(100),
+        reading_time VARCHAR(50),
+        seo_title VARCHAR(255),
+        meta_description TEXT,
+        og_image TEXT,
+        related_solutions JSONB,
+        related_products JSONB,
+        cta_label VARCHAR(255),
+        cta_href VARCHAR(255),
+        is_featured BOOLEAN DEFAULT false,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Seed sample articles if articles table is empty
+    const articlesCheck = await client.query('SELECT COUNT(*) FROM articles');
+    if (parseInt(articlesCheck.rows[0].count, 10) === 0) {
+      console.log('[Database] Seeding sample articles...');
+      const seedArticleQuery = `
+        INSERT INTO articles (
+          slug, title, excerpt, body, featured_image_url, category, author_name, author_title,
+          author_image_url, tags, date, reading_time, seo_title, meta_description, og_image,
+          related_solutions, related_products, cta_label, cta_href, is_featured
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+        ON CONFLICT (slug) DO NOTHING;
+      `;
+      for (const article of mockArticlesCatalogue) {
+        await client.query(seedArticleQuery, [
+          article.slug, article.title, article.excerpt, article.body, article.featured_image_url,
+          article.category, article.author_name, article.author_title, article.author_image_url,
+          JSON.stringify(article.tags || []), article.date, article.reading_time, article.seo_title,
+          article.meta_description, article.og_image, JSON.stringify(article.related_solutions || []),
+          JSON.stringify(article.related_products || []), article.cta_label, article.cta_href, article.is_featured
+        ]);
+      }
+    }
 
     await client.query(seedProductsQuery);
     client.release();
@@ -963,6 +1012,176 @@ app.get('/api/exchange-rate', (req, res) => {
   });
 });
 
+// Helper function to map database/mock article row to public API object
+function mapArticle(a) {
+  const tags = Array.isArray(a.tags) ? a.tags : (typeof a.tags === 'string' ? JSON.parse(a.tags || '[]') : []);
+  const related_solutions = Array.isArray(a.related_solutions) ? a.related_solutions : (typeof a.related_solutions === 'string' ? JSON.parse(a.related_solutions || '[]') : []);
+  const related_products = Array.isArray(a.related_products) ? a.related_products : (typeof a.related_products === 'string' ? JSON.parse(a.related_products || '[]') : []);
+
+  return {
+    id: a.id,
+    slug: a.slug,
+    title: a.title,
+    excerpt: a.excerpt || '',
+    body: a.body || '',
+    featured_image_url: a.featured_image_url || null,
+    category: a.category || 'general',
+    author_name: a.author_name || 'Deeps Systems',
+    author_title: a.author_title || '',
+    author_image_url: a.author_image_url || '/assets/logo.jpg',
+    tags,
+    date: a.date || '',
+    reading_time: a.reading_time || '3 min',
+    seo_title: a.seo_title || a.title,
+    meta_description: a.meta_description || a.excerpt || '',
+    og_image: a.og_image || a.featured_image_url || '/assets/logo.jpg',
+    related_solutions,
+    related_products,
+    cta_label: a.cta_label || null,
+    cta_href: a.cta_href || null,
+    is_featured: Boolean(a.is_featured),
+    created_at: a.created_at || new Date().toISOString()
+  };
+}
+
+// Public Read Articles API: List articles (supports category, search, pagination)
+app.get('/api/articles', async (req, res) => {
+  const { category, search, page = 1, limit = 10 } = req.query;
+  const pageNum = parseInt(page, 10) || 1;
+  const limitNum = parseInt(limit, 10) || 10;
+  const offset = (pageNum - 1) * limitNum;
+
+  if (process.env.DATABASE_URL === 'mock') {
+    let filtered = [...mockArticlesCatalogue];
+
+    if (category) {
+      const catClean = String(category).toLowerCase();
+      filtered = filtered.filter(a => a.category.toLowerCase() === catClean);
+    }
+
+    if (search) {
+      const q = String(search).toLowerCase().trim();
+      filtered = filtered.filter(a => {
+        const titleMatch = a.title.toLowerCase().includes(q);
+        const excerptMatch = a.excerpt.toLowerCase().includes(q);
+        const tags = Array.isArray(a.tags) ? a.tags : [];
+        const tagMatch = tags.some(t => String(t).toLowerCase().includes(q));
+        return titleMatch || excerptMatch || tagMatch;
+      });
+    }
+
+    // Sort featured first, then by id desc
+    filtered.sort((a, b) => {
+      if (a.is_featured && !b.is_featured) return -1;
+      if (!a.is_featured && b.is_featured) return 1;
+      return b.id - a.id;
+    });
+
+    const total = filtered.length;
+    const paginated = filtered.slice(offset, offset + limitNum).map(mapArticle);
+
+    return res.json({
+      articles: paginated,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum)
+      }
+    });
+  }
+
+  try {
+    let whereConditions = [];
+    let values = [];
+    let paramCount = 1;
+
+    if (category) {
+      whereConditions.push(`LOWER(category) = LOWER($${paramCount})`);
+      values.push(category);
+      paramCount++;
+    }
+
+    if (search) {
+      whereConditions.push(`(LOWER(title) LIKE $${paramCount} OR LOWER(excerpt) LIKE $${paramCount} OR tags::text ILIKE $${paramCount})`);
+      values.push(`%${search.trim().toLowerCase()}%`);
+      paramCount++;
+    }
+
+    const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
+    const countQuery = `SELECT COUNT(*) FROM articles ${whereClause}`;
+    const countResult = await pool.query(countQuery, values);
+    const total = parseInt(countResult.rows[0].count, 10);
+
+    const query = `
+      SELECT * FROM articles
+      ${whereClause}
+      ORDER BY is_featured DESC, id DESC
+      LIMIT $${paramCount} OFFSET $${paramCount + 1}
+    `;
+    const queryValues = [...values, limitNum, offset];
+    const result = await pool.query(query, queryValues);
+
+    const articles = result.rows.map(mapArticle);
+
+    return res.json({
+      articles,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum)
+      }
+    });
+  } catch (err) {
+    console.error('[Articles API] Error fetching articles from database:', err);
+    return res.status(500).json({ error: 'An internal server error occurred while retrieving articles.' });
+  }
+});
+
+// Public Read Single Article Endpoint: GET /api/articles/:slug
+app.get('/api/articles/:slug', async (req, res) => {
+  const { slug } = req.params;
+
+  if (process.env.DATABASE_URL === 'mock') {
+    const articleRow = mockArticlesCatalogue.find(a => a.slug === slug || String(a.id) === slug);
+
+    if (!articleRow) {
+      return res.status(404).json({ error: 'Article not found.' });
+    }
+
+    const article = mapArticle(articleRow);
+    const related = mockArticlesCatalogue
+      .filter(a => a.category === articleRow.category && a.slug !== articleRow.slug)
+      .slice(0, 3)
+      .map(mapArticle);
+
+    return res.json({ article, related });
+  }
+
+  try {
+    const query = 'SELECT * FROM articles WHERE slug = $1 OR id::text = $1';
+    const result = await pool.query(query, [slug]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Article not found.' });
+    }
+
+    const articleRow = result.rows[0];
+    const article = mapArticle(articleRow);
+
+    const relatedQuery = 'SELECT * FROM articles WHERE category = $1 AND slug != $2 ORDER BY id DESC LIMIT 3';
+    const relatedResult = await pool.query(relatedQuery, [articleRow.category, articleRow.slug]);
+    const related = relatedResult.rows.map(mapArticle);
+
+    return res.json({ article, related });
+  } catch (err) {
+    console.error('[Articles API] Error fetching article by slug:', err);
+    return res.status(500).json({ error: 'An internal server error occurred while retrieving the article.' });
+  }
+});
+
 // Rate limiter for admin login
 const adminLoginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -1308,6 +1527,151 @@ let mockSuppliers = [
 
 let mockPriceHistory = [];
 let mockBundles = [];
+
+let mockArticlesCatalogue = [
+  {
+    id: 1,
+    slug: 'bitc-transition-hardware-liability-png',
+    title: 'The BITC Transition: Why Hardware is Becoming a Liability in PNG',
+    excerpt: 'Exploring how cloud-native architectures are outperforming traditional on-premise server rooms in tropical climates.',
+    body: `<p class="mb-4">In tropical Pacific environments like Papua New Guinea, traditional on-premise hardware infrastructure faces unprecedented physical and operational challenges. High ambient temperatures, excessive humidity, power grid instability, and salt-air exposure in coastal regions severely reduce server lifespan while incurring massive maintenance overhead.</p><h3 class="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-white">The Born-in-the-Cloud (BITC) Advantage</h3><p class="mb-4">Transitioning to Born-in-the-Cloud (BITC) architecture enables enterprise organizations in PNG to eliminate single points of physical failure, optimize capital expenditure, and achieve up to 99.99% operational uptime.</p><p class="mb-4">By migrating core workloads to serverless environments and distributed cloud platforms, organizations shift away from costly hardware refresh cycles and gain immediate high availability across regional offices in Port Moresby, Lae, Mount Hagen, and Kokopo.</p><h3 class="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-white">Operational Efficiency & Cost Containment</h3><p class="mb-4">Rather than allocating significant budget to localized UPS backups, specialized cooling systems, and emergency hardware replacements, BITC organizations leverage hyper-scalable infrastructure designed for resilience. Deeps Systems provides end-to-end guidance to audit, modernize, and migrate existing systems to resilient cloud environments.</p>`,
+    featured_image_url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200',
+    category: 'digital-transformation',
+    author_name: 'Kmaisan W.',
+    author_title: 'Chief Systems Architect',
+    author_image_url: '/assets/logo.jpg',
+    tags: ['Cloud Architecture', 'BITC', 'Infrastructure', 'PNG Tech'],
+    date: 'May 12, 2024',
+    reading_time: '6 min',
+    seo_title: 'The BITC Transition: Why Hardware is Becoming a Liability in PNG',
+    meta_description: 'Discover how Born-in-the-Cloud (BITC) architecture outperforms traditional on-premise server rooms in Papua New Guinea.',
+    og_image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200',
+    related_solutions: [
+      { label: 'Cloud Infrastructure & Optimization', href: '/solutions#cloud' },
+      { label: 'Enterprise Systems Audit', href: '/solutions#audit' }
+    ],
+    related_products: [
+      { label: 'Starlink Enterprise Kit', href: '/shop#shop-starlink' }
+    ],
+    cta_label: 'Schedule a BITC Cloud Readiness Audit',
+    cta_href: '/contact',
+    is_featured: true,
+    created_at: new Date('2024-05-12').toISOString()
+  },
+  {
+    id: 2,
+    slug: 'quantum-inspired-algorithms-highland-agribusiness',
+    title: 'Quantum-Inspired Algorithms in Highland Agribusiness',
+    excerpt: 'How complex logistics modeling is saving coffee exporters thousands in seasonal waste through optimized routing.',
+    body: `<p class="mb-4">Logistics in Papua New Guinea’s Highland regions present unique topological and infrastructural complexities. Freight delays from farm-gate collection points to shipping ports in Lae or Port Moresby often result in significant cargo deterioration and revenue loss for agricultural exporters.</p><h3 class="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-white">Algorithmic Route & Fleet Optimization</h3><p class="mb-4">Deeps Systems implemented quantum-inspired optimization algorithms designed to model real-time road conditions, seasonal weather patterns, vehicle load limits, and fuel efficiency. By dynamically recalculating routing schedules for coffee bean transport fleets, we reduced transit delays by over 34%.</p><p class="mb-4">This data-driven approach allows exporters to maximize load capacity, minimize spoilage, streamline supply chains, and secure international sustainability compliance certifications.</p>`,
+    featured_image_url: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1200',
+    category: 'case-studies',
+    author_name: 'Kmaisan W.',
+    author_title: 'Chief Systems Architect',
+    author_image_url: '/assets/logo.jpg',
+    tags: ['Supply Chain', 'Optimization', 'Highlands', 'Agribusiness'],
+    date: 'May 08, 2024',
+    reading_time: '4 min',
+    seo_title: 'Quantum-Inspired Agribusiness Logistics in PNG | Deeps Systems',
+    meta_description: 'How algorithmic routing models optimize Highland coffee exporter supply chains in Papua New Guinea.',
+    og_image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1200',
+    related_solutions: [
+      { label: 'Custom Optimization Logic', href: '/solutions#optimization' }
+    ],
+    related_products: [
+      { label: 'Starlink Mini Kit', href: '/shop#shop-starlink' }
+    ],
+    cta_label: 'Explore Agribusiness Supply Chain Solutions',
+    cta_href: '/solutions',
+    is_featured: false,
+    created_at: new Date('2024-05-08').toISOString()
+  },
+  {
+    id: 3,
+    slug: 'starlink-satellite-connectivity-remote-png',
+    title: 'Starlink Satellite Connectivity: Transforming Remote PNG Operations',
+    excerpt: 'How low-earth orbit satellite technology is bridging the digital divide for mines, plantations, and rural SME hubs.',
+    body: `<p class="mb-4">High-speed, low-latency connectivity is essential for modern business operations. In remote areas across Papua New Guinea where terrestrial fiber optic cables or cellular towers are unavailable, Starlink low-earth orbit satellite technology provides transformative broadband access.</p><h3 class="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-white">Enterprise Resiliency in Remote Hubs</h3><p class="mb-4">Deeps Systems deploys turnkey Starlink solutions coupled with custom dual-WAN failover routing, enabling continuous cloud access, remote VoIP communication, real-time telemetry, and automated data backups regardless of geographical location.</p><p class="mb-4">From agricultural plantations in New Britain to remote mining exploration sites, reliable satellite connectivity closes the operational gap and unlocks cloud productivity tools across remote workforces.</p>`,
+    featured_image_url: 'https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?q=80&w=1200',
+    category: 'png-pacific',
+    author_name: 'Deeps Systems Technical Team',
+    author_title: 'Connectivity Engineering',
+    author_image_url: '/assets/logo.jpg',
+    tags: ['Starlink', 'Satellite Internet', 'PNG Infrastructure', 'Enterprise Connectivity'],
+    date: 'April 25, 2024',
+    reading_time: '5 min',
+    seo_title: 'Starlink Satellite Connectivity for Remote PNG | Deeps Systems',
+    meta_description: 'Deploying low-earth orbit Starlink satellite connectivity across remote enterprise locations in Papua New Guinea.',
+    og_image: 'https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?q=80&w=1200',
+    related_solutions: [
+      { label: 'Network Integration & Security', href: '/solutions#network' }
+    ],
+    related_products: [
+      { label: 'Starlink Standard Kit', href: '/shop#shop-starlink' },
+      { label: 'Starlink Enterprise Kit', href: '/shop#shop-starlink' }
+    ],
+    cta_label: 'Order Starlink Kits & Installation',
+    cta_href: '/shop',
+    is_featured: false,
+    created_at: new Date('2024-04-25').toISOString()
+  },
+  {
+    id: 4,
+    slug: 'cybersecurity-best-practices-pacific-enterprises',
+    title: 'Cybersecurity Best Practices for Growing Pacific Enterprises',
+    excerpt: 'Protecting corporate assets against ransomware, phishing, and data breaches with Zero-Trust architecture.',
+    body: `<p class="mb-4">As Pacific organizations accelerate their digital transformation, exposure to cyber threats grows exponentially. Ransomware attacks, phishing campaigns, and credential theft pose substantial operational and financial risks to SMEs, government departments, and financial institutions alike.</p><h3 class="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-white">Implementing Zero-Trust Security Frameworks</h3><p class="mb-4">Adopting Zero-Trust security principles ensures that every user, device, and network request is authenticated, authorized, and continuously validated before being granted access to internal applications and confidential data repositories.</p><p class="mb-4">Implementing Multi-Factor Authentication (MFA), role-based access control, automated threat monitoring, and encrypted backups significantly strengthens organizational resilience across distributed enterprise teams.</p>`,
+    featured_image_url: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1200',
+    category: 'cybersecurity',
+    author_name: 'Kmaisan W.',
+    author_title: 'Chief Systems Architect',
+    author_image_url: '/assets/logo.jpg',
+    tags: ['Cybersecurity', 'Zero Trust', 'Data Protection', 'Pacific SMEs'],
+    date: 'April 18, 2024',
+    reading_time: '5 min',
+    seo_title: 'Cybersecurity Best Practices for Pacific Enterprises | Deeps Systems',
+    meta_description: 'Essential Zero-Trust cybersecurity strategies to protect Pacific organizations against modern cyber threats.',
+    og_image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1200',
+    related_solutions: [
+      { label: 'Cybersecurity & Identity Management', href: '/solutions#security' }
+    ],
+    related_products: [
+      { label: 'Microsoft 365 Business Licensing', href: '/shop#shop-microsoft' }
+    ],
+    cta_label: 'Schedule a Cybersecurity Audit',
+    cta_href: '/contact',
+    is_featured: false,
+    created_at: new Date('2024-04-18').toISOString()
+  },
+  {
+    id: 5,
+    slug: 'deeps-systems-partners-with-nebula-cloud',
+    title: 'Deeps Systems Partners with Regional Cloud Leaders for Expansion',
+    excerpt: 'Scaling PNG-grown optimization logic to the broader Pacific through hyper-scalable serverless infrastructure.',
+    body: `<p class="mb-4">Deeps Systems is proud to announce strategic technology partnerships expanding our regional reach across the South Pacific. By combining localized Papua New Guinean engineering experience with global cloud infrastructure standards, we deliver tailored digital solutions for complex regional markets.</p><h3 class="text-2xl font-bold mt-8 mb-4 text-gray-900 dark:text-white">Building Pacific Tech Capabilities</h3><p class="mb-4">Our mission remains focused: empower local PNG businesses, financial institutions, and enterprise organizations with state-of-the-art software engineering, automation tools, high-speed satellite connectivity, and cloud optimization.</p>`,
+    featured_image_url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200',
+    category: 'deeps-systems',
+    author_name: 'Deeps Systems Newsroom',
+    author_title: 'Corporate Communications',
+    author_image_url: '/assets/logo.jpg',
+    tags: ['Partnerships', 'Expansion', 'Deeps Systems', 'Pacific Tech'],
+    date: 'May 01, 2024',
+    reading_time: '3 min',
+    seo_title: 'Deeps Systems Regional Expansion & Cloud Partnerships',
+    meta_description: 'Deeps Systems scales PNG-grown optimization logic across the South Pacific through regional partnerships.',
+    og_image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200',
+    related_solutions: [
+      { label: 'Enterprise Digital Transformation', href: '/solutions' }
+    ],
+    related_products: [
+      { label: 'Explore Deeps Systems Online Store', href: '/shop' }
+    ],
+    cta_label: 'Partner With Deeps Systems',
+    cta_href: '/contact',
+    is_featured: false,
+    created_at: new Date('2024-05-01').toISOString()
+  }
+];
 
 // Public Products API Endpoint
 app.get('/api/products', async (req, res) => {

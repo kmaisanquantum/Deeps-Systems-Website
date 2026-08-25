@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import SolutionsPage from './pages/SolutionsPage';
 import AdvantagePage from './pages/AdvantagePage';
 import InsightsPage from './pages/InsightsPage';
+import ArticlePage from './pages/ArticlePage';
 import ContactPage from './pages/ContactPage';
 import ShopPage from './pages/ShopPage';
 import NotFound from './pages/NotFound';
@@ -37,6 +38,8 @@ const App: React.FC = () => {
             <Route path="/solutions" element={<SolutionsPage />} />
             <Route path="/advantage" element={<AdvantagePage />} />
             <Route path="/insights" element={<InsightsPage />} />
+            <Route path="/insights/:category/:slug" element={<ArticlePage />} />
+            <Route path="/insights/:slug" element={<ArticlePage />} />
             <Route path="/shop" element={<ShopPage />} />
             <Route path="/contact" element={<ContactPage />} />
           </Routes>
