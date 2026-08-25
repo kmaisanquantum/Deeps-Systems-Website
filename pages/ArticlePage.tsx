@@ -16,7 +16,8 @@ import {
   Rocket,
   ShoppingBag,
   Loader2,
-  Tag
+  Tag,
+  ExternalLink
 } from 'lucide-react';
 import Seo from '../components/Seo';
 import { getApiUrl } from '../utils/api';
@@ -49,6 +50,9 @@ const ArticlePage: React.FC = () => {
         if (data && data.article) {
           setArticle(data.article);
           setRelatedArticles(Array.isArray(data.related) ? data.related : []);
+          if (data.article.external_url) {
+            window.location.href = data.article.external_url;
+          }
         } else {
           throw new Error('Invalid article response structure.');
         }
@@ -260,6 +264,24 @@ const ArticlePage: React.FC = () => {
                 #{tag}
               </span>
             ))}
+          </div>
+        )}
+
+        {/* External Link Fallback Box if redirection hasn't completed */}
+        {article.external_url && (
+          <div className="mb-10 p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-4">
+            <div>
+              <p className="font-bold text-sm text-emerald-600 dark:text-emerald-400">This article is published on LinkedIn</p>
+              <p className="text-xs text-gray-600 dark:text-slate-300">If you are not redirected automatically, click the button to read the full post.</p>
+            </div>
+            <a
+              href={article.external_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shrink-0 shadow-md"
+            >
+              Read on LinkedIn <ExternalLink className="w-4 h-4" />
+            </a>
           </div>
         )}
 

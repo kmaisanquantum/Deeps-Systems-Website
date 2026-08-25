@@ -353,6 +353,9 @@ async function initializeDatabase() {
     await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS installation_available BOOLEAN DEFAULT false;');
     await client.query("ALTER TABLE products ADD COLUMN IF NOT EXISTS product_type VARCHAR(50) DEFAULT 'hardware';");
 
+    // Articles schema migration
+    await client.query('ALTER TABLE articles ADD COLUMN IF NOT EXISTS external_url TEXT;');
+
     // New tables: suppliers, product_price_history, bundles, bundle_items, admin_users
     await client.query(`
       CREATE TABLE IF NOT EXISTS suppliers (
@@ -428,6 +431,7 @@ async function initializeDatabase() {
         cta_label VARCHAR(255),
         cta_href VARCHAR(255),
         is_featured BOOLEAN DEFAULT false,
+        external_url TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
     `);
@@ -440,8 +444,8 @@ async function initializeDatabase() {
         INSERT INTO articles (
           slug, title, excerpt, body, featured_image_url, category, author_name, author_title,
           author_image_url, tags, date, reading_time, seo_title, meta_description, og_image,
-          related_solutions, related_products, cta_label, cta_href, is_featured
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+          related_solutions, related_products, cta_label, cta_href, is_featured, external_url
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
         ON CONFLICT (slug) DO NOTHING;
       `;
       for (const article of mockArticlesCatalogue) {
@@ -450,7 +454,8 @@ async function initializeDatabase() {
           article.category, article.author_name, article.author_title, article.author_image_url,
           JSON.stringify(article.tags || []), article.date, article.reading_time, article.seo_title,
           article.meta_description, article.og_image, JSON.stringify(article.related_solutions || []),
-          JSON.stringify(article.related_products || []), article.cta_label, article.cta_href, article.is_featured
+          JSON.stringify(article.related_products || []), article.cta_label, article.cta_href, article.is_featured,
+          article.external_url || null
         ]);
       }
     }
@@ -1040,6 +1045,7 @@ function mapArticle(a) {
     cta_label: a.cta_label || null,
     cta_href: a.cta_href || null,
     is_featured: Boolean(a.is_featured),
+    external_url: a.external_url || null,
     created_at: a.created_at || new Date().toISOString()
   };
 }
@@ -1556,6 +1562,7 @@ let mockArticlesCatalogue = [
     cta_label: 'Schedule a BITC Cloud Readiness Audit',
     cta_href: '/contact',
     is_featured: true,
+    external_url: 'https://www.linkedin.com/company/deeps-systems',
     created_at: new Date('2024-05-12').toISOString()
   },
   {
@@ -1584,6 +1591,7 @@ let mockArticlesCatalogue = [
     cta_label: 'Explore Agribusiness Supply Chain Solutions',
     cta_href: '/solutions',
     is_featured: false,
+    external_url: 'https://www.linkedin.com/company/deeps-systems',
     created_at: new Date('2024-05-08').toISOString()
   },
   {
@@ -1613,6 +1621,7 @@ let mockArticlesCatalogue = [
     cta_label: 'Order Starlink Kits & Installation',
     cta_href: '/shop',
     is_featured: false,
+    external_url: 'https://www.linkedin.com/company/deeps-systems',
     created_at: new Date('2024-04-25').toISOString()
   },
   {
@@ -1641,6 +1650,7 @@ let mockArticlesCatalogue = [
     cta_label: 'Schedule a Cybersecurity Audit',
     cta_href: '/contact',
     is_featured: false,
+    external_url: 'https://www.linkedin.com/company/deeps-systems',
     created_at: new Date('2024-04-18').toISOString()
   },
   {
@@ -1669,6 +1679,7 @@ let mockArticlesCatalogue = [
     cta_label: 'Partner With Deeps Systems',
     cta_href: '/contact',
     is_featured: false,
+    external_url: 'https://www.linkedin.com/company/deeps-systems',
     created_at: new Date('2024-05-01').toISOString()
   }
 ];
