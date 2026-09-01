@@ -9,8 +9,7 @@ import {
   Cloud,
   ArrowRight,
   Sun,
-  Moon,
-  BookOpen
+  Moon
 } from 'lucide-react';
 import { servicesItems, shopItems, advantageItems } from './navbarData';
 import { useCart } from './CartContext';
@@ -223,16 +222,6 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
-          {/* Insights Link */}
-          <Link
-            to="/insights"
-            aria-current={location.pathname === '/insights' ? 'page' : undefined}
-            onClick={(e) => handleLinkClick(e, '/insights')}
-            className={`px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${location.pathname === '/insights' ? 'text-emerald-600' : 'text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white'}`}
-          >
-            Insights
-          </Link>
-
           {/* Shop Dropdown */}
           <div className="relative group" onMouseEnter={() => handleMouseEnter('shop')} onMouseLeave={handleMouseLeave}>
             <button
@@ -429,20 +418,6 @@ const Navbar: React.FC = () => {
                   ))}
                 </div>
               )}
-            </div>
-
-            <div className="space-y-2">
-              <Link
-                to="/insights"
-                aria-current={location.pathname === '/insights' ? 'page' : undefined}
-                onClick={(e) => handleLinkClick(e, '/insights')}
-                className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10 hover:text-emerald-600 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                   <BookOpen className="w-5 h-5 text-emerald-600" />
-                   <span className="font-bold text-sm uppercase tracking-widest">Insights</span>
-                </div>
-              </Link>
             </div>
 
             <div className="space-y-2">
