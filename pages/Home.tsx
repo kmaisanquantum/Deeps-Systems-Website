@@ -1,5 +1,6 @@
 import React from 'react';
 import Hero from '../components/Hero';
+import DeepsGuard360HeroShortcut from '../components/DeepsGuard360HeroShortcut';
 import BriefIntroduction from '../components/BriefIntroduction';
 import SaaSSlider from '../components/SaaSSlider';
 import DeepsGuard360Spotlight from '../components/DeepsGuard360Spotlight';
@@ -10,7 +11,10 @@ const Home: React.FC = () => {
   return (
     <>
       <Seo canonicalUrl="https://dspng.tech/" />
-      <Hero />
+      <div className="relative">
+        <Hero />
+        <DeepsGuard360HeroShortcut />
+      </div>
       <BriefIntroduction />
       <SaaSSlider />
       <DeepsGuard360Spotlight />
