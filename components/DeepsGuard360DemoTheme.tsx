@@ -1,80 +1,70 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const colorClasses: Record<string, string> = {
-  'bg-emerald-50': 'bg-sky-50',
-  'bg-emerald-500/10': 'bg-sky-500/10',
-  'bg-emerald-500/15': 'bg-sky-500/15',
-  'bg-emerald-600': 'bg-sky-600',
-  'dark:bg-emerald-500/10': 'dark:bg-sky-500/10',
-  'text-emerald-600': 'text-sky-600',
-  'text-emerald-700': 'text-sky-700',
-  'text-emerald-800': 'text-sky-800',
-  'text-emerald-100': 'text-sky-100',
-  'text-emerald-300': 'text-sky-300',
-  'text-emerald-400': 'text-sky-400',
-  'dark:text-emerald-200': 'dark:text-sky-200',
-  'dark:text-emerald-300': 'dark:text-sky-300',
-  'border-emerald-100': 'border-sky-100',
-  'border-emerald-400/40': 'border-sky-400/40',
-  'border-emerald-500/20': 'border-sky-500/20',
-  'border-emerald-500/30': 'border-sky-500/30',
-  'hover:border-emerald-500/30': 'hover:border-sky-500/30',
-  'hover:border-emerald-500/50': 'hover:border-sky-500/50',
-  'hover:bg-emerald-50': 'hover:bg-sky-50',
-  'hover:bg-emerald-500/5': 'hover:bg-sky-500/5',
-  'hover:bg-emerald-500/20': 'hover:bg-sky-500/20',
-  'hover:bg-emerald-600': 'hover:bg-sky-600',
-  'hover:bg-emerald-500': 'hover:bg-sky-500',
-  'group-hover:text-emerald-600': 'group-hover:text-sky-600',
-  'group-hover:text-emerald-700': 'group-hover:text-sky-700',
-  'bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950': 'bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950',
-  'from-emerald-950': 'from-blue-950',
-  'via-emerald-950': 'via-blue-950',
-  'to-emerald-950': 'to-blue-950',
+const DEEPSGUARD_ROUTE = '/deepsguard360';
+
+/**
+ * The demo is intentionally isolated from the Deeps Systems site palette.
+ * Convert emerald utility tokens within the demo experience only; alerts and
+ * warning states remain red and amber because those are semantic indicators.
+ */
+const blueClass = (token: string) => {
+  if (!token.includes('emerald')) return token;
+  return token.replaceAll('emerald-950', 'blue-950').replaceAll('emerald', 'sky');
 };
 
-const isStatusColor = (element: Element) => {
-  const text = (element.textContent ?? '').trim();
-  return /^(active|online|resolved|on duty|off duty|complete|connected|verified|success|trial|day shift|night shift|leave|maintenance)$/i.test(text);
+const recolorElement = (element: HTMLElement) => {
+  const classes = Array.from(element.classList);
+  const replacements = classes.map(blueClass);
+  if (classes.some((token, index) => token !== replacements[index])) {
+    element.classList.remove(...classes);
+    element.classList.add(...replacements);
+  }
 };
 
-/** Applies DeepsGuard360's blue product palette only on its interactive demo route. */
+const applyMapPalette = () => {
+  const section = document.getElementById('map');
+  if (!section) return;
+
+  const mapPanel = section.querySelector<HTMLElement>('[class*="min-h-[360px]"]');
+  if (mapPanel) {
+    mapPanel.style.backgroundColor = '#eef4f9';
+    mapPanel.style.backgroundImage = 'linear-gradient(28deg, transparent 46%, #b8c9d8 47%, #b8c9d8 48%, transparent 49%), linear-gradient(110deg, transparent 43%, #c5d4e0 44%, #c5d4e0 45%, transparent 46%), linear-gradient(0deg, transparent 48%, #d3dfe8 49%, #d3dfe8 50%, transparent 51%)';
+    mapPanel.style.backgroundSize = '180px 140px';
+    mapPanel.querySelectorAll<HTMLElement>(':scope > div').forEach((layer) => {
+      if (layer.style.backgroundImage.includes('#b5c8bc') || layer.style.backgroundImage.includes('#c3d2c8') || layer.style.backgroundImage.includes('#d4dfd8')) {
+        layer.style.backgroundImage = 'linear-gradient(28deg, transparent 46%, #b8c9d8 47%, #b8c9d8 48%, transparent 49%), linear-gradient(110deg, transparent 43%, #c5d4e0 44%, #c5d4e0 45%, transparent 46%), linear-gradient(0deg, transparent 48%, #d3dfe8 49%, #d3dfe8 50%, transparent 51%)';
+      }
+    });
+  }
+};
+
 const DeepsGuard360DemoTheme: React.FC = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (!pathname.startsWith('/deepsguard360/demo')) return;
+    if (!pathname.startsWith(`${DEEPSGUARD_ROUTE}/demo`)) return;
 
-    const recolor = (root: ParentNode) => {
-      root.querySelectorAll<HTMLElement>('[class]').forEach((element) => {
-        if (isStatusColor(element)) return;
-        for (const [from, to] of Object.entries(colorClasses)) {
-          if (element.classList.contains(from)) {
-            element.classList.remove(from);
-            element.classList.add(to);
-          }
-        }
-      });
+    const root = document.getElementById('main-content') ?? document.body;
+    const recolor = (node: ParentNode) => {
+      if (node instanceof HTMLElement && node.hasAttribute('class')) recolorElement(node);
+      node.querySelectorAll<HTMLElement>('[class]').forEach(recolorElement);
+      applyMapPalette();
     };
 
-    recolor(document.getElementById('main-content') ?? document);
+    recolor(root);
     const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
-        if (node instanceof HTMLElement) {
-          if (node.hasAttribute('class') && !isStatusColor(node)) {
-            for (const [from, to] of Object.entries(colorClasses)) {
-              if (node.classList.contains(from)) {
-                node.classList.remove(from);
-                node.classList.add(to);
-              }
-            }
-          }
-          recolor(node);
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.target instanceof HTMLElement) {
+          recolorElement(mutation.target);
         }
-      }));
+        mutation.addedNodes.forEach((node) => {
+          if (node instanceof HTMLElement) recolor(node);
+        });
+      });
     });
-    observer.observe(document.getElementById('main-content') ?? document.body, { childList: true, subtree: true });
+    observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+
     return () => observer.disconnect();
   }, [pathname]);
 
