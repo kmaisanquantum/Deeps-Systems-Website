@@ -7,6 +7,7 @@ import ScrollUpButton from './components/ScrollUpButton';
 import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import SolutionsPage from './pages/SolutionsPage';
+import DeepsGuard360Page from './pages/DeepsGuard360Page';
 import AdvantagePage from './pages/AdvantagePage';
 import InsightsPage from './pages/InsightsPage';
 import ArticlePage from './pages/ArticlePage';
@@ -26,7 +27,7 @@ const App: React.FC = () => {
         <div className="min-h-screen selection:bg-emerald-500/30">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-6 focus:py-3 focus:bg-emerald-600 focus:text-white focus:font-bold focus:rounded-xl focus:shadow-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-6 focus:py-3 focus:bg-emerald-600 focus:text-white focus:font-bold focus:rounded-xl focus:shadow-2xl"
         >
           Skip to main content
         </a>
@@ -36,6 +37,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/solutions" element={<SolutionsPage />} />
+            <Route path="/deepsguard360" element={<DeepsGuard360Page />} />
             <Route path="/advantage" element={<AdvantagePage />} />
             <Route path="/insights" element={<InsightsPage />} />
             <Route path="/insights/:category/:slug" element={<ArticlePage />} />

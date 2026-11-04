@@ -32,6 +32,7 @@ export const servicesItems = [
   { name: 'Energy & Logistics', icon: React.createElement(Truck, { className: "w-5 h-5" }), href: '/solutions#details-logistics', desc: 'Quantum-inspired pathfinding.' },
   { name: 'Agribusiness', icon: React.createElement(Sprout, { className: "w-5 h-5" }), href: '/solutions#details-agribusiness', desc: 'Traceability-as-a-Service.' },
   { name: 'Advanced Suite', icon: React.createElement(Rocket, { className: "w-5 h-5" }), href: '/solutions#advanced-solutions', desc: 'Disruptive BITC SaaS outcomes.' },
+  { name: 'DeepsGuard360', icon: React.createElement(Shield, { className: "w-5 h-5" }), href: '/deepsguard360', desc: 'Integrated security operations SaaS.' },
 ];
 
 export const shopItems = [
