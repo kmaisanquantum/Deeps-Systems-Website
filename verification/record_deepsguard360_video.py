@@ -1,122 +1,176 @@
 import argparse
 import asyncio
 import shutil
+import socket
 import subprocess
 import tempfile
+import time
 from pathlib import Path
+from urllib.request import urlopen
 
 from playwright.async_api import async_playwright
 
-# Sections in the requested explainer order. The screenshots are captured from
-# the actual interactive demo and contain only its fictional demo data.
+# Actual demo sections in the requested walkthrough order.
 SCENES = [
-    ("discovery", "One platform. Complete security operations."),
-    ("registration", "Register a company and create a private workspace."),
-    ("subscription", "Starter 50 · Growth 150 · Professional 300 · Enterprise custom."),
-    ("overview", "See guards, sites, patrols, incidents and performance at a glance."),
-    ("guards", "Manage guard profiles, documents and site assignments."),
-    ("workforce", "Build rosters, assign shifts and track attendance."),
-    ("mobile", "Mobile duties, clock-in, patrols, incidents and offline sync."),
-    ("map", "Monitor patrol routes and checkpoints on the Papua New Guinea map."),
-    ("control", "Review the simulated Commercial Site A emergency alert."),
-    ("cctv", "CCTV status panels are clearly marked simulations."),
-    ("incidents", "Track classification, response, resolution and history."),
-    ("client", "Give clients restricted access to their own sites and reports."),
-    ("reports", "Turn security operations into useful reports and analytics."),
-    ("master", "Manage multiple companies with isolated workspaces."),
+    ("discovery", "Landing"),
+    ("registration", "Registration"),
+    ("subscription", "Subscription"),
+    ("overview", "Dashboard"),
+    ("guards", "Guard management"),
+    ("workforce", "Scheduling"),
+    ("mobile", "Guard mobile app"),
+    ("map", "GPS and patrol map"),
+    ("control", "Control room"),
+    ("cctv", "CCTV"),
+    ("incidents", "Incidents"),
+    ("client", "Client portal"),
+    ("reports", "Reports"),
+    ("master", "Multi-company administration"),
 ]
 
 
-def run(command: list[str]) -> None:
-    if not shutil.which(command[0]):
-        raise SystemExit(f"Required tool not found: {command[0]}")
-    subprocess.run(command, check=True)
+def site_is_ready(url: str) -> bool:
+    try:
+        with urlopen(url, timeout=2) as response:
+            return response.status < 500
+    except Exception:
+        return False
+
+
+def start_vite(repo_root: Path, base_url: str, enabled: bool) -> subprocess.Popen | None:
+    if site_is_ready(base_url):
+        print(f"Using running site at {base_url}")
+        return None
+    if not enabled:
+        raise SystemExit(f"Site unavailable at {base_url}. Start Vite or omit --no-start-server.")
+    if shutil.which("npm") is None:
+        raise SystemExit("npm was not found. Install Node.js/npm or start the site yourself.")
+
+    port = 3000
+    try:
+        port = int(base_url.rsplit(":", 1)[1].split("/", 1)[0])
+    except (IndexError, ValueError):
+        pass
+    process = subprocess.Popen(
+        ["npm", "run", "dev", "--", "--host", "127.0.0.1", "--port", str(port), "--strictPort"],
+        cwd=repo_root,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.STDOUT,
+    )
+    for _ in range(60):
+        if process.poll() is not None:
+            raise SystemExit("Vite exited before it became available. Check npm dependencies and project scripts.")
+        if site_is_ready(base_url):
+            print(f"Started Vite at {base_url}")
+            return process
+        time.sleep(1)
+    process.terminate()
+    raise SystemExit(f"Timed out waiting for Vite at {base_url}.")
 
 
 async def capture(base_url: str, output_dir: Path, headed: bool) -> list[Path]:
-    screenshots = output_dir / "screenshots"
+    screenshots = output_dir / "deepsguard360-promo-frames"
     screenshots.mkdir(parents=True, exist_ok=True)
-    results: list[Path] = []
+    captured: list[Path] = []
 
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=not headed)
-        page = await browser.new_page(viewport={"width": 1920, "height": 1080}, device_scale_factor=1, color_scheme="dark")
-        await page.goto(f"{base_url.rstrip('/')}/deepsguard360/demo", wait_until="networkidle")
+    async with async_playwright() as playwright:
+        browser = await playwright.chromium.launch(headless=not headed)
+        page = await browser.new_page(
+            viewport={"width": 1920, "height": 1080},
+            device_scale_factor=1,
+            color_scheme="dark",
+        )
+        await page.goto(f"{base_url.rstrip('/')}/deepsguard360/demo", wait_until="domcontentloaded", timeout=60000)
+        await page.locator("#discovery").wait_for(state="visible", timeout=30000)
         await page.wait_for_timeout(1200)
 
-        for index, (section_id, _caption) in enumerate(SCENES, start=1):
+        for index, (section_id, label) in enumerate(SCENES, start=1):
             section = page.locator(f"#{section_id}")
-            await section.scroll_into_view_if_needed()
-            await page.wait_for_timeout(700)
+            await section.scroll_into_view_if_needed(timeout=15000)
+            await page.wait_for_timeout(650)
+
+            # Play the demo's scripted controls where they are available.
             if section_id == "control":
-                assign = page.get_by_role("button", name="Assign response")
-                if await assign.count() and await assign.first.is_visible():
-                    await assign.first.click()
-                    await page.wait_for_timeout(350)
+                action = page.get_by_role("button", name="Assign response")
+                if await action.count() and await action.first.is_visible():
+                    await action.first.click()
+                    await page.wait_for_timeout(450)
             elif section_id == "mobile":
-                clock_in = page.get_by_role("button", name="Clock in")
-                if await clock_in.count() and await clock_in.first.is_visible():
-                    await clock_in.first.click()
-                    await page.wait_for_timeout(300)
-            elif section_id == "incidents":
-                resolve = page.get_by_role("button", name="Resolve incident")
-                if await resolve.count() and await resolve.first.is_visible():
-                    await resolve.first.click()
+                action = page.get_by_role("button", name="Clock in")
+                if await action.count() and await action.first.is_visible():
+                    await action.first.click()
                     await page.wait_for_timeout(350)
-            target = screenshots / f"scene-{index:02d}-{section_id}.png"
-            await page.screenshot(path=str(target), animations="disabled")
-            results.append(target)
+            elif section_id == "incidents":
+                action = page.get_by_role("button", name="Resolve incident")
+                if await action.count() and await action.first.is_visible():
+                    await action.first.click()
+                    await page.wait_for_timeout(450)
+
+            frame = screenshots / f"scene-{index:02d}-{section_id}.png"
+            await page.screenshot(path=str(frame), animations="disabled")
+            captured.append(frame)
+            print(f"Captured {index:02d}/{len(SCENES)}: {label}")
 
         await browser.close()
-    return results
+    return captured
 
 
-def write_concat_list(images: list[Path], durations: list[float], output: Path) -> None:
-    # ffmpeg concat demuxer uses a final repeated frame to honor the last duration.
-    lines = []
-    for image, duration in zip(images, durations):
-        safe = str(image.resolve()).replace("'", "'\\''")
-        lines.extend([f"file '{safe}'", f"duration {duration:.6f}"])
-    safe_last = str(images[-1].resolve()).replace("'", "'\\''")
-    lines.append(f"file '{safe_last}'")
-    output.write_text("\n".join(lines) + "\n", encoding="utf-8")
+def create_concat_file(frames: list[Path], destination: Path, duration: float) -> None:
+    # 14 scenes share 30 seconds equally (~2.14 seconds per screen).
+    lines: list[str] = []
+    for frame in frames:
+        escaped = str(frame.resolve()).replace("'", "'\\''")
+        lines.extend((f"file '{escaped}'", f"duration {duration:.6f}"))
+    escaped_last = str(frames[-1].resolve()).replace("'", "'\\''")
+    lines.append(f"file '{escaped_last}'")
+    destination.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def encode(images: list[Path], output_dir: Path, captions_path: Path) -> None:
-    # Make the 30-second cut a visual montage of all 14 parts rather than the
-    # first 30 seconds of the much longer walkthrough. Captions remain a VTT
-    # sidecar so the existing HTML5 track can be used without burning text in.
-    with tempfile.TemporaryDirectory(prefix="deepsguard360-video-") as temp_dir:
-        temp = Path(temp_dir)
-        promo_concat = temp / "promo.txt"
-        full_concat = temp / "full.txt"
-        write_concat_list(images, [30.0 / len(images)] * len(images), promo_concat)
-        write_concat_list(images, [12.0] * len(images), full_concat)
+def encode_promo(frames: list[Path], output_dir: Path) -> Path:
+    if not frames:
+        raise SystemExit("No demo screenshots were captured.")
+    if shutil.which("ffmpeg") is None:
+        raise SystemExit("ffmpeg was not found. Install ffmpeg and rerun the script.")
 
-        video_args = ["-vsync", "vfr", "-vf", "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,format=yuv420p", "-c:v", "libx264", "-preset", "medium", "-crf", "24", "-movflags", "+faststart"]
-        run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(promo_concat), *video_args, str(output_dir / "deepsguard360-promo-30s.mp4")])
-        run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(full_concat), *video_args, str(output_dir / "deepsguard360-demo-full.mp4")])
-
-        # Provide a contact-sheet-like poster from the opening scene. The SVG
-        # poster already used by the page is preserved and remains unchanged.
-        if not captions_path.is_file():
-            raise SystemExit(f"Expected existing captions file: {captions_path}")
+    output = output_dir / "deepsguard360-promo-30s.mp4"
+    with tempfile.TemporaryDirectory(prefix="deepsguard360-ffmpeg-") as temporary:
+        concat = Path(temporary) / "frames.txt"
+        create_concat_file(frames, concat, 30.0 / len(frames))
+        subprocess.run(
+            [
+                "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat),
+                "-vf", "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,format=yuv420p",
+                "-r", "30", "-c:v", "libx264", "-preset", "medium", "-crf", "24",
+                "-movflags", "+faststart", "-an", str(output),
+            ],
+            check=True,
+        )
+    return output
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Capture DeepsGuard360 demo screens and encode silent MP4 walkthroughs.")
-    parser.add_argument("--base-url", default="http://127.0.0.1:3000", help="Base URL for the locally running Vite site")
+    parser = argparse.ArgumentParser(description="Capture DeepsGuard360 demo sections and create a 30-second silent MP4 promo.")
+    parser.add_argument("--base-url", default="http://127.0.0.1:3000", help="Local Vite site URL")
     parser.add_argument("--output-dir", type=Path, default=Path("public/videos"))
-    parser.add_argument("--headed", action="store_true", help="Show Chromium while capturing screens")
+    parser.add_argument("--headed", action="store_true", help="Show Chromium while capturing")
+    parser.add_argument("--no-start-server", action="store_true", help="Do not start Vite automatically")
     args = parser.parse_args()
 
-    if not shutil.which("ffmpeg"):
-        raise SystemExit("Install ffmpeg, start the Vite site, then rerun this script.")
+    repo_root = Path(__file__).resolve().parents[1]
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    images = asyncio.run(capture(args.base_url, args.output_dir, args.headed))
-    encode(images, args.output_dir, args.output_dir / "deepsguard360-promo-30s.vtt")
-    print("Wrote silent 1920x1080 review MP4s to public/videos/.")
-    print("They contain demo-screen captures and no narration/music. Add approved audio before campaign release.")
+    server = start_vite(repo_root, args.base_url, enabled=not args.no_start_server)
+    try:
+        frames = asyncio.run(capture(args.base_url, args.output_dir, args.headed))
+        video = encode_promo(frames, args.output_dir)
+        print(f"Created {video} ({video.stat().st_size:,} bytes).")
+        print("This is a silent screenshot montage; no narration or music is included. The existing VTT captions file is left unchanged.")
+    finally:
+        if server is not None:
+            server.terminate()
+            try:
+                server.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                server.kill()
 
 
 if __name__ == "__main__":
