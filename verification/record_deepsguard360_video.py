@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
-"""Capture the DeepsGuard360 demo screens and stitch a 30s MP4 montage.
+"""Capture the DeepsGuard360 demo screens and stitch a voiced 30s MP4 montage.
 
 Usage from the repository root:
-  python -m pip install playwright
+  python -m pip install playwright edge-tts
   python -m playwright install chromium
   python verification/record_deepsguard360_video.py
 
 ffmpeg and Node/npm must also be installed. The script starts the Vite server
 if the configured URL is not already responding, then stops only the server it
 started itself. Screenshots are saved under verification/deepsguard360-frames/.
+The narration is generated from public/videos/deepsguard360-promo-30s.vtt.
 """
 
 import argparse
 import asyncio
 import shutil
 import subprocess
+import tempfile
 import time
 from pathlib import Path
 from urllib.request import urlopen
@@ -139,28 +141,69 @@ def make_concat_list(frames: list[Path], concat_path: Path, seconds_per_screen: 
     concat_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def encode_video(frames: list[Path], output_path: Path) -> None:
+def narration_from_vtt(vtt_path: Path) -> str:
+    # Keep caption text verbatim while excluding the WebVTT header and cue times.
+    captions = [
+        line for line in vtt_path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and line.strip() != "WEBVTT" and "-->" not in line
+    ]
+    if not captions:
+        raise SystemExit(f"No caption text found in {vtt_path}.")
+    return "\n".join(captions)
+
+
+def encode_video(frames: list[Path], output_path: Path, captions_path: Path) -> None:
     if shutil.which("ffmpeg") is None:
         raise SystemExit("ffmpeg was not found. Install it and rerun the script.")
     if not frames:
         raise SystemExit("No screenshots were captured.")
+    if shutil.which("python") is None:
+        raise SystemExit("python was not found. Install Python and rerun the script.")
 
-    with __import__("tempfile").TemporaryDirectory(prefix="deepsguard360-") as temp_dir:
-        concat_path = Path(temp_dir) / "screenshots.txt"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="deepsguard360-") as temp_dir:
+        temp_path = Path(temp_dir)
+        concat_path = temp_path / "screenshots.txt"
+        silent_video_path = temp_path / "silent.mp4"
+        narration_path = temp_path / "narration.txt"
+        audio_path = temp_path / "narration.mp3"
+        voiced_video_path = temp_path / "voiced.mp4"
+        narration_path.write_text(narration_from_vtt(captions_path), encoding="utf-8")
         make_concat_list(frames, concat_path, 2.0)
+
+        try:
+            subprocess.run(
+                [
+                    "python", "-m", "edge_tts", "--voice", "en-US-GuyNeural",
+                    "--file", str(narration_path), "--write-media", str(audio_path),
+                ],
+                check=True,
+            )
+        except subprocess.CalledProcessError as error:
+            raise SystemExit("Narration generation failed. Install edge-tts with 'python -m pip install edge-tts' and retry.") from error
+
         subprocess.run(
             [
                 "ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_path),
                 "-vf", "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,format=yuv420p",
                 "-r", "30", "-t", "30", "-c:v", "libx264", "-preset", "medium", "-crf", "24",
-                "-movflags", "+faststart", "-an", str(output_path),
+                "-movflags", "+faststart", str(silent_video_path),
             ],
             check=True,
         )
+        subprocess.run(
+            [
+                "ffmpeg", "-y", "-i", str(silent_video_path), "-i", str(audio_path),
+                "-c:v", "copy", "-c:a", "aac", "-shortest", "-movflags", "+faststart",
+                str(voiced_video_path),
+            ],
+            check=True,
+        )
+        voiced_video_path.replace(output_path)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Capture DeepsGuard360 demo screens and create its 30-second promo MP4.")
+    parser = argparse.ArgumentParser(description="Capture DeepsGuard360 demo screens and create its voiced 30-second promo MP4.")
     parser.add_argument("--base-url", default="http://127.0.0.1:3000", help="Local Vite URL (default: %(default)s)")
     parser.add_argument("--headed", action="store_true", help="Show Chromium while it captures")
     parser.add_argument("--no-start-server", action="store_true", help="Require the Vite site to already be running")
@@ -168,13 +211,13 @@ def main() -> None:
 
     repo_root = Path(__file__).resolve().parents[1]
     output_path = repo_root / "public" / "videos" / "deepsguard360-promo-30s.mp4"
+    captions_path = repo_root / "public" / "videos" / "deepsguard360-promo-30s.vtt"
     screenshot_dir = repo_root / "verification" / "deepsguard360-frames"
     server = start_vite(repo_root, args.base_url, enabled=not args.no_start_server)
     try:
         frames = asyncio.run(capture_screenshots(args.base_url, screenshot_dir, args.headed))
-        encode_video(frames, output_path)
-        print(f"Created {output_path} ({output_path.stat().st_size:,} bytes).")
-        print("The montage is silent; the existing captions file and video markup were not changed.")
+        encode_video(frames, output_path, captions_path)
+        print(f"Created voiced video {output_path} ({output_path.stat().st_size:,} bytes).")
     finally:
         if server is not None:
             server.terminate()
