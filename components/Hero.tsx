@@ -4,7 +4,6 @@ import {
   ArrowRight, Binary,
   Mail, Twitter, Linkedin, X
 } from 'lucide-react';
-import HeroSlider from './HeroSlider';
 
 const Hero: React.FC = () => {
   const [showGlow, setShowGlow] = useState(false);
@@ -147,13 +146,10 @@ const Hero: React.FC = () => {
             Our Approach
           </button>
         </div>
-
-        <HeroSlider />
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes fade-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
       `}} />
     </section>
   );
