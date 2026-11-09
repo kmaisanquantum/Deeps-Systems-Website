@@ -7,6 +7,13 @@ const capabilities = [
   { label: 'Control Room', icon: Radio }, { label: 'Incident Management', icon: Activity },  
   { label: 'Client Portal', icon: ShieldCheck }, { label: 'SaaS Subscriptions', icon: BarChart3 },  
 ];  
+
+const spotlightFeatures = [  
+  { label: 'Guard Management', description: 'Rosters, licensing and deployment in one place', icon: Users },  
+  { label: 'Patrol Tracking', description: 'Live GPS checkpoints and site coverage', icon: MapPin },  
+  { label: 'Incident Reporting', description: 'Field reports routed straight to the control room', icon: Activity },  
+  { label: 'Client Portal', description: 'Give clients real-time visibility of their sites', icon: ShieldCheck },  
+];  
   
 const DeepsGuard360Spotlight: React.FC = () => (  
   <section className="relative isolate overflow-hidden border-y border-sky-500/20 bg-gray-950 px-5 py-16 text-white md:px-6 md:py-24">  
@@ -21,14 +28,18 @@ const DeepsGuard360Spotlight: React.FC = () => (
         <div className="mt-8 flex flex-col gap-3 sm:flex-row"><Link to="/deepsguard360" className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-sky-600 to-blue-700 px-6 py-3 text-sm font-bold text-white">Explore DeepsGuard360 <ArrowRight className="h-4 w-4" /></Link></div>  
       </div>  
       <div className="relative mx-auto w-full max-w-xl"><div className="absolute -inset-4 rounded-[2rem] bg-sky-500/10 blur-2xl" /><div className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-950 p-5 text-white shadow-2xl shadow-blue-950/30 sm:p-6">  
-        <div className="mb-4 flex items-center justify-between"><p className="text-sm font-bold">Watch: 30-second platform tour</p><span className="rounded-full bg-sky-500/10 px-2.5 py-1 text-[10px] font-bold text-sky-300">VIDEO</span></div>  
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-black">  
-          <video className="aspect-video w-full object-cover" autoPlay muted loop playsInline controls preload="metadata" poster="/images/deepsguard360-poster.svg" aria-label="DeepsGuard360 product demo video">  
-            <source src="/videos/deepsguard360-promo-30s.mp4" type="video/mp4" />  
-            <track kind="captions" src="/videos/deepsguard360-promo-30s.vtt" srcLang="en" label="English" default />  
-          </video>  
-        </div>  
-        <div className="mt-4 flex items-center justify-between rounded-xl bg-sky-500/10 px-4 py-3"><span className="text-xs font-semibold text-sky-100">Sound on for the narrated tour</span><ArrowRight className="h-4 w-4 text-sky-300" /></div>  
+        <div className="mb-4 flex items-center justify-between"><p className="text-sm font-bold">DeepsGuard360 core modules</p><span className="rounded-full bg-sky-500/10 px-2.5 py-1 text-[10px] font-bold text-sky-300">PLATFORM</span></div>  
+        <ul className="space-y-3">  
+          {spotlightFeatures.map(({ label, description, icon: Icon }) => (  
+            <li key={label} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">  
+              <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sky-500/10 text-sky-300"><Icon className="h-4 w-4" /></span>  
+              <span>  
+                <span className="block text-sm font-bold text-white">{label}</span>  
+                <span className="block text-xs text-slate-300">{description}</span>  
+              </span>  
+            </li>  
+          ))}  
+        </ul>  
       </div></div>  
     </div>  
   </section>  
