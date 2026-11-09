@@ -25,9 +25,9 @@ const HeroSlider: React.FC = () => {
   }, [paused]);
 
   return (
-    <div className="mt-20 md:mt-28 relative group opacity-0 animate-[fade-in_1.5s_ease-out_2s_forwards]">
+    <div className="mt-8 md:mt-10 relative group opacity-0 animate-[fade-in_1.5s_ease-out_2s_forwards]">
       <div
-        className="relative max-w-5xl mx-auto rounded-3xl overflow-hidden border border-gray-100 dark:border-white/10 shadow-2xl bg-white dark:bg-transparent"
+        className="relative max-w-3xl mx-auto rounded-3xl overflow-hidden border border-gray-100 dark:border-white/10 shadow-2xl bg-white dark:bg-transparent"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
         role="region"
@@ -69,10 +69,10 @@ const HeroSlider: React.FC = () => {
 
           {/* Slide 2 — interactive demo CTA */}
           <div
-            className="w-full shrink-0 flex flex-col items-center justify-center text-center px-6 md:px-16 py-14 md:py-20 bg-gradient-to-br from-slate-950 to-emerald-950"
+            className="w-full shrink-0 flex flex-col items-center justify-center text-center px-6 md:px-16 py-8 md:py-12 bg-gradient-to-br from-slate-950 to-emerald-950"
             aria-hidden={index !== 1}
           >
-            <h3 className="font-montserrat text-2xl md:text-4xl font-extrabold text-white mb-3 md:mb-5">
+            <h3 className="font-montserrat text-xl md:text-2xl font-extrabold text-white mb-3 md:mb-5">
               Try the interactive demo
             </h3>
             <p className="text-slate-300 text-sm md:text-lg max-w-xl mb-6 md:mb-8 leading-relaxed">
@@ -101,7 +101,7 @@ const HeroSlider: React.FC = () => {
                 <div className="h-24 md:h-32 bg-gray-50 dark:bg-white/2 rounded-xl border border-gray-100 dark:border-white/5 flex items-center justify-center text-[10px] text-gray-600 dark:text-slate-400 uppercase tracking-widest font-bold hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Precision Core</div>
                 <div className="h-24 md:h-32 bg-gray-50 dark:bg-white/2 rounded-xl border border-gray-100 dark:border-white/5 flex items-center justify-center text-[10px] text-gray-600 dark:text-slate-400 uppercase tracking-widest font-bold hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Cloud Native</div>
                 <div className="hidden md:flex h-32 bg-gray-50 dark:bg-white/2 rounded-xl border border-gray-100 dark:border-white/5 items-center justify-center text-[10px] text-gray-600 dark:text-slate-400 uppercase tracking-widest font-bold hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Scalable Logic</div>
-                <div className="h-48 md:h-64 col-span-2 md:col-span-2 bg-emerald-500/[0.02] dark:bg-emerald-500/5 rounded-2xl border border-emerald-500/10 flex items-center justify-center relative overflow-hidden group/viz">
+                <div className="h-32 md:h-40 col-span-2 md:col-span-2 bg-emerald-500/[0.02] dark:bg-emerald-500/5 rounded-2xl border border-emerald-500/10 flex items-center justify-center relative overflow-hidden group/viz">
                   <div className="absolute inset-0 bg-emerald-500/[0.05] opacity-0 group-hover/viz:opacity-100 transition-opacity"></div>
                   <div className="flex flex-col items-center p-4 relative z-10">
                     <Zap className="w-10 h-10 md:w-12 md:h-12 text-emerald-600 mb-4 animate-pulse" />
@@ -110,7 +110,7 @@ const HeroSlider: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="hidden md:block h-64 bg-gray-50 dark:bg-white/2 rounded-2xl border border-gray-100 dark:border-white/5 relative overflow-hidden">
+                <div className="hidden md:block h-40 bg-gray-50 dark:bg-white/2 rounded-2xl border border-gray-100 dark:border-white/5 relative overflow-hidden">
                   <div className="absolute inset-4 border border-gray-200 dark:border-white/5 rounded-xl border-dashed animate-[spin_20s_linear_infinite]"></div>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <Binary className="w-8 h-8 text-gray-200 dark:text-slate-700 opacity-20" />
