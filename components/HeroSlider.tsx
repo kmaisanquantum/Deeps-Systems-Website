@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, ChevronRight, Zap, Binary } from 'lucide-react';
 
 const AUTO_ADVANCE_MS = 6000;
-const SLIDE_COUNT = 3;
+const SLIDE_COUNT = 2;
 
 /**
  * Auto-rotating carousel that sits just below the hero headline area.
- * Slide 1: DeepsGuard360 promo video. Slide 2: interactive demo CTA.
- * Slide 3: the original hero visual grid (Precision Core / Cloud Native / Scalable Logic).
+ * Slide 1: interactive demo CTA.
+ * Slide 2: the original hero visual grid (Precision Core / Cloud Native / Scalable Logic).
  */
 const HeroSlider: React.FC = () => {
   const [index, setIndex] = useState(0);
@@ -38,39 +38,10 @@ const HeroSlider: React.FC = () => {
           className="flex transition-transform duration-700 ease-out"
           style={{ transform: `translateX(-${index * 100}%)` }}
         >
-          {/* Slide 1 — promo video */}
-          <div className="relative w-full shrink-0 bg-slate-950" aria-hidden={index !== 0}>
-            <video
-              className="w-full aspect-video object-cover"
-              autoPlay
-              muted
-              loop
-              playsInline
-              controls
-              preload="metadata"
-              poster="/images/deepsguard360-poster.svg"
-              aria-label="DeepsGuard360 30-second platform tour"
-            >
-              <source src="/videos/deepsguard360-promo-30s.mp4" type="video/mp4" />
-              <track kind="captions" src="/videos/deepsguard360-promo-30s.vtt" srcLang="en" label="English" default />
-            </video>
-            <div className="absolute top-3 left-3 md:top-4 md:left-4 z-10 flex flex-col items-start gap-2">
-              <span className="rounded-full bg-black/60 backdrop-blur px-3 py-1.5 text-[10px] md:text-xs font-bold text-white tracking-wide">
-                DeepsGuard360 — 30-second platform tour
-              </span>
-              <Link
-                to="/deepsguard360"
-                className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-3 py-1.5 text-[10px] md:text-xs font-bold text-white shadow-lg transition hover:bg-emerald-500"
-              >
-                Explore platform <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
-
-          {/* Slide 2 — interactive demo CTA */}
+          {/* Slide 1 — interactive demo CTA */}
           <div
             className="w-full shrink-0 flex flex-col items-center justify-center text-center px-6 md:px-16 py-8 md:py-12 bg-gradient-to-br from-slate-950 to-emerald-950"
-            aria-hidden={index !== 1}
+            aria-hidden={index !== 0}
           >
             <h3 className="font-montserrat text-xl md:text-2xl font-extrabold text-white mb-3 md:mb-5">
               Try the interactive demo
@@ -86,10 +57,10 @@ const HeroSlider: React.FC = () => {
             </Link>
           </div>
 
-          {/* Slide 3 — original hero visual grid */}
+          {/* Slide 2 — original hero visual grid */}
           <div
             className="w-full shrink-0 flex items-center justify-center p-4 md:p-10 bg-white dark:bg-transparent"
-            aria-hidden={index !== 2}
+            aria-hidden={index !== 1}
           >
             <div className="w-full bg-white dark:bg-transparent rounded-2xl md:rounded-[40px] border border-gray-100 dark:border-white/5 transition-all duration-700 group-hover:border-emerald-500/20">
               <div className="flex items-center gap-2 mb-6 md:mb-8 justify-center md:justify-start">
