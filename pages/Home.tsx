@@ -16,9 +16,9 @@ const Home: React.FC = () => {
         <DeepsGuard360HeroShortcut />
       </div>
       <BriefIntroduction />
-      <SaaSSlider />
       <DeepsGuard360Spotlight />
       <OnlineStorePreview />
+      <SaaSSlider />
     </>
   );
 };
