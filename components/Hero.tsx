@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  ArrowRight, Zap, Binary,
+  ArrowRight, Binary,
   Mail, Twitter, Linkedin, X
 } from 'lucide-react';
+import HeroSlider from './HeroSlider';
 
 const Hero: React.FC = () => {
   const [showGlow, setShowGlow] = useState(false);
@@ -147,36 +148,7 @@ const Hero: React.FC = () => {
           </button>
         </div>
 
-        <div className="mt-20 md:mt-28 relative group opacity-0 animate-[fade-in_1.5s_ease-out_2s_forwards]">
-          <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-[#0a0a0a] via-transparent to-transparent z-10 pointer-events-none"></div>
-          <div className="bg-white dark:bg-transparent rounded-2xl md:rounded-[40px] p-4 md:p-10 max-w-5xl mx-auto overflow-hidden border border-gray-100 dark:border-white/5 group-hover:border-emerald-500/20 transition-all duration-700 shadow-2xl">
-             <div className="flex items-center gap-2 mb-6 md:mb-8 justify-center md:justify-start">
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20"></div>
-                <div className="w-2.5 h-2.5 rounded-full bg-blue-100 dark:bg-blue-500/20"></div>
-                <div className="w-2.5 h-2.5 rounded-full bg-amber-100 dark:bg-amber-500/20"></div>
-             </div>
-             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
-                <div className="h-24 md:h-32 bg-gray-50 dark:bg-white/2 rounded-xl border border-gray-100 dark:border-white/5 flex items-center justify-center text-[10px] text-gray-600 dark:text-slate-400 uppercase tracking-widest font-bold hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Precision Core</div>
-                <div className="h-24 md:h-32 bg-gray-50 dark:bg-white/2 rounded-xl border border-gray-100 dark:border-white/5 flex items-center justify-center text-[10px] text-gray-600 dark:text-slate-400 uppercase tracking-widest font-bold hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Cloud Native</div>
-                <div className="hidden md:flex h-32 bg-gray-50 dark:bg-white/2 rounded-xl border border-gray-100 dark:border-white/5 items-center justify-center text-[10px] text-gray-600 dark:text-slate-400 uppercase tracking-widest font-bold hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">Scalable Logic</div>
-                <div className="h-48 md:h-64 col-span-2 md:col-span-2 bg-emerald-500/[0.02] dark:bg-emerald-500/5 rounded-2xl border border-emerald-500/10 flex items-center justify-center relative overflow-hidden group/viz">
-                  <div className="absolute inset-0 bg-emerald-500/[0.05] opacity-0 group-hover/viz:opacity-100 transition-opacity"></div>
-                  <div className="flex flex-col items-center p-4 relative z-10">
-                    <Zap className="w-10 h-10 md:w-12 md:h-12 text-emerald-600 mb-4 animate-pulse" />
-                    <div className="h-1.5 w-32 md:w-48 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner">
-                      <div className="h-full bg-emerald-600 w-1/2 animate-[loading_2s_infinite] shadow-[0_0_15px_rgba(22,163,74,0.8)]"></div>
-                    </div>
-                  </div>
-                </div>
-                <div className="hidden md:block h-64 bg-gray-50 dark:bg-white/2 rounded-2xl border border-gray-100 dark:border-white/5 relative overflow-hidden">
-                   <div className="absolute inset-4 border border-gray-200 dark:border-white/5 rounded-xl border-dashed animate-[spin_20s_linear_infinite]"></div>
-                   <div className="absolute inset-0 flex items-center justify-center">
-                      <Binary className="w-8 h-8 text-gray-200 dark:text-slate-700 opacity-20" />
-                   </div>
-                </div>
-             </div>
-          </div>
-        </div>
+        <HeroSlider />
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
