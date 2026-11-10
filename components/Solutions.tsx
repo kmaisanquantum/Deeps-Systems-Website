@@ -67,6 +67,7 @@ const Solutions: React.FC = () => {
         "Architecture Modernization Consulting"
       ],
       buttonText: "Learn More: Advisory",
+      link: "/deepsadvisory360",
       details: "Strategic planning for sustainable local growth. Our advisory services provide tailored technology roadmaps that align your digital strategy with long-term business objectives and regional opportunities."
     },
     {

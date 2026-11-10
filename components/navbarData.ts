@@ -27,7 +27,7 @@ export const servicesItems = [
   { name: 'Managed IT Support', icon: React.createElement(Headset, { className: "w-5 h-5" }), href: '/deepscare360', desc: 'Proactive operational uptime.' },
   { name: 'Digital Compliance', icon: React.createElement(ShieldCheck, { className: "w-5 h-5" }), href: '/deepscomply360', desc: 'Secure data protection.' },
   { name: 'Cloud & Automation', icon: React.createElement(Cpu, { className: "w-5 h-5" }), href: '/deepsflow', desc: 'Streamlined digital workflows.' },
-  { name: 'ICT Advisory', icon: React.createElement(FileSearch, { className: "w-5 h-5" }), href: '/solutions#details-advisory', desc: 'Strategic technology roadmaps.' },
+  { name: 'ICT Advisory', icon: React.createElement(FileSearch, { className: "w-5 h-5" }), href: '/deepsadvisory360', desc: 'Strategic technology roadmaps.' },
   { name: 'Financial Institutions', icon: React.createElement(Landmark, { className: "w-5 h-5" }), href: '/deepsfin360', desc: 'SME-in-a-Box SaaS solutions.' },
   { name: 'Energy & Logistics', icon: React.createElement(Truck, { className: "w-5 h-5" }), href: '/deepsfleet360', desc: 'Quantum-inspired pathfinding.' },
   { name: 'Agribusiness', icon: React.createElement(Sprout, { className: "w-5 h-5" }), href: '/agritrace', desc: 'Traceability-as-a-Service.' },
