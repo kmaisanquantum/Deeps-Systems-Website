@@ -189,6 +189,28 @@ const Contact: React.FC = () => {
                   </div>
                 </a>
               </div>
+              <div className="flex items-center gap-6 group">
+                <a href="mailto:sales@dspng.tech" className="flex items-center gap-6 group">
+                  <div className="p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 group-hover:border-emerald-500/30 transition-all shadow-sm">
+                    <Mail className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest mb-1">Sales</p>
+                    <p className="text-gray-900 dark:text-white font-bold font-mono">sales@dspng.tech</p>
+                  </div>
+                </a>
+              </div>
+              <div className="flex items-center gap-6 group">
+                <a href="mailto:service@dspng.tech" className="flex items-center gap-6 group">
+                  <div className="p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 group-hover:border-emerald-500/30 transition-all shadow-sm">
+                    <Mail className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-gray-600 dark:text-slate-400 uppercase tracking-widest mb-1">Service</p>
+                    <p className="text-gray-900 dark:text-white font-bold font-mono">service@dspng.tech</p>
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
 
