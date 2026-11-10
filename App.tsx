@@ -17,6 +17,8 @@ import DeepsFlowPage from './pages/DeepsFlowPage';
 import DeepsFlowDemoPage from './pages/DeepsFlowDemoPage';
 import DeepsCare360Page from './pages/DeepsCare360Page';
 import DeepsCare360DemoPage from './pages/DeepsCare360DemoPage';
+import DeepsFleet360Page from './pages/DeepsFleet360Page';
+import DeepsFleet360DemoPage from './pages/DeepsFleet360DemoPage';
 import AdvantagePage from './pages/AdvantagePage';
 import ContactPage from './pages/ContactPage';
 import NotFound from './pages/NotFound';
@@ -41,6 +43,8 @@ const App: React.FC = () => (
             <Route path="/deepsflow/demo" element={<DeepsFlowDemoPage />} />
             <Route path="/deepscare360" element={<DeepsCare360Page />} />
             <Route path="/deepscare360/demo" element={<DeepsCare360DemoPage />} />
+            <Route path="/deepsfleet360" element={<DeepsFleet360Page />} />
+            <Route path="/deepsfleet360/demo" element={<DeepsFleet360DemoPage />} />
             <Route path="/advantage" element={<AdvantagePage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="*" element={<NotFound />} />

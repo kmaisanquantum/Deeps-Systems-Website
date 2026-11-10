@@ -106,6 +106,7 @@ const Solutions: React.FC = () => {
         "Real-time Highland Corridor Tracking"
       ],
       buttonText: "Learn More: Logistics Tech",
+      link: "/deepsfleet360",
       details: "Maximum efficiency for PNG's toughest terrains. Our Born-in-the-Cloud (BITC) platform uses advanced algorithms to minimize fuel costs and maximize asset life through predictive analytics."
     },
     {
