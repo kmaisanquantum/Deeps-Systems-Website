@@ -13,6 +13,8 @@ import DeepsGuard360Page from './pages/DeepsGuard360Page';
 import DeepsGuard360DemoPage from './pages/DeepsGuard360DemoPage';
 import AgriTracePage from './pages/AgriTracePage';
 import AgriTraceDemoPage from './pages/AgriTraceDemoPage';
+import DeepsFlowPage from './pages/DeepsFlowPage';
+import DeepsFlowDemoPage from './pages/DeepsFlowDemoPage';
 import AdvantagePage from './pages/AdvantagePage';
 import ContactPage from './pages/ContactPage';
 import NotFound from './pages/NotFound';
@@ -33,6 +35,8 @@ const App: React.FC = () => (
             <Route path="/deepsguard360/demo" element={<DeepsGuard360DemoPage />} />
             <Route path="/agritrace" element={<AgriTracePage />} />
             <Route path="/agritrace/demo" element={<AgriTraceDemoPage />} />
+            <Route path="/deepsflow" element={<DeepsFlowPage />} />
+            <Route path="/deepsflow/demo" element={<DeepsFlowDemoPage />} />
             <Route path="/advantage" element={<AdvantagePage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="*" element={<NotFound />} />

@@ -51,6 +51,7 @@ const Solutions: React.FC = () => {
         "Intelligent Process Integration"
       ],
       buttonText: "Learn More: Automation",
+      link: "/deepsflow",
       details: "Driving business efficiency through digital transformation. We focus on streamlining workflows and optimizing operational costs by leveraging advanced cloud-native automation technologies tailored for PNG's unique market."
     },
     {
