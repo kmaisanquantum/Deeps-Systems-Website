@@ -39,6 +39,7 @@ const Solutions: React.FC = () => {
         "Continuous Compliance Auditing"
       ],
       buttonText: "Learn More: Compliance",
+      link: "/deepscomply360",
       details: "Securing your business information with integrity. Our focus on data protection and regulatory alignment ensures your digital assets remain secure and compliant with local and international standards."
     },
     {

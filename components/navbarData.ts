@@ -25,7 +25,7 @@ import {
 
 export const servicesItems = [
   { name: 'Managed IT Support', icon: React.createElement(Headset, { className: "w-5 h-5" }), href: '/deepscare360', desc: 'Proactive operational uptime.' },
-  { name: 'Digital Compliance', icon: React.createElement(ShieldCheck, { className: "w-5 h-5" }), href: '/solutions#details-compliance', desc: 'Secure data protection.' },
+  { name: 'Digital Compliance', icon: React.createElement(ShieldCheck, { className: "w-5 h-5" }), href: '/deepscomply360', desc: 'Secure data protection.' },
   { name: 'Cloud & Automation', icon: React.createElement(Cpu, { className: "w-5 h-5" }), href: '/deepsflow', desc: 'Streamlined digital workflows.' },
   { name: 'ICT Advisory', icon: React.createElement(FileSearch, { className: "w-5 h-5" }), href: '/solutions#details-advisory', desc: 'Strategic technology roadmaps.' },
   { name: 'Financial Institutions', icon: React.createElement(Landmark, { className: "w-5 h-5" }), href: '/solutions#details-financial', desc: 'SME-in-a-Box SaaS solutions.' },
