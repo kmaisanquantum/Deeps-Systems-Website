@@ -20,7 +20,6 @@ const Footer: React.FC = () => {
     { name: 'Advantages', href: '/advantage' },
     { name: 'Solutions', href: '/solutions' },
     { name: 'Insights', href: '/insights' },
-    { name: 'Partners', href: '/advantage#partners' },
   ];
 
   const contactInfo = [
