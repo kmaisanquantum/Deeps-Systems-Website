@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Truck, Sprout, Landmark, ChevronDown, BarChart3, ArrowUpRight, ArrowUp, Zap, Lock, Globe, Settings, Scale, ArrowRight, ShieldCheck, Cpu, Headset, FileSearch } from 'lucide-react';
+import { Truck, Sprout, Landmark, ChevronDown, BarChart3, ArrowUpRight, ArrowUp, Zap, Lock, Globe, Scale, ArrowRight, ShieldCheck, Cpu, Headset, FileSearch } from 'lucide-react';
 
 type Solution = {
   sector: string;
@@ -69,18 +69,6 @@ const Solutions: React.FC = () => {
       buttonText: "Learn More: Advisory",
       link: "/deepsadvisory360",
       details: "Strategic planning for sustainable local growth. Our advisory services provide tailored technology roadmaps that align your digital strategy with long-term business objectives and regional opportunities."
-    },
-    {
-      sector: "Digital Optimization",
-      id: "details-classical",
-      icon: (className: string) => <Settings className={`${className} animate-icon-spin-slow`} />,
-      items: [
-        "Process Automation SaaS",
-        "Lean BITC Architectures",
-        "Strategic Resource Planning"
-      ],
-      buttonText: "Learn More: Architecture",
-      details: "The foundation of digital excellence. We provide lean, cloud-native frameworks that eliminate manual overhead and streamline PNG's core industries with precision and reliability."
     },
     {
       sector: "SME & Finance",

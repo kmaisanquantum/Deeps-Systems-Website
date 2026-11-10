@@ -3,7 +3,6 @@ import {
   Landmark,
   Truck,
   Sprout,
-  Rocket,
   Cloud,
   Zap,
   Smartphone,
@@ -31,7 +30,6 @@ export const servicesItems = [
   { name: 'Financial Institutions', icon: React.createElement(Landmark, { className: "w-5 h-5" }), href: '/deepsfin360', desc: 'SME-in-a-Box SaaS solutions.' },
   { name: 'Energy & Logistics', icon: React.createElement(Truck, { className: "w-5 h-5" }), href: '/deepsfleet360', desc: 'Quantum-inspired pathfinding.' },
   { name: 'Agribusiness', icon: React.createElement(Sprout, { className: "w-5 h-5" }), href: '/agritrace', desc: 'Traceability-as-a-Service.' },
-  { name: 'Advanced Suite', icon: React.createElement(Rocket, { className: "w-5 h-5" }), href: '/solutions#advanced-solutions', desc: 'Disruptive BITC SaaS outcomes.' },
   { name: 'DeepsGuard360', icon: React.createElement(Shield, { className: "w-5 h-5" }), href: '/deepsguard360', desc: 'Integrated security operations SaaS.' },
 ];
 
