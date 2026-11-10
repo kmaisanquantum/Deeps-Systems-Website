@@ -14,8 +14,6 @@ import DeepsGuard360DemoPage from './pages/DeepsGuard360DemoPage';
 import AgriTracePage from './pages/AgriTracePage';
 import AgriTraceDemoPage from './pages/AgriTraceDemoPage';
 import AdvantagePage from './pages/AdvantagePage';
-import InsightsPage from './pages/InsightsPage';
-import ArticlePage from './pages/ArticlePage';
 import ContactPage from './pages/ContactPage';
 import NotFound from './pages/NotFound';
 import { HelmetProvider } from 'react-helmet-async';
@@ -36,9 +34,6 @@ const App: React.FC = () => (
             <Route path="/agritrace" element={<AgriTracePage />} />
             <Route path="/agritrace/demo" element={<AgriTraceDemoPage />} />
             <Route path="/advantage" element={<AdvantagePage />} />
-            <Route path="/insights" element={<InsightsPage />} />
-            <Route path="/insights/:category/:slug" element={<ArticlePage />} />
-            <Route path="/insights/:slug" element={<ArticlePage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
