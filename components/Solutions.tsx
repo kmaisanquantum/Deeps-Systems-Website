@@ -25,6 +25,7 @@ const Solutions: React.FC = () => {
         "Infrastructure Health Audits"
       ],
       buttonText: "Learn More: IT Support",
+      link: "/deepscare360",
       details: "Your reliable partnership for continuous operations. We emphasize proactive maintenance and rapid response to ensure maximum operational uptime, allowing you to focus on core business growth while we handle the digital backbone."
     },
     {
