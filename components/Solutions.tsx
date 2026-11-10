@@ -93,6 +93,7 @@ const Solutions: React.FC = () => {
         "Automated Credit-Risk Simulations"
       ],
       buttonText: "Learn More: SME SaaS",
+      link: "/deepsfin360",
       details: "Moving beyond legacy banking tech. We provide Papua New Guinean SMEs with world-class Software, AI, and Cyber outcomes through a flexible, Kina-based SaaS model designed to scale with local growth."
     },
     {
