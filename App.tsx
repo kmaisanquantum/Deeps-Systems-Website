@@ -12,6 +12,8 @@ import Home from './pages/Home';
 import SolutionsPage from './pages/SolutionsPage';
 import DeepsGuard360Page from './pages/DeepsGuard360Page';
 import DeepsGuard360DemoPage from './pages/DeepsGuard360DemoPage';
+import AgriTracePage from './pages/AgriTracePage';
+import AgriTraceDemoPage from './pages/AgriTraceDemoPage';
 import AdvantagePage from './pages/AdvantagePage';
 import InsightsPage from './pages/InsightsPage';
 import ArticlePage from './pages/ArticlePage';
@@ -36,6 +38,8 @@ const App: React.FC = () => (
               <Route path="/solutions" element={<SolutionsPage />} />
               <Route path="/deepsguard360" element={<DeepsGuard360Page />} />
               <Route path="/deepsguard360/demo" element={<DeepsGuard360DemoPage />} />
+              <Route path="/agritrace" element={<AgriTracePage />} />
+              <Route path="/agritrace/demo" element={<AgriTraceDemoPage />} />
               <Route path="/advantage" element={<AdvantagePage />} />
               <Route path="/insights" element={<InsightsPage />} />
               <Route path="/insights/:category/:slug" element={<ArticlePage />} />

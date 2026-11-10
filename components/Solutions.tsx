@@ -1,8 +1,19 @@
 import React, { useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { Truck, Sprout, Landmark, ChevronDown, BarChart3, ArrowUpRight, ArrowUp, Zap, Lock, Globe, Settings, Scale, ArrowRight, ShieldCheck, Cpu, Headset, FileSearch } from 'lucide-react';
 
+type Solution = {
+  sector: string;
+  id: string;
+  icon: (className: string) => React.ReactNode;
+  items: string[];
+  buttonText: string;
+  link?: string;
+  details: string;
+};
+
 const Solutions: React.FC = () => {
-  const solutions = [
+  const solutions: Solution[] = [
     {
       sector: "Managed IT Support",
       id: "details-managed-it",
@@ -107,6 +118,7 @@ const Solutions: React.FC = () => {
         "Last-mile Cold Storage Telemetry"
       ],
       buttonText: "Learn More: Traceability",
+      link: "/agritrace",
       details: "Bridging the gap between the highlands and global markets. Traceability-as-a-Service provides PNG producers with export-ready data, secured by BITC infrastructure that works anywhere."
     }
   ];
@@ -176,16 +188,28 @@ const Solutions: React.FC = () => {
                 </ul>
                 
                 <div className="p-4 md:p-5 bg-gray-50 dark:bg-white/2 border-t border-gray-100 dark:border-white/5">
-                  <a 
-                    href={`#${sol.id}`}
-                    onClick={(e) => handleSmoothScroll(e, sol.id)}
-                    className="w-full py-3 rounded-xl bg-white dark:bg-transparent border border-gray-200 dark:border-white/10 text-emerald-600 font-bold text-[10px] md:text-xs flex items-center justify-center gap-3 btn-secondary-cta active-click group/btn overflow-hidden shadow-sm"
-                  >
-                    <span>{sol.buttonText}</span>
-                    <div className="flex flex-col h-4 overflow-hidden relative">
-                       <ChevronDown className="w-3.5 h-3.5 text-emerald-600 animate-arrow-down" />
-                    </div>
-                  </a>
+                  {sol.link ? (
+                    <Link
+                      to={sol.link}
+                      className="w-full py-3 rounded-xl bg-white dark:bg-transparent border border-gray-200 dark:border-white/10 text-emerald-600 font-bold text-[10px] md:text-xs flex items-center justify-center gap-3 btn-secondary-cta active-click group/btn overflow-hidden shadow-sm"
+                    >
+                      <span>{sol.buttonText}</span>
+                      <div className="flex flex-col h-4 overflow-hidden relative">
+                         <ArrowRight className="w-3.5 h-3.5 text-emerald-600 transition-transform group-hover/btn:translate-x-1" />
+                      </div>
+                    </Link>
+                  ) : (
+                    <a 
+                      href={`#${sol.id}`}
+                      onClick={(e) => handleSmoothScroll(e, sol.id)}
+                      className="w-full py-3 rounded-xl bg-white dark:bg-transparent border border-gray-200 dark:border-white/10 text-emerald-600 font-bold text-[10px] md:text-xs flex items-center justify-center gap-3 btn-secondary-cta active-click group/btn overflow-hidden shadow-sm"
+                    >
+                      <span>{sol.buttonText}</span>
+                      <div className="flex flex-col h-4 overflow-hidden relative">
+                         <ChevronDown className="w-3.5 h-3.5 text-emerald-600 animate-arrow-down" />
+                      </div>
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
