@@ -225,8 +225,10 @@ def encode_video(frames: list[Path], output_path: Path, captions_path: Path) -> 
         subprocess.run(
             [
                 "ffmpeg", "-y", "-i", str(silent_video_path), "-i", str(audio_path),
-                "-filter_complex", "[1:a]apad[a]", "-map", "0:v", "-map", "[a]",
-                "-c:v", "copy", "-c:a", "aac", "-t", str(TOTAL_SECONDS),
+                "-filter_complex", "[1:a]highpass=f=80,lowpass=f=14000,afftdn=nf=-25,acompressor=threshold=-20dB:ratio=3:attack=5:release=100,loudnorm=I=-16:TP=-1.5:LRA=11,apad[a]",
+                "-map", "0:v", "-map", "[a]",
+                "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2",
+                "-t", str(TOTAL_SECONDS),
                 "-movflags", "+faststart", str(voiced_video_path),
             ],
             check=True,
