@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, Mail, MapPin, ShoppingBag } from 'lucide-react';
-import { storeItem } from './navbarData';
+import { Building2, Mail, MapPin } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -21,7 +20,6 @@ const Footer: React.FC = () => {
     { name: 'Advantages', href: '/advantage' },
     { name: 'Solutions', href: '/solutions' },
     { name: 'Insights', href: '/insights' },
-    { name: storeItem.name, href: storeItem.href, icon: <ShoppingBag className="w-4 h-4" /> },
     { name: 'Partners', href: '/advantage#partners' },
   ];
 
@@ -61,7 +59,6 @@ const Footer: React.FC = () => {
                     onClick={(e) => handleLinkClick(e, link.href)}
                     className="text-gray-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-sm flex items-center gap-2 group"
                   >
-                    {link.icon && <span className="text-emerald-600/50 group-hover:text-emerald-600 transition-colors">{link.icon}</span>}
                     {link.name}
                   </Link>
                 </li>

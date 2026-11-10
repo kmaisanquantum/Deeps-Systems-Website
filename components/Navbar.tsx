@@ -4,20 +4,16 @@ import {
   Menu,
   X,
   ChevronDown,
-  ShoppingBag,
   Rocket,
   Cloud,
-  ArrowRight,
   Sun,
   Moon
 } from 'lucide-react';
-import { servicesItems, shopItems, advantageItems } from './navbarData';
-import { useCart } from './CartContext';
+import { servicesItems, advantageItems } from './navbarData';
 
 export const NAVBAR_HEIGHT_MOBILE_CLASS = 'pt-[64px]';
 
 const Navbar: React.FC = () => {
-  const { totalItems, isCartOpen, setIsCartOpen } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -222,72 +218,7 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
-          {/* Shop Dropdown */}
-          <div className="relative group" onMouseEnter={() => handleMouseEnter('shop')} onMouseLeave={handleMouseLeave}>
-            <button
-              aria-expanded={activeDropdown === 'shop'}
-              aria-haspopup="true"
-              onKeyDown={(e) => handleKeyDown(e, 'shop')}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${activeDropdown === 'shop' ? 'text-emerald-600' : 'text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white'}`}
-            >
-              Online Shop <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'shop' ? 'rotate-180' : ''}`} />
-            </button>
-            {activeDropdown === 'shop' && (
-              <div
-                className="absolute top-full right-0 pt-2 w-[380px] max-w-[calc(100vw-2rem)] z-50"
-                role="menu"
-              >
-                <div className="bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="grid grid-cols-1 gap-2">
-                    <div className="text-xs font-bold text-emerald-600 uppercase tracking-widest px-2 mb-2">Shop & Services</div>
-                    {shopItems.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
-                        onClick={(e) => handleLinkClick(e, item.href)}
-                        className="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
-                        role="menuitem"
-                      >
-                        <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover/item:scale-110 transition-all">
-                          {item.icon}
-                        </div>
-                        <div>
-                          <div className="text-sm font-bold text-gray-900 dark:text-white group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
-                          <div className="text-xs text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
-                        </div>
-                      </Link>
-                    ))}
-                    <div className="pt-2 mt-2 border-t border-gray-100 dark:border-white/5">
-                      <Link
-                        to="/shop"
-                        className="flex items-center justify-between w-full p-3 rounded-xl bg-emerald-600 text-white font-bold text-xs group/all"
-                        role="menuitem"
-                      >
-                        <span>Browse All Services</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover/all:translate-x-1 transition-transform" />
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
           <div className="ml-1 pl-2 lg:ml-2 lg:pl-4 border-l border-gray-100 dark:border-white/10 flex items-center gap-2 lg:gap-4">
-            {/* Desktop Basket Toggle */}
-            <button
-              onClick={() => setIsCartOpen(!isCartOpen)}
-              className="relative p-2.5 rounded-full bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white transition-colors active-click"
-              aria-label="Open basket"
-            >
-              <ShoppingBag className="w-5 h-5" />
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-[10px] font-bold text-white ring-2 ring-white dark:ring-[#0a0a0a] animate-in zoom-in duration-300">
-                  {totalItems}
-                </span>
-              )}
-            </button>
-
             {/* Desktop Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -307,20 +238,6 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Menu Toggle */}
         <div className="flex items-center gap-3 md:hidden">
-          {/* Mobile Basket Toggle */}
-          <button
-            onClick={() => setIsCartOpen(!isCartOpen)}
-            className="relative p-2 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/10 text-gray-900 dark:text-white"
-            aria-label="Open basket"
-          >
-            <ShoppingBag className="w-5 h-5" />
-            {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-[9px] font-bold text-white ring-2 ring-white dark:ring-[#0a0a0a]">
-                {totalItems}
-              </span>
-            )}
-          </button>
-
           <button 
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMobileMenuOpen}
@@ -416,45 +333,6 @@ const Navbar: React.FC = () => {
                       </div>
                     </Link>
                   ))}
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <button
-                onClick={() => toggleMobileSubmenu('shop')}
-                aria-expanded={mobileActiveSubmenu === 'shop'}
-                className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
-              >
-                <div className="flex items-center gap-3">
-                   <ShoppingBag className="w-5 h-5 text-emerald-600" />
-                   <span className="font-bold text-sm uppercase tracking-widest">Online Shop</span>
-                </div>
-                <ChevronDown className={`w-5 h-5 transition-transform ${mobileActiveSubmenu === 'shop' ? 'rotate-180' : ''}`} />
-              </button>
-
-              {mobileActiveSubmenu === 'shop' && (
-                <div className="grid grid-cols-1 gap-2 pt-2 px-1">
-                  {shopItems.map(item => (
-                    <Link
-                      key={item.name}
-                      to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
-                      onClick={(e) => handleLinkClick(e, item.href)}
-                      className="flex items-center gap-4 p-4 bg-white dark:bg-white/5 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
-                    >
-                      <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">{item.icon}</div>
-                      <div className="flex flex-col">
-                        <span className="font-bold text-sm">{item.name}</span>
-                        <span className="text-xs text-gray-600 dark:text-slate-400">{item.desc}</span>
-                      </div>
-                    </Link>
-                  ))}
-                  <Link
-                    to="/shop"
-                    className="flex items-center justify-center gap-2 p-4 bg-emerald-600 text-white rounded-xl font-bold text-sm uppercase tracking-widest"
-                  >
-                    Browse All Services <ArrowRight className="w-4 h-4" />
-                  </Link>
                 </div>
               )}
             </div>

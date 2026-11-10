@@ -35,11 +35,6 @@ export const servicesItems = [
   { name: 'DeepsGuard360', icon: React.createElement(Shield, { className: "w-5 h-5" }), href: '/deepsguard360', desc: 'Integrated security operations SaaS.' },
 ];
 
-export const shopItems = [
-  { name: 'Microsoft Office', icon: React.createElement(Monitor, { className: "w-5 h-5" }), href: '/shop#shop-microsoft', desc: 'Microsoft 365 licensing (reseller).' },
-  { name: 'Starlink Kits', icon: React.createElement(Rocket, { className: "w-5 h-5" }), href: '/shop#shop-starlink', desc: 'Satellite internet hardware (reseller).' },
-];
-
 export const advantageItems = [
   { name: 'Infrastructure', icon: React.createElement(Cloud, { className: "w-5 h-5" }), href: '/advantage#adv-infra', desc: 'Zero legacy physical burden.' },
   { name: 'Scalability', icon: React.createElement(Zap, { className: "w-5 h-5" }), href: '/advantage#adv-scale', desc: 'Elastic cloud power.' },
@@ -57,10 +52,3 @@ export const ecosystemItems = [
   { name: 'Pe', icon: React.createElement(Wallet, { className: "w-5 h-5 text-amber-600" }), href: 'https://pe.dspng.tech', desc: 'Micro-payment & credit scoring.' },
   { name: 'RBM', icon: React.createElement(Monitor, { className: "w-5 h-5 text-blue-600" }), href: 'https://rbm.dspng.tech', desc: 'Reserve business monitoring.' },
 ];
-
-export const storeItem = {
-  name: 'Our Online Store',
-  icon: React.createElement(ShoppingBag, { className: "w-5 h-5" }),
-  href: '/shop',
-  desc: 'Shop for BITC optimization tools and sachet services.'
-};

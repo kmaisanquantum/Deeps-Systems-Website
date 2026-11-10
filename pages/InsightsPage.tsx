@@ -15,7 +15,6 @@ import {
   Twitter,
   Zap,
   BookOpen,
-  ShoppingBag,
   Rocket,
   Loader2,
   ExternalLink
@@ -554,13 +553,6 @@ const InsightsPage: React.FC = () => {
               >
                 <Rocket className="w-4 h-4" />
                 Outcome Solutions
-              </Link>
-              <Link
-                to="/shop"
-                className="px-6 py-3.5 rounded-2xl bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white font-bold text-sm uppercase tracking-wider flex items-center gap-2 hover:bg-emerald-50 dark:hover:bg-white/20 transition-all active-click"
-              >
-                <ShoppingBag className="w-4 h-4 text-emerald-600" />
-                Online Shop
               </Link>
             </div>
           </div>
