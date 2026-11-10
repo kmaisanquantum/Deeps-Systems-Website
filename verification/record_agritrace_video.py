@@ -156,7 +156,8 @@ def synthesize_narration(narration_path: Path, audio_path: Path) -> str:
     espeak-ng synthesiser when the network or the TTS endpoint is unavailable.
     """
     command = [
-        "python", "-m", "edge_tts", "--voice", "en-US-GuyNeural",
+        "python", "-m", "edge_tts", "--voice", "en-US-JennyNeural",
+        "--rate=-5%",
         "--file", str(narration_path), "--write-media", str(audio_path),
     ]
     # Honour a proxy when the environment provides one (edge-tts does not read
@@ -172,7 +173,7 @@ def synthesize_narration(narration_path: Path, audio_path: Path) -> str:
     except subprocess.CalledProcessError:
         pass
     if audio_path.exists() and audio_path.stat().st_size > 0:
-        return "edge-tts (en-US-GuyNeural)"
+        return "edge-tts (en-US-JennyNeural)"
 
     if shutil.which("espeak-ng") is None:
         raise SystemExit(
@@ -181,7 +182,7 @@ def synthesize_narration(narration_path: Path, audio_path: Path) -> str:
         )
     print("edge-tts unavailable; using the offline espeak-ng voice instead.")
     subprocess.run(
-        ["espeak-ng", "-v", "en-us", "-s", "150", "-p", "45", "-f", str(narration_path), "-w", str(audio_path)],
+        ["espeak-ng", "-v", "en-us+f3", "-s", "150", "-p", "45", "-f", str(narration_path), "-w", str(audio_path)],
         check=True,
     )
     return "espeak-ng (offline)"

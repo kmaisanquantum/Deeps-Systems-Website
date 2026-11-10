@@ -14,6 +14,7 @@ The narration is generated from public/videos/deepsguard360-promo-30s.vtt.
 
 import argparse
 import asyncio
+import os
 import shutil
 import subprocess
 import tempfile
@@ -152,6 +153,45 @@ def narration_from_vtt(vtt_path: Path) -> str:
     return "\n".join(captions)
 
 
+def synthesize_narration(narration_path: Path, audio_path: Path) -> str:
+    """Render the narration script to an audio file.
+
+    Prefers edge-tts (a natural neural voice) and falls back to the offline
+    espeak-ng synthesiser when the network or the TTS endpoint is unavailable.
+    """
+    command = [
+        "python", "-m", "edge_tts", "--voice", "en-US-JennyNeural",
+        "--rate=-5%",
+        "--file", str(narration_path), "--write-media", str(audio_path),
+    ]
+    # Honour a proxy when the environment provides one (edge-tts does not read
+    # the proxy environment variables on its own).
+    proxy = (
+        os.environ.get("HTTPS_PROXY") or os.environ.get("https_proxy")
+        or os.environ.get("HTTP_PROXY") or os.environ.get("http_proxy")
+    )
+    if proxy:
+        command.extend(["--proxy", proxy])
+    try:
+        subprocess.run(command, check=True)
+    except subprocess.CalledProcessError:
+        pass
+    if audio_path.exists() and audio_path.stat().st_size > 0:
+        return "edge-tts (en-US-JennyNeural)"
+
+    if shutil.which("espeak-ng") is None:
+        raise SystemExit(
+            "Narration generation failed and espeak-ng is not installed. "
+            "Install edge-tts with 'python -m pip install edge-tts' or install espeak-ng."
+        )
+    print("edge-tts unavailable; using the offline espeak-ng voice instead.")
+    subprocess.run(
+        ["espeak-ng", "-v", "en-us+f3", "-s", "150", "-p", "45", "-f", str(narration_path), "-w", str(audio_path)],
+        check=True,
+    )
+    return "espeak-ng (offline)"
+
+
 def encode_video(frames: list[Path], output_path: Path, captions_path: Path) -> None:
     if shutil.which("ffmpeg") is None:
         raise SystemExit("ffmpeg was not found. Install it and rerun the script.")
@@ -171,16 +211,8 @@ def encode_video(frames: list[Path], output_path: Path, captions_path: Path) -> 
         narration_path.write_text(narration_from_vtt(captions_path), encoding="utf-8")
         make_concat_list(frames, concat_path, 2.0)
 
-        try:
-            subprocess.run(
-                [
-                    "python", "-m", "edge_tts", "--voice", "en-US-GuyNeural",
-                    "--file", str(narration_path), "--write-media", str(audio_path),
-                ],
-                check=True,
-            )
-        except subprocess.CalledProcessError as error:
-            raise SystemExit("Narration generation failed. Install edge-tts with 'python -m pip install edge-tts' and retry.") from error
+        voice = synthesize_narration(narration_path, audio_path)
+        print(f"Narration synthesised with {voice}.")
 
         subprocess.run(
             [
@@ -194,12 +226,15 @@ def encode_video(frames: list[Path], output_path: Path, captions_path: Path) -> 
         subprocess.run(
             [
                 "ffmpeg", "-y", "-i", str(silent_video_path), "-i", str(audio_path),
-                "-c:v", "copy", "-c:a", "aac", "-shortest", "-movflags", "+faststart",
-                str(voiced_video_path),
+                "-filter_complex", "[1:a]apad[a]", "-map", "0:v", "-map", "[a]",
+                "-c:v", "copy", "-c:a", "aac", "-t", "30",
+                "-movflags", "+faststart", str(voiced_video_path),
             ],
             check=True,
         )
-        voiced_video_path.replace(output_path)
+        # shutil.move (rather than Path.replace) so this works when the temp
+        # directory and the output live on different filesystems.
+        shutil.move(str(voiced_video_path), str(output_path))
 
 
 def main() -> None:
