@@ -3,7 +3,6 @@ import cors from 'cors';
 import pg from 'pg';
 import path from 'path';
 import fs from 'fs/promises';
-import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
 import bcrypt from 'bcryptjs';
@@ -568,9 +567,9 @@ app.head('/status', handleStatus);
 app.head('/api/status', handleStatus);
 
 // ---------------------------------------------------------------------------
-// Live Visitors Log: lightweight JSON-file storage (no database dependency).
-// Privacy: stores only timestamp, path and a coarse location. Raw IPs are never
-// persisted in a readable form nor returned by the read endpoint.
+// Visitors store: lightweight JSON-file storage (no database dependency).
+// Privacy: each entry holds only { timestamp, path, location }. No cookies, no
+// fingerprinting and no IP address is stored.
 // ---------------------------------------------------------------------------
 const visitsFilePath = path.join(__dirname, 'data', 'visits.json');
 const MAX_STORED_VISITS = 500;
@@ -594,11 +593,6 @@ async function writeVisits(visits) {
   await fs.writeFile(visitsFilePath, JSON.stringify(visits), 'utf8');
 }
 
-function hashIp(ip) {
-  if (!ip) return null;
-  return crypto.createHash('sha256').update(String(ip)).digest('hex').slice(0, 16);
-}
-
 // Coarse location derived from CDN/proxy country headers when available,
 // otherwise omitted. No external lookup is performed.
 function coarseLocationFromRequest(req) {
@@ -614,16 +608,12 @@ app.post('/api/visits', async (req, res) => {
     const rawPath = typeof req.body?.path === 'string' ? req.body.path : '';
     const visitPath = (rawPath || '/').slice(0, 300);
 
-    const forwarded = req.headers['x-forwarded-for'];
-    const ip = (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : null)
-      || req.socket?.remoteAddress
-      || null;
-
+    // Store only anonymous visit data: timestamp + path (+ coarse country).
+    // No cookies, no fingerprinting, no IP address is stored.
     const visit = {
       timestamp: new Date().toISOString(),
       path: visitPath,
       location: coarseLocationFromRequest(req),
-      ipHash: hashIp(ip),
     };
 
     const visits = await readVisits();
@@ -649,6 +639,64 @@ app.get('/api/visits/recent', async (req, res) => {
   } catch (err) {
     console.error('[API] Failed to retrieve visits:', err);
     return res.status(500).json({ error: 'Failed to retrieve visits.' });
+  }
+});
+
+// Calendar-day helpers for the aggregated stats endpoint.
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function startOfDay(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+// Monday-based start of the week containing `date`.
+function startOfWeek(date) {
+  const d = startOfDay(date);
+  const offset = (d.getDay() + 6) % 7; // 0 = Monday
+  d.setDate(d.getDate() - offset);
+  return d;
+}
+
+app.get('/api/visits/stats', async (req, res) => {
+  try {
+    const visits = await readVisits();
+    const timestamps = visits
+      .map((v) => new Date(v.timestamp).getTime())
+      .filter((t) => !Number.isNaN(t));
+
+    const todayStart = startOfDay(new Date()).getTime();
+    const yesterdayStart = todayStart - DAY_MS;
+    const thisWeekStart = startOfWeek(new Date()).getTime();
+    const lastWeekStart = thisWeekStart - 7 * DAY_MS;
+
+    let today = 0;
+    let yesterday = 0;
+    let thisWeek = 0;
+    let lastWeek = 0;
+
+    for (const t of timestamps) {
+      if (t >= todayStart) today += 1;
+      else if (t >= yesterdayStart) yesterday += 1;
+
+      if (t >= thisWeekStart) thisWeek += 1;
+      else if (t >= lastWeekStart) lastWeek += 1;
+    }
+
+    // Counts for the last 14 calendar days, oldest first (index 13 = today).
+    const daily = new Array(14).fill(0);
+    const firstDayStart = todayStart - 13 * DAY_MS;
+    for (const t of timestamps) {
+      if (t < firstDayStart) continue;
+      const index = Math.floor((t - firstDayStart) / DAY_MS);
+      if (index >= 0 && index < daily.length) daily[index] += 1;
+    }
+
+    return res.json({ today, yesterday, thisWeek, lastWeek, daily });
+  } catch (err) {
+    console.error('[API] Failed to compute visit stats:', err);
+    return res.status(500).json({ error: 'Failed to compute visit stats.' });
   }
 });
 
