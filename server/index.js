@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import pg from 'pg';
 import path from 'path';
+import fs from 'fs/promises';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
 import bcrypt from 'bcryptjs';
@@ -564,6 +566,91 @@ app.get('/status', handleStatus);
 app.get('/api/status', handleStatus);
 app.head('/status', handleStatus);
 app.head('/api/status', handleStatus);
+
+// ---------------------------------------------------------------------------
+// Live Visitors Log: lightweight JSON-file storage (no database dependency).
+// Privacy: stores only timestamp, path and a coarse location. Raw IPs are never
+// persisted in a readable form nor returned by the read endpoint.
+// ---------------------------------------------------------------------------
+const visitsFilePath = path.join(__dirname, 'data', 'visits.json');
+const MAX_STORED_VISITS = 500;
+const RECENT_VISITS_LIMIT = 10;
+
+async function readVisits() {
+  try {
+    const raw = await fs.readFile(visitsFilePath, 'utf8');
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      console.warn('[Visitors] Failed to read visits file:', err.message);
+    }
+    return [];
+  }
+}
+
+async function writeVisits(visits) {
+  await fs.mkdir(path.dirname(visitsFilePath), { recursive: true });
+  await fs.writeFile(visitsFilePath, JSON.stringify(visits), 'utf8');
+}
+
+function hashIp(ip) {
+  if (!ip) return null;
+  return crypto.createHash('sha256').update(String(ip)).digest('hex').slice(0, 16);
+}
+
+// Coarse location derived from CDN/proxy country headers when available,
+// otherwise omitted. No external lookup is performed.
+function coarseLocationFromRequest(req) {
+  const country =
+    req.headers['cf-ipcountry'] ||
+    req.headers['x-vercel-ip-country'] ||
+    req.headers['x-country-code'];
+  return typeof country === 'string' && country.trim() ? country.trim().toUpperCase() : null;
+}
+
+app.post('/api/visits', async (req, res) => {
+  try {
+    const rawPath = typeof req.body?.path === 'string' ? req.body.path : '';
+    const visitPath = (rawPath || '/').slice(0, 300);
+
+    const forwarded = req.headers['x-forwarded-for'];
+    const ip = (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : null)
+      || req.socket?.remoteAddress
+      || null;
+
+    const visit = {
+      timestamp: new Date().toISOString(),
+      path: visitPath,
+      location: coarseLocationFromRequest(req),
+      ipHash: hashIp(ip),
+    };
+
+    const visits = await readVisits();
+    visits.push(visit);
+    await writeVisits(visits.slice(-MAX_STORED_VISITS));
+
+    return res.status(201).json({ success: true });
+  } catch (err) {
+    console.error('[API] Failed to record visit:', err);
+    return res.status(500).json({ error: 'Failed to record visit.' });
+  }
+});
+
+app.get('/api/visits/recent', async (req, res) => {
+  try {
+    const visits = await readVisits();
+    const recent = visits.slice(-RECENT_VISITS_LIMIT).reverse().map((v) => ({
+      timestamp: v.timestamp,
+      path: v.path,
+      location: v.location || null,
+    }));
+    return res.json({ total: visits.length, recent });
+  } catch (err) {
+    console.error('[API] Failed to retrieve visits:', err);
+    return res.status(500).json({ error: 'Failed to retrieve visits.' });
+  }
+});
 
 // Reusable SMTP transporter configuration via Nodemailer
 const transporter = nodemailer.createTransport({
