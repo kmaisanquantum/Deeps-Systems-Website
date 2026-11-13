@@ -3,6 +3,7 @@ import cors from 'cors';
 import pg from 'pg';
 import path from 'path';
 import fs from 'fs/promises';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
 import bcrypt from 'bcryptjs';
@@ -568,12 +569,15 @@ app.head('/api/status', handleStatus);
 
 // ---------------------------------------------------------------------------
 // Visitors store: lightweight JSON-file storage (no database dependency).
-// Privacy: each entry holds only { timestamp, path, location }. No cookies, no
-// fingerprinting and no IP address is stored.
+// Privacy: each entry holds { timestamp, path, location, ipHash }. The IP is
+// stored only as a truncated SHA-256 hash (never in raw form) and is used
+// solely to deduplicate visits from the same client.
 // ---------------------------------------------------------------------------
 const visitsFilePath = path.join(__dirname, 'data', 'visits.json');
 const MAX_STORED_VISITS = 500;
 const RECENT_VISITS_LIMIT = 10;
+const VISIT_DEDUP_WINDOW_MS = 30 * 60 * 1000;
+const BOT_UA_PATTERN = /bot|crawl|spider|slurp|ping|monitor|headless/i;
 
 async function readVisits() {
   try {
@@ -593,6 +597,11 @@ async function writeVisits(visits) {
   await fs.writeFile(visitsFilePath, JSON.stringify(visits), 'utf8');
 }
 
+function hashIp(ip) {
+  if (!ip) return null;
+  return crypto.createHash('sha256').update(String(ip)).digest('hex').slice(0, 16);
+}
+
 // Coarse location derived from CDN/proxy country headers when available,
 // otherwise omitted. No external lookup is performed.
 function coarseLocationFromRequest(req) {
@@ -605,18 +614,43 @@ function coarseLocationFromRequest(req) {
 
 app.post('/api/visits', async (req, res) => {
   try {
+    // Ignore obvious bots and crawlers without recording anything.
+    const userAgent = req.headers['user-agent'] || '';
+    if (BOT_UA_PATTERN.test(userAgent)) {
+      return res.status(200).json({ success: true, ignored: true });
+    }
+
     const rawPath = typeof req.body?.path === 'string' ? req.body.path : '';
     const visitPath = (rawPath || '/').slice(0, 300);
 
-    // Store only anonymous visit data: timestamp + path (+ coarse country).
-    // No cookies, no fingerprinting, no IP address is stored.
+    const forwarded = req.headers['x-forwarded-for'];
+    const ip = (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : null)
+      || req.socket?.remoteAddress
+      || null;
+    const ipHash = hashIp(ip);
+
+    const visits = await readVisits();
+
+    // Deduplicate: skip if this IP already has a visit within the window.
+    if (ipHash) {
+      const now = Date.now();
+      const isDuplicate = visits.some((v) => {
+        if (v.ipHash !== ipHash) return false;
+        const t = new Date(v.timestamp).getTime();
+        return !Number.isNaN(t) && (now - t) < VISIT_DEDUP_WINDOW_MS;
+      });
+      if (isDuplicate) {
+        return res.status(200).json({ success: true, deduplicated: true });
+      }
+    }
+
     const visit = {
       timestamp: new Date().toISOString(),
       path: visitPath,
       location: coarseLocationFromRequest(req),
+      ipHash,
     };
 
-    const visits = await readVisits();
     visits.push(visit);
     await writeVisits(visits.slice(-MAX_STORED_VISITS));
 

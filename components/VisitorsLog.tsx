@@ -26,6 +26,8 @@ const timeAgo = (iso: string): string => {
   return `${days} d ago`;
 };
 
+const VISIT_FLAG = 'dg-visit-logged';
+
 const VisitorsLog: React.FC = () => {
   const [data, setData] = useState<VisitsData | null>(null);
 
@@ -34,12 +36,28 @@ const VisitorsLog: React.FC = () => {
 
     const load = async () => {
       try {
-        // Record the current visit, then read the latest stats.
-        await fetch(getApiUrl('/api/visits'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ path: window.location.pathname }),
-        });
+        // Record one visit per browser session (not per mount/refresh).
+        let alreadyLogged = false;
+        try {
+          alreadyLogged = Boolean(sessionStorage.getItem(VISIT_FLAG));
+        } catch {
+          alreadyLogged = false;
+        }
+
+        if (!alreadyLogged) {
+          const postRes = await fetch(getApiUrl('/api/visits'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ path: window.location.pathname }),
+          });
+          if (postRes.ok) {
+            try {
+              sessionStorage.setItem(VISIT_FLAG, '1');
+            } catch {
+              // Ignore storage failures (e.g. private mode).
+            }
+          }
+        }
 
         const res = await fetch(getApiUrl('/api/visits/recent'), {
           headers: { Accept: 'application/json' },
