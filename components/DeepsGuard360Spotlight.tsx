@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Headset, HeartPulse, Landmark, Shield, ShieldCheck, Sprout, Truck, Workflow, Zap } from 'lucide-react';
+import { ArrowRight, Headset, Landmark, Shield, ShieldCheck, Sprout, Truck, Workflow } from 'lucide-react';
 
 const platforms = [
   {
@@ -71,16 +71,7 @@ const DeepsGuard360Spotlight: React.FC = () => (
         <h2 className="font-montserrat text-3xl font-extrabold leading-tight md:text-5xl">One suite. <span className="text-sky-400">Every operation covered.</span></h2>
         <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-slate-300 md:text-base">Purpose-built SaaS platforms for Papua New Guinea and the Pacific—each one connecting teams, field operations and customers in a single workspace.</p>
       </div>
-      <Link to="/deepspulse" className="group mt-12 flex flex-col items-start gap-5 rounded-3xl border border-emerald-400/30 bg-gradient-to-r from-emerald-500/15 via-sky-500/10 to-emerald-500/5 p-6 transition hover:border-emerald-400/50 hover:from-emerald-500/20 md:flex-row md:items-center md:p-7">
-        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-300"><HeartPulse className="h-7 w-7" /></span>
-        <div className="min-w-0 flex-1">
-          <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.2em] text-emerald-300"><Zap className="h-3 w-3" /> Powers every platform</div>
-          <h3 className="font-montserrat text-xl font-bold text-white md:text-2xl">Deeps Pulse</h3>
-          <p className="mt-2 text-sm leading-relaxed text-slate-300">The shared engagement engine embedded across the Deeps ecosystem—gamification, recognition and rewards that make enterprise software people actually want to use.</p>
-        </div>
-        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white transition group-hover:bg-emerald-500">Explore Pulse <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span>
-      </Link>
-      <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {platforms.map(({ name, description, icon: Icon, href, demo, pills }) => (
           <article key={name} className="flex flex-col rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-sky-400/30 hover:bg-white/10">
             <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500/10 text-sky-300"><Icon className="h-6 w-6" /></span>
