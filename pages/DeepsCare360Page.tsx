@@ -81,15 +81,21 @@ const DeepsCare360Page: React.FC = () => (
     <section className="px-5 pb-16 md:px-6 md:pb-24">
       <div className="mx-auto max-w-5xl">
         <div className="overflow-hidden rounded-3xl border border-gray-200 bg-gray-950 shadow-2xl shadow-teal-950/20 dark:border-white/10">
-          <div className="aspect-video bg-black">
-            <video className="h-full w-full object-cover" controls playsInline preload="metadata" aria-label="DeepsCare360 product demo video">
-              <source src="/videos/deepscare360-promo-30s.mp4" type="video/mp4" />
-              <track kind="captions" src="/videos/deepscare360-promo-30s.vtt" srcLang="en" label="English" default />
-              Your browser does not support HTML5 video. The demo video is not available yet; use the interactive demo link instead.
-            </video>
+          <div className="grid gap-px bg-white/5 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { value: '24/7', label: 'Proactive monitoring' },
+              { value: 'SLA', label: 'Response & resolution' },
+              { value: 'Assets', label: 'Device register' },
+              { value: 'Export', label: 'Client reporting' },
+            ].map((stat) => (
+              <div key={stat.label} className="bg-gray-950 px-6 py-8">
+                <p className="font-montserrat text-3xl font-extrabold text-teal-300">{stat.value}</p>
+                <p className="mt-2 text-xs font-semibold uppercase tracking-widest text-slate-400">{stat.label}</p>
+              </div>
+            ))}
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-black/40 px-5 py-3">
-            <span className="text-xs text-slate-400">DeepsCare360 · Product walkthrough</span>
+            <span className="text-xs text-slate-400">DeepsCare360 · Platform at a glance</span>
             <Link to="/deepscare360/demo" className="text-xs font-bold text-teal-300">Open interactive demo →</Link>
           </div>
         </div>
