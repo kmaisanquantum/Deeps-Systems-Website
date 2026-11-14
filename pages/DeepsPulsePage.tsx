@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Activity, ArrowRight, Award, BarChart3, Bell, Check, Gift, Headset,
+  Activity, ArrowRight, Award, BarChart3, Bell, Check, Gift, Headset, HeartPulse,
   Landmark, Lock, RefreshCw, ScrollText, Shield, ShieldCheck, SlidersHorizontal,
   Sprout, Trophy, Truck, WalletCards, Workflow, Zap,
 } from 'lucide-react';
