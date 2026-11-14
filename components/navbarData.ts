@@ -12,6 +12,7 @@ import {
   Headset,
   FileSearch,
   Shield,
+  HeartPulse,
   Lightbulb,
   Building2,
   Store,
@@ -31,6 +32,7 @@ export const servicesItems = [
   { name: 'Energy & Logistics', icon: React.createElement(Truck, { className: "w-5 h-5" }), href: '/deepsfleet360', desc: 'Quantum-inspired pathfinding.' },
   { name: 'Agribusiness', icon: React.createElement(Sprout, { className: "w-5 h-5" }), href: '/agritrace', desc: 'Traceability-as-a-Service.' },
   { name: 'DeepsGuard360', icon: React.createElement(Shield, { className: "w-5 h-5" }), href: '/deepsguard360', desc: 'Integrated security operations SaaS.' },
+  { name: 'Deeps Pulse', icon: React.createElement(HeartPulse, { className: "w-5 h-5" }), href: '/deepspulse', desc: 'Engagement engine for every platform.' },
 ];
 
 export const advantageItems = [
