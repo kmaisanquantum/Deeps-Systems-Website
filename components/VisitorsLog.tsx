@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Activity } from 'lucide-react';
+import { Activity, Shield } from 'lucide-react';
 import { getApiUrl } from '../utils/api';
 
 interface Visit {
@@ -241,7 +241,10 @@ const VisitorsLog: React.FC = () => {
             </div>
           )}
 
-          <p className="mt-6 text-[11px] text-slate-500">Anonymous visit stats only.</p>
+          <p className="mt-6 flex items-center gap-2 text-[11px] text-slate-400">
+            <Shield className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            Your IP address is recorded and tracked for security and analytics purposes.
+          </p>
         </div>
       </div>
     </section>
