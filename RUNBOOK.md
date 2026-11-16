@@ -21,6 +21,7 @@ All configuration is managed securely via environment variables. No secrets are 
 | Environment Variable | Description | Default Fallback |
 | :--- | :--- | :--- |
 | `PORT` | Listening port for the monolithic server container. | `3000` |
+| `VITE_API_BASE_URL` | Build-time frontend API origin. Leave unset for the monolithic same-origin deployment (relative `/api/*` requests); set to the Node backend origin (e.g. `https://api.dspng.tech`) only when the SPA is hosted separately from the server. | `''` (same-origin) |
 | `DATABASE_URL` | PostgreSQL connection string or `'mock'` for simulated offline mode. | Uses standard PG credentials or local. |
 | `FORMSPREE_URL` | Destination endpoint for best-effort email notification. | `https://formspree.io/f/mqakppov` |
 | `MAIL_SALES` | Destination recipient for orders / purchases. | `sales@dspng.tech` |
