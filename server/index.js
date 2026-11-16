@@ -695,41 +695,48 @@ function startOfWeek(date) {
   return d;
 }
 
+// Aggregate a list of visit records into today / yesterday / thisWeek / lastWeek
+// counts plus a 14-day daily series (oldest first, index 13 = today). Shared by
+// the stats API endpoint and the daily digest email.
+function computeVisitStats(visits) {
+  const timestamps = visits
+    .map((v) => new Date(v.timestamp).getTime())
+    .filter((t) => !Number.isNaN(t));
+
+  const todayStart = startOfDay(new Date()).getTime();
+  const yesterdayStart = todayStart - DAY_MS;
+  const thisWeekStart = startOfWeek(new Date()).getTime();
+  const lastWeekStart = thisWeekStart - 7 * DAY_MS;
+
+  let today = 0;
+  let yesterday = 0;
+  let thisWeek = 0;
+  let lastWeek = 0;
+
+  for (const t of timestamps) {
+    if (t >= todayStart) today += 1;
+    else if (t >= yesterdayStart) yesterday += 1;
+
+    if (t >= thisWeekStart) thisWeek += 1;
+    else if (t >= lastWeekStart) lastWeek += 1;
+  }
+
+  // Counts for the last 14 calendar days, oldest first (index 13 = today).
+  const daily = new Array(14).fill(0);
+  const firstDayStart = todayStart - 13 * DAY_MS;
+  for (const t of timestamps) {
+    if (t < firstDayStart) continue;
+    const index = Math.floor((t - firstDayStart) / DAY_MS);
+    if (index >= 0 && index < daily.length) daily[index] += 1;
+  }
+
+  return { today, yesterday, thisWeek, lastWeek, daily };
+}
+
 app.get('/api/visits/stats', async (req, res) => {
   try {
     const visits = await readVisits();
-    const timestamps = visits
-      .map((v) => new Date(v.timestamp).getTime())
-      .filter((t) => !Number.isNaN(t));
-
-    const todayStart = startOfDay(new Date()).getTime();
-    const yesterdayStart = todayStart - DAY_MS;
-    const thisWeekStart = startOfWeek(new Date()).getTime();
-    const lastWeekStart = thisWeekStart - 7 * DAY_MS;
-
-    let today = 0;
-    let yesterday = 0;
-    let thisWeek = 0;
-    let lastWeek = 0;
-
-    for (const t of timestamps) {
-      if (t >= todayStart) today += 1;
-      else if (t >= yesterdayStart) yesterday += 1;
-
-      if (t >= thisWeekStart) thisWeek += 1;
-      else if (t >= lastWeekStart) lastWeek += 1;
-    }
-
-    // Counts for the last 14 calendar days, oldest first (index 13 = today).
-    const daily = new Array(14).fill(0);
-    const firstDayStart = todayStart - 13 * DAY_MS;
-    for (const t of timestamps) {
-      if (t < firstDayStart) continue;
-      const index = Math.floor((t - firstDayStart) / DAY_MS);
-      if (index >= 0 && index < daily.length) daily[index] += 1;
-    }
-
-    return res.json({ today, yesterday, thisWeek, lastWeek, daily });
+    return res.json(computeVisitStats(visits));
   } catch (err) {
     console.error('[API] Failed to compute visit stats:', err);
     return res.status(500).json({ error: 'Failed to compute visit stats.' });
@@ -777,6 +784,139 @@ function escapeHtml(str) {
 // Configurable recipient addresses
 const MAIL_SALES = process.env.MAIL_SALES || 'sales@dspng.tech';
 const MAIL_ADMIN = process.env.MAIL_ADMIN || 'wokman@dspng.tech';
+
+// ---------------------------------------------------------------------------
+// Daily visitor digest: emails a summary of the day's traffic to MAIL_ADMIN.
+// Reuses the shared `transporter`; falls back to console logging when SMTP
+// credentials are absent (same pattern as sendInquiryEmail).
+// ---------------------------------------------------------------------------
+const VISIT_DIGEST_HOUR = 23;
+const VISIT_DIGEST_MINUTE = 55;
+
+function localDateKey(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function formatVisitTime(iso) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+function buildVisitDigestHtml({ stats, recent, generatedAt }) {
+  const rows = recent.length
+    ? recent
+        .map(
+          (v) => `
+        <tr>
+          <td style="padding: 6px 10px; border-bottom: 1px solid #e2e8f0;">${escapeHtml(formatVisitTime(v.timestamp))}</td>
+          <td style="padding: 6px 10px; border-bottom: 1px solid #e2e8f0;">${escapeHtml(v.path || '/')}</td>
+          <td style="padding: 6px 10px; border-bottom: 1px solid #e2e8f0; font-family: monospace;">${escapeHtml(v.ip || '—')}</td>
+          <td style="padding: 6px 10px; border-bottom: 1px solid #e2e8f0;">${escapeHtml(v.location || '—')}</td>
+        </tr>`
+        )
+        .join('')
+    : '<tr><td colspan="4" style="padding: 10px; color: #64748b;">No visits recorded in this window.</td></tr>';
+
+  return `
+    <div style="font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 640px; border: 1px solid #e2e8f0; border-radius: 8px;">
+      <h2 style="color: #10b981; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">Daily Visitor Report</h2>
+
+      <table style="border-collapse: collapse; margin-bottom: 20px;">
+        <tr><td style="padding: 4px 16px 4px 0;"><strong>Today</strong></td><td style="padding: 4px 0;">${stats.today}</td></tr>
+        <tr><td style="padding: 4px 16px 4px 0;"><strong>Yesterday</strong></td><td style="padding: 4px 0;">${stats.yesterday}</td></tr>
+        <tr><td style="padding: 4px 16px 4px 0;"><strong>This week</strong></td><td style="padding: 4px 0;">${stats.thisWeek}</td></tr>
+        <tr><td style="padding: 4px 16px 4px 0;"><strong>Last week</strong></td><td style="padding: 4px 0;">${stats.lastWeek}</td></tr>
+        <tr><td style="padding: 4px 16px 4px 0;"><strong>Last 14 days</strong></td><td style="padding: 4px 0;">${stats.daily.join(', ')}</td></tr>
+      </table>
+
+      <h3 style="margin-bottom: 8px;">Recent visits</h3>
+      <table style="border-collapse: collapse; width: 100%; font-size: 13px;">
+        <thead>
+          <tr style="text-align: left; background-color: #f8fafc;">
+            <th style="padding: 6px 10px; border-bottom: 2px solid #e2e8f0;">Time</th>
+            <th style="padding: 6px 10px; border-bottom: 2px solid #e2e8f0;">Page</th>
+            <th style="padding: 6px 10px; border-bottom: 2px solid #e2e8f0;">IP</th>
+            <th style="padding: 6px 10px; border-bottom: 2px solid #e2e8f0;">Location</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+
+      <p style="font-size: 11px; color: #64748b; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+        Automated daily visitor report generated at ${escapeHtml(generatedAt)} by Deeps Systems.
+      </p>
+    </div>
+  `;
+}
+
+async function sendVisitDigest() {
+  try {
+    const visits = await readVisits();
+    const stats = computeVisitStats(visits);
+    const recent = visits
+      .slice(-RECENT_VISITS_LIMIT)
+      .reverse()
+      .map((v) => ({
+        timestamp: v.timestamp,
+        path: v.path || '/',
+        ip: v.ip || null,
+        location: v.location || null,
+      }));
+
+    const now = new Date();
+    const subjectLine = `Deeps Systems — Daily visitor report (${localDateKey(now)})`;
+    const htmlBody = buildVisitDigestHtml({ stats, recent, generatedAt: now.toISOString() });
+
+    const mailOptions = {
+      from: process.env.SMTP_USER ? `"Deeps Systems" <${process.env.SMTP_USER}>` : '"Deeps Systems" <no-reply@dspng.tech>',
+      to: MAIL_ADMIN,
+      subject: subjectLine,
+      html: htmlBody,
+    };
+
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.log('[Nodemailer] SMTP credentials omitted. Logging visitor digest instead:');
+      console.log('To:', MAIL_ADMIN);
+      console.log('Subject:', subjectLine);
+      console.log('Stats:', JSON.stringify(stats));
+      console.log('Body Preview:', htmlBody.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 300) + '...');
+      return;
+    }
+
+    console.log(`[Nodemailer] Dispatching daily visitor digest to: ${MAIL_ADMIN}`);
+    await transporter.sendMail(mailOptions);
+    console.log('[Nodemailer] Daily visitor digest dispatched successfully.');
+  } catch (err) {
+    console.error('[Visitors] Failed to send daily visitor digest:', err);
+  }
+}
+
+// Schedule the digest for the next 11:55 PM local server time, then re-arm daily.
+function scheduleVisitDigest() {
+  const now = new Date();
+  const next = new Date(now);
+  next.setHours(VISIT_DIGEST_HOUR, VISIT_DIGEST_MINUTE, 0, 0);
+  if (next <= now) next.setDate(next.getDate() + 1);
+
+  const delay = next.getTime() - now.getTime();
+  console.log(`[Visitors] Daily digest scheduled in ${Math.round(delay / 1000)}s (at ${next.toISOString()}).`);
+
+  setTimeout(() => {
+    sendVisitDigest();
+    scheduleVisitDigest();
+  }, delay);
+}
+
+scheduleVisitDigest();
+
+// Optional one-off digest at boot, enabled via VISIT_DIGEST_ON_BOOT (testing).
+if (process.env.VISIT_DIGEST_ON_BOOT === 'true') {
+  sendVisitDigest();
+}
 
 // Direct SMTP email notification via Nodemailer
 async function sendInquiryEmail(type, data) {

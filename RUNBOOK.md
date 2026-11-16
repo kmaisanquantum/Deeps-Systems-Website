@@ -36,6 +36,7 @@ All configuration is managed securely via environment variables. No secrets are 
 | `SMTP_DEBUG` | Enables verbose Nodemailer connection and socket-level protocol logging. | `false` |
 | `SMTP_USER` | SMTP authentication username; also used to derive the `from` sender address. | `''` (empty; if unset, emails are logged instead of sent) |
 | `SMTP_PASS` | SMTP authentication password. | `''` (empty; if unset, emails are logged instead of sent) |
+| `VISIT_DIGEST_ON_BOOT` | When set to `'true'`, sends the daily visitor report digest immediately on server boot (useful for testing). The digest otherwise runs daily at 11:55 PM local server time. | `false` |
 | `USD_TO_PGK_RATE` | Fallback / seed USD to PGK exchange rate when FX provider is offline. | `3.6` |
 | `FX_PROVIDER_URL` | Live FX API endpoint URL for real-time USD->PGK exchange rates. | `https://open.er-api.com/v6/latest/USD` |
 | `FX_REFRESH_MINUTES` | Interval in minutes to refresh live FX rate cache. | `360` (6 hours) |
