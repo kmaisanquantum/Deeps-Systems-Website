@@ -648,6 +648,7 @@ app.post('/api/visits', async (req, res) => {
       timestamp: new Date().toISOString(),
       path: visitPath,
       location: coarseLocationFromRequest(req),
+      ip,
       ipHash,
     };
 
@@ -668,6 +669,7 @@ app.get('/api/visits/recent', async (req, res) => {
       timestamp: v.timestamp,
       path: v.path,
       location: v.location || null,
+      ip: v.ip || null,
     }));
     return res.json({ total: visits.length, recent });
   } catch (err) {

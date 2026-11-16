@@ -6,6 +6,7 @@ interface Visit {
   timestamp: string;
   path: string;
   location?: string | null;
+  ip?: string | null;
 }
 
 interface VisitsData {
@@ -232,6 +233,9 @@ const VisitorsLog: React.FC = () => {
                 >
                   <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" />
                   {timeAgo(visit.timestamp)} · {visit.path}
+                  {visit.ip && (
+                    <span className="font-mono text-xs text-slate-500">{visit.ip}</span>
+                  )}
                 </span>
               ))}
             </div>
