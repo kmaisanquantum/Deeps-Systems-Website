@@ -9,6 +9,7 @@ import nodemailer from 'nodemailer';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
+import geoip from 'geoip-lite';
 
 const { Pool } = pg;
 
@@ -602,14 +603,64 @@ function hashIp(ip) {
   return crypto.createHash('sha256').update(String(ip)).digest('hex').slice(0, 16);
 }
 
-// Coarse location derived from CDN/proxy country headers when available,
-// otherwise omitted. No external lookup is performed.
-function coarseLocationFromRequest(req) {
-  const country =
+// Resolve a readable location ("City, CC" or just "CC") from an IP using the
+// bundled offline MaxMind GeoLite database (no external API calls, no rate
+// limits). Returns null for private/localhost or otherwise unresolvable IPs.
+function resolveIpLocation(ip) {
+  let candidate = typeof ip === 'string' ? ip.trim() : '';
+  if (candidate.startsWith('::ffff:')) candidate = candidate.slice(7);
+  if (!candidate) return null;
+
+  try {
+    const geo = geoip.lookup(candidate);
+    if (geo && geo.country) {
+      const cc = String(geo.country).toUpperCase();
+      const city = geo.city ? String(geo.city).trim() : '';
+      return city ? `${city}, ${cc}` : cc;
+    }
+  } catch (err) {
+    console.warn('[GeoIP] lookup failed:', err.message);
+  }
+  return null;
+}
+
+// Coarse location for a visitor. CDN/proxy country headers are used as a fast
+// path when present; otherwise the IP is resolved offline via GeoIP.
+function coarseLocationFromRequest(req, ip) {
+  const headerCountry =
     req.headers['cf-ipcountry'] ||
     req.headers['x-vercel-ip-country'] ||
     req.headers['x-country-code'];
-  return typeof country === 'string' && country.trim() ? country.trim().toUpperCase() : null;
+  const country = typeof headerCountry === 'string' && headerCountry.trim()
+    ? headerCountry.trim().toUpperCase()
+    : null;
+
+  if (country) return country;
+  return resolveIpLocation(ip);
+}
+
+// One-time backfill: resolve locations for visits stored before GeoIP existed
+// (they have an IP but a null location).
+async function backfillVisitLocations() {
+  try {
+    const visits = await readVisits();
+    let updated = 0;
+    for (const visit of visits) {
+      if (!visit.location && visit.ip) {
+        const resolved = resolveIpLocation(visit.ip);
+        if (resolved) {
+          visit.location = resolved;
+          updated += 1;
+        }
+      }
+    }
+    if (updated > 0) {
+      await writeVisits(visits);
+      console.log(`[GeoIP] Backfilled location for ${updated} stored visit(s).`);
+    }
+  } catch (err) {
+    console.warn('[GeoIP] Backfill failed:', err.message);
+  }
 }
 
 app.post('/api/visits', async (req, res) => {
@@ -647,7 +698,7 @@ app.post('/api/visits', async (req, res) => {
     const visit = {
       timestamp: new Date().toISOString(),
       path: visitPath,
-      location: coarseLocationFromRequest(req),
+      location: coarseLocationFromRequest(req, ip),
       ip,
       ipHash,
     };
@@ -917,6 +968,9 @@ scheduleVisitDigest();
 if (process.env.VISIT_DIGEST_ON_BOOT === 'true') {
   sendVisitDigest();
 }
+
+// Resolve locations for legacy stored visits that predate the GeoIP lookup.
+backfillVisitLocations();
 
 // Direct SMTP email notification via Nodemailer
 async function sendInquiryEmail(type, data) {
