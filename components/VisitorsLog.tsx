@@ -98,14 +98,21 @@ const VisitorsLog: React.FC = () => {
       }
 
       // Recent visits + total (required to render the card).
+      const recentUrl = getApiUrl('/api/visits/recent');
       try {
-        const res = await fetch(getApiUrl('/api/visits/recent'), {
+        const res = await fetch(recentUrl, {
           headers: { Accept: 'application/json' },
         });
-        if (!res.ok) throw new Error(`Unexpected status ${res.status}`);
+        if (!res.ok) {
+          console.warn(`[VisitorsLog] GET ${recentUrl} failed with status ${res.status} ${res.statusText}`);
+          throw new Error(`Unexpected status ${res.status}`);
+        }
 
         const json = await res.json();
-        if (!json || !Array.isArray(json.recent)) throw new Error('Malformed response');
+        if (!json || !Array.isArray(json.recent)) {
+          console.warn(`[VisitorsLog] GET ${recentUrl} returned a malformed payload.`);
+          throw new Error('Malformed response');
+        }
 
         if (active) {
           setData({
@@ -113,9 +120,14 @@ const VisitorsLog: React.FC = () => {
             recent: json.recent,
           });
         }
-      } catch {
-        // Fail silently — render nothing when the API is unreachable.
-        if (active) setFailed(true);
+      } catch (err) {
+        // API unreachable — still render the card with a fallback total so the
+        // widget (and its privacy notice) stays visible to every visitor.
+        console.warn(`[VisitorsLog] Falling back to empty stats for ${recentUrl}:`, err);
+        if (active) {
+          setFailed(true);
+          setData({ total: 0, recent: [] });
+        }
         return;
       }
 
@@ -136,8 +148,9 @@ const VisitorsLog: React.FC = () => {
             daily: json.daily.map((n: unknown) => Number(n) || 0),
           });
         }
-      } catch {
+      } catch (err) {
         // Stats unavailable — keep the dashes placeholder.
+        console.warn('[VisitorsLog] Optional visit stats unavailable:', err);
       }
     };
 
@@ -147,7 +160,7 @@ const VisitorsLog: React.FC = () => {
     };
   }, []);
 
-  if (failed || !data) return null;
+  if (!data) return null;
 
   const points = stats ? buildPoints(stats.daily) : [];
   const recentVisits = data.recent.slice(0, 3);
@@ -169,6 +182,12 @@ const VisitorsLog: React.FC = () => {
               <span className="text-xs font-bold uppercase tracking-widest text-slate-400">total visitors</span>
             </div>
           </div>
+
+          {failed && (
+            <p className="mt-3 text-[11px] font-medium text-amber-300/80">
+              Visitor stats are temporarily unavailable.
+            </p>
+          )}
 
           {/* Middle: sparkline + counters */}
           <div className="mt-6 flex flex-col gap-8 md:flex-row md:items-center md:gap-10">
