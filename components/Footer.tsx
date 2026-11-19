@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, Mail, MapPin } from 'lucide-react';
+import { Building2, Mail, MapPin, Satellite } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -127,6 +127,15 @@ const Footer: React.FC = () => {
             >
               <Mail className="w-4 h-4" />
               Staff Webmail
+            </a>
+            <a
+              href="https://meshsat.dspng.space"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-600 dark:text-slate-400 text-xs hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-2"
+            >
+              <Satellite className="w-4 h-4" />
+              Satellite Gateway
             </a>
           </div>
         </div>
