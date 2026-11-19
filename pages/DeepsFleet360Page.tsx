@@ -4,6 +4,7 @@ import {
   ArrowRight, BarChart3, Building2, Check, FileText, Fuel, MapPin, Route, Smartphone, Truck, Users, Wrench,
 } from 'lucide-react';
 import Seo from '../components/Seo';
+import IntegrationSection from '../components/IntegrationSection';
 
 const features = [
   { title: 'Route Optimization', description: 'Plan the most efficient path between towns and depots to cut travel time and wear.', icon: Route },
@@ -162,6 +163,7 @@ const DeepsFleet360Page: React.FC = () => (
         </div>
       </div>
     </section>
+    <IntegrationSection platform="DeepsFleet360" />
     <section className="px-5 pb-20 md:px-6 md:pb-28">
       <div className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-gray-950 px-6 py-14 text-center text-white md:px-12 md:py-20">
         <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-300"><Truck className="h-7 w-7" /></div>

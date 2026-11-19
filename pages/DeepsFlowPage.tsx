@@ -5,6 +5,7 @@ import {
   Cloud, Cpu, Smartphone, TrendingUp, Workflow, Zap,
 } from 'lucide-react';
 import Seo from '../components/Seo';
+import IntegrationSection from '../components/IntegrationSection';
 
 const features = [
   { title: 'Streamlined Workflow Automation', description: 'Automate repetitive steps so routine work runs itself, with approvals and hand-offs that no longer need chasing.', icon: Workflow },
@@ -161,6 +162,7 @@ const DeepsFlowPage: React.FC = () => (
         </div>
       </div>
     </section>
+    <IntegrationSection platform="DeepsFlow" />
     <section className="px-5 pb-20 md:px-6 md:pb-28">
       <div className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-gray-950 px-6 py-14 text-center text-white md:px-12 md:py-20">
         <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500/15 text-indigo-300"><Cloud className="h-7 w-7" /></div>

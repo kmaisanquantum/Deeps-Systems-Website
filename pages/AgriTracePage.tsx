@@ -5,6 +5,7 @@ import {
   FileText, Leaf, MapPin, Package, Route, Sprout, Thermometer, TrendingUp, Users, WalletCards,
 } from 'lucide-react';
 import Seo from '../components/Seo';
+import IntegrationSection from '../components/IntegrationSection';
 
 const features = [
   { title: 'Farmer & Plot Registry', description: 'Maintain a verified register of farmers and their plots, with village, crop, and area details.', icon: Users },
@@ -165,6 +166,7 @@ const AgriTracePage: React.FC = () => (
         </div>
       </div>
     </section>
+    <IntegrationSection platform="AgriTrace" />
     <section className="px-5 pb-20 md:px-6 md:pb-28">
       <div className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-gray-950 px-6 py-14 text-center text-white md:px-12 md:py-20">
         <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-300"><Leaf className="h-7 w-7" /></div>

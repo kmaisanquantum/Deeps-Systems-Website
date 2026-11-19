@@ -5,6 +5,7 @@ import {
   Database, FileText, History, Lock, Scale, Settings, ShieldCheck, Users, WalletCards,
 } from 'lucide-react';
 import Seo from '../components/Seo';
+import IntegrationSection from '../components/IntegrationSection';
 
 const features = [
   { title: 'Regulatory Compliance Automation', description: 'Turn recurring regulatory requirements into tracked, assigned, and automated obligations.', icon: Settings },
@@ -165,6 +166,7 @@ const DeepsComply360Page: React.FC = () => (
         </div>
       </div>
     </section>
+    <IntegrationSection platform="DeepsComply360" />
     <section className="px-5 pb-20 md:px-6 md:pb-28">
       <div className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-gray-950 px-6 py-14 text-center text-white md:px-12 md:py-20">
         <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/15 text-blue-300"><ShieldCheck className="h-7 w-7" /></div>

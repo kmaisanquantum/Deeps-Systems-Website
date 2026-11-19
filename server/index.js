@@ -2774,6 +2774,229 @@ app.post('/api/inquiries', async (req, res) => {
   }
 });
 
+// ---------------------------------------------------------------------------
+// Email trial sign-in (magic link) + integration requests.
+// Reuses the shared `transporter`, `JWT_SECRET` and `escapeHtml` helpers.
+// Trial records and per-user workspaces are persisted to JSON files under
+// server/data (git-ignored runtime data).
+// ---------------------------------------------------------------------------
+const DATA_DIR = path.join(__dirname, 'data');
+const TRIALS_FILE = path.join(DATA_DIR, 'trials.json');
+const TRIAL_WS_DIR = path.join(DATA_DIR, 'trial-workspaces');
+const TRIAL_SITE_ORIGIN = process.env.TRIAL_SITE_ORIGIN || 'https://dspng.tech';
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+async function ensureDir(dir) {
+  await fs.mkdir(dir, { recursive: true });
+}
+
+async function readTrials() {
+  try {
+    const raw = await fs.readFile(TRIALS_FILE, 'utf8');
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+async function writeTrials(trials) {
+  await ensureDir(DATA_DIR);
+  await fs.writeFile(TRIALS_FILE, JSON.stringify(trials, null, 2));
+}
+
+function hashEmail(email) {
+  return crypto.createHash('sha256').update(String(email).trim().toLowerCase()).digest('hex').slice(0, 32);
+}
+
+function workspaceFileFor(email, platform) {
+  return path.join(TRIAL_WS_DIR, `${hashEmail(email)}-${platform}.json`);
+}
+
+// Rate limiters: 5 sign-in requests / IP / hour, and a modest cap on
+// integration requests (mirrors the low-volume expectations of the contact form).
+const trialRequestLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many sign-in requests from this IP, please try again later.' }
+});
+
+const integrationRequestLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many integration requests from this IP, please try again later.' }
+});
+
+// Trial token auth: accepts a Bearer header or `?token=` query parameter.
+function requireTrial(req, res, next) {
+  const authHeader = req.headers.authorization;
+  let token = '';
+  if (authHeader && authHeader.startsWith('Bearer ')) token = authHeader.slice(7);
+  else if (req.query && req.query.token) token = String(req.query.token);
+  if (!token) return res.status(401).json({ error: 'Trial token missing or malformed.' });
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (!decoded.email || !decoded.platform) throw new Error('Malformed trial token payload.');
+    req.trial = decoded;
+    return next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid or expired trial token.' });
+  }
+}
+
+async function sendTrialEmail(email, platform, link) {
+  const html = `
+    <div style="font-family: sans-serif; line-height: 1.6; color: #0f172a;">
+      <h2 style="color: #059669; margin-bottom: 8px;">Your ${escapeHtml(platform)} demo sign-in link</h2>
+      <p>Hi,</p>
+      <p>Click the button below to sign in to your ${escapeHtml(platform)} demo workspace. This link expires in 7 days and is valid only for this email address.</p>
+      <p style="margin: 24px 0;">
+        <a href="${escapeHtml(link)}" style="display: inline-block; background: #059669; color: #ffffff; padding: 12px 24px; border-radius: 10px; font-weight: bold; text-decoration: none;">Sign in to ${escapeHtml(platform)}</a>
+      </p>
+      <p style="font-size: 12px; color: #64748b;">If the button does not work, paste this link into your browser:<br>${escapeHtml(link)}</p>
+      <p style="font-size: 12px; color: #64748b;">If you did not request this email, you can safely ignore it.</p>
+      <p style="font-size: 12px; color: #64748b;">— Deeps Systems</p>
+    </div>`;
+
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.log(`[Trial] SMTP not configured. Sign-in link for ${email}: ${link}`);
+    return;
+  }
+  await transporter.sendMail({
+    from: process.env.SMTP_USER ? `"Deeps Systems" <${process.env.SMTP_USER}>` : '"Deeps Systems" <no-reply@dspng.tech>',
+    to: email,
+    subject: `Your ${platform} demo sign-in link`,
+    html,
+  });
+}
+
+async function sendIntegrationEmail(data) {
+  const html = `
+    <div style="font-family: sans-serif; line-height: 1.6; color: #0f172a;">
+      <h2 style="color: #059669; margin-bottom: 8px;">New integration &amp; collaboration request</h2>
+      <p><strong>Platform interest:</strong> ${escapeHtml(data.platform)}</p>
+      <p><strong>Full name:</strong> ${escapeHtml(data.name)}</p>
+      <p><strong>Work email:</strong> ${escapeHtml(data.email)}</p>
+      <p><strong>Company:</strong> ${escapeHtml(data.company)}</p>
+      <p style="margin-top: 16px;"><strong>Message:</strong></p>
+      <p style="white-space: pre-wrap;">${escapeHtml(data.message)}</p>
+    </div>`;
+
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.log('[Integration] SMTP not configured. Integration request received:', JSON.stringify(data));
+    return;
+  }
+  const mailOptions = {
+    from: process.env.SMTP_USER ? `"Deeps Systems" <${process.env.SMTP_USER}>` : '"Deeps Systems" <no-reply@dspng.tech>',
+    to: MAIL_SALES,
+    subject: `Integration request: ${data.platform} — ${data.company || data.name}`,
+    html,
+  };
+  if (EMAIL_REGEX.test(data.email)) mailOptions.replyTo = data.email;
+  await transporter.sendMail(mailOptions);
+}
+
+// POST /api/trial/request — email a magic sign-in link and record the trial.
+app.post('/api/trial/request', trialRequestLimiter, async (req, res) => {
+  const { email, platform } = req.body ?? {};
+  if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email)) {
+    return res.status(400).json({ error: 'A valid email address is required.' });
+  }
+  if (!platform || typeof platform !== 'string' || !platform.trim()) {
+    return res.status(400).json({ error: 'A platform is required.' });
+  }
+  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedPlatform = platform.trim().toLowerCase();
+  try {
+    const token = jwt.sign({ email: normalizedEmail, platform: normalizedPlatform }, JWT_SECRET, { expiresIn: '7d' });
+    const now = new Date().toISOString();
+    const trials = await readTrials();
+    const existing = trials.find(t => t.email === normalizedEmail && t.platform === normalizedPlatform);
+    if (existing) {
+      existing.lastLoginAt = now;
+    } else {
+      trials.push({ email: normalizedEmail, platform: normalizedPlatform, createdAt: now, lastLoginAt: now });
+    }
+    await writeTrials(trials);
+
+    const link = `${TRIAL_SITE_ORIGIN}/${normalizedPlatform}/demo?token=${token}`;
+    sendTrialEmail(normalizedEmail, normalizedPlatform, link).catch(err => console.error('[Trial] Failed to send sign-in email:', err));
+
+    return res.json({ success: true, message: 'Sign-in link sent.' });
+  } catch (err) {
+    console.error('[API] Error handling trial request:', err);
+    return res.status(500).json({ error: 'An internal server error occurred while processing your request.' });
+  }
+});
+
+// GET /api/trial/verify — validate a trial token and return its identity.
+app.get('/api/trial/verify', (req, res) => {
+  const authHeader = req.headers.authorization;
+  let token = req.query && req.query.token ? String(req.query.token) : '';
+  if (!token && authHeader && authHeader.startsWith('Bearer ')) token = authHeader.slice(7);
+  if (!token) return res.status(400).json({ error: 'Token is required.' });
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (!decoded.email || !decoded.platform) throw new Error('Malformed trial token payload.');
+    return res.json({ email: decoded.email, platform: decoded.platform });
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid or expired trial token.' });
+  }
+});
+
+// GET/PUT/POST /api/trial/workspace — read or persist the signed-in user's demo state.
+app.all('/api/trial/workspace', requireTrial, async (req, res) => {
+  const { email, platform } = req.trial;
+  const file = workspaceFileFor(email, platform);
+  try {
+    if (req.method === 'GET') {
+      let state = null;
+      try {
+        state = JSON.parse(await fs.readFile(file, 'utf8'));
+      } catch {
+        state = null;
+      }
+      return res.json({ email, platform, state });
+    }
+    // PUT (and POST alias) persist the workspace payload.
+    const state = (req.body && typeof req.body === 'object' && 'state' in req.body) ? req.body.state : null;
+    await ensureDir(TRIAL_WS_DIR);
+    await fs.writeFile(file, JSON.stringify(state, null, 2));
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('[API] Error handling trial workspace:', err);
+    return res.status(500).json({ error: 'An internal server error occurred while processing your workspace.' });
+  }
+});
+
+// POST /api/integration-request — route an integration request to the sales inbox.
+app.post('/api/integration-request', integrationRequestLimiter, async (req, res) => {
+  const { name, email, company, platform, message } = req.body ?? {};
+  if (!name || typeof name !== 'string' || name.trim().length < 2) {
+    return res.status(400).json({ error: 'Name must be at least 2 characters.' });
+  }
+  if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email)) {
+    return res.status(400).json({ error: 'A valid work email address is required.' });
+  }
+  if (!message || typeof message !== 'string' || message.trim().length < 10) {
+    return res.status(400).json({ error: 'Message must be at least 10 characters.' });
+  }
+  const payload = {
+    name: name.trim(),
+    email: email.trim(),
+    company: typeof company === 'string' ? company.trim() : '',
+    platform: typeof platform === 'string' && platform.trim() ? platform.trim() : 'General',
+    message: message.trim(),
+  };
+  try {
+    sendIntegrationEmail(payload).catch(err => console.error('[Integration] Failed to send email:', err));
+    return res.status(201).json({ success: true, message: 'Integration request received.' });
+  } catch (err) {
+    console.error('[API] Error handling integration request:', err);
+    return res.status(500).json({ error: 'An internal server error occurred while processing your request.' });
+  }
+});
+
 // Explicitly serve robots.txt to prevent any catch-all interference
 app.get('/robots.txt', (req, res) => {
   res.type('text/plain');
