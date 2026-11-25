@@ -21,6 +21,7 @@ import {
   Monitor,
   LifeBuoy
 } from 'lucide-react';
+import { iotNavItems } from './iot/iotData';
 
 export const servicesItems = [
   { name: 'Managed IT Support', icon: React.createElement(Headset, { className: "w-5 h-5" }), href: '/deepscare360', desc: 'Proactive operational uptime.' },
@@ -32,6 +33,13 @@ export const servicesItems = [
   { name: 'Agribusiness', icon: React.createElement(Sprout, { className: "w-5 h-5" }), href: '/agritrace', desc: 'Traceability-as-a-Service.' },
   { name: 'DeepsGuard360', icon: React.createElement(Shield, { className: "w-5 h-5" }), href: '/deepsguard360', desc: 'Integrated security operations SaaS.' },
 ];
+
+export const iotItems = iotNavItems.map(({ name, href, desc, icon }) => ({
+  name,
+  href,
+  desc,
+  icon: React.createElement(icon, { className: 'w-5 h-5' }),
+}));
 
 export const advantageItems = [
   { name: 'Infrastructure', icon: React.createElement(Cloud, { className: "w-5 h-5" }), href: '/advantage#adv-infra', desc: 'Zero legacy physical burden.' },

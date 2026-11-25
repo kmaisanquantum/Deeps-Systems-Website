@@ -6,10 +6,11 @@ import {
   ChevronDown,
   Rocket,
   Cloud,
+  Radio,
   Sun,
   Moon
 } from 'lucide-react';
-import { servicesItems, advantageItems } from './navbarData';
+import { servicesItems, advantageItems, iotItems } from './navbarData';
 
 export const NAVBAR_HEIGHT_MOBILE_CLASS = 'pt-[64px]';
 
@@ -138,7 +139,7 @@ const Navbar: React.FC = () => {
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-0.5 lg:gap-2" role="menubar">
+        <div className="hidden lg:flex items-center gap-0.5 lg:gap-2" role="menubar">
 
           <div className="relative group" onMouseEnter={() => handleMouseEnter('advantages')} onMouseLeave={handleMouseLeave}>
             <button 
@@ -218,6 +219,68 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
+          <div
+            className="relative group"
+            onPointerEnter={(e) => { if (e.pointerType === 'mouse') handleMouseEnter('iot'); }}
+            onPointerLeave={(e) => { if (e.pointerType === 'mouse') handleMouseLeave(); }}
+          >
+            <button
+              type="button"
+              onClick={(e) => {
+                // Mouse users get the menu from hover; touch and assistive clicks toggle it.
+                if ((e.nativeEvent as PointerEvent).pointerType === 'mouse') return;
+                setActiveDropdown(activeDropdown === 'iot' ? null : 'iot');
+              }}
+              aria-expanded={activeDropdown === 'iot'}
+              aria-haspopup="true"
+              aria-controls="iot-desktop-menu"
+              onKeyDown={(e) => handleKeyDown(e, 'iot')}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${activeDropdown === 'iot' ? 'text-emerald-600' : 'text-gray-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-white'}`}
+            >
+              IoT &amp; Connected Systems <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === 'iot' ? 'rotate-180' : ''}`} />
+            </button>
+            {activeDropdown === 'iot' && (
+              <div
+                id="iot-desktop-menu"
+                className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-[680px] max-w-[calc(100vw-2rem)] z-50"
+                role="menu"
+              >
+                <div className="bg-white dark:bg-[#0d0d0d] rounded-2xl border border-gray-100 dark:border-white/10 shadow-2xl p-5 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="mb-3 flex items-center justify-between px-1">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-gray-400 dark:text-slate-500">IoT &amp; Connected Systems</span>
+                    <Link
+                      to="/iot"
+                      onClick={(e) => handleLinkClick(e, '/iot')}
+                      className="text-xs font-bold text-emerald-600 dark:text-emerald-300 hover:underline"
+                    >
+                      View overview →
+                    </Link>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {iotItems.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        aria-current={location.pathname === item.href ? 'page' : undefined}
+                        onClick={(e) => handleLinkClick(e, item.href)}
+                        className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-emerald-50 dark:hover:bg-white/5 border border-transparent transition-all group/item"
+                        role="menuitem"
+                      >
+                        <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 group-hover/item:scale-110 transition-all">
+                          {item.icon}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-gray-900 dark:text-white group-hover/item:text-emerald-600 transition-colors">{item.name}</div>
+                          <div className="text-[11px] text-gray-600 dark:text-slate-400 leading-tight">{item.desc}</div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="ml-1 pl-2 lg:ml-2 lg:pl-4 border-l border-gray-100 dark:border-white/10 flex items-center gap-2 lg:gap-4">
             {/* Desktop Theme Toggle */}
             <button
@@ -237,7 +300,7 @@ const Navbar: React.FC = () => {
         </div>
 
         {/* Mobile Menu Toggle */}
-        <div className="flex items-center gap-3 md:hidden">
+        <div className="flex items-center gap-3 lg:hidden">
           <button 
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMobileMenuOpen}
@@ -256,7 +319,7 @@ const Navbar: React.FC = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed top-0 left-0 right-0 h-[100dvh] min-h-screen h-screen pt-[64px] bg-white dark:bg-[#0a0a0a] backdrop-blur-3xl z-[45] flex flex-col animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="lg:hidden fixed top-0 left-0 right-0 h-[100dvh] min-h-screen h-screen pt-[64px] bg-white dark:bg-[#0a0a0a] backdrop-blur-3xl z-[45] flex flex-col animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex-grow overflow-y-auto px-6 py-8 pb-[calc(6rem+env(safe-area-inset-bottom))] space-y-4">
             
             {/* Theme Toggle in Mobile */}
@@ -323,6 +386,48 @@ const Navbar: React.FC = () => {
                     <Link
                       key={item.name} 
                       to={item.href} aria-current={location.pathname === item.href.split("#")[0] ? "page" : undefined}
+                      onClick={(e) => handleLinkClick(e, item.href)}
+                      className="flex items-center gap-4 p-4 bg-white dark:bg-white/5 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
+                    >
+                      <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">{item.icon}</div>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-sm">{item.name}</span>
+                        <span className="text-xs text-gray-600 dark:text-slate-400">{item.desc}</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <button
+                onClick={() => toggleMobileSubmenu('iot')}
+                aria-expanded={mobileActiveSubmenu === 'iot'}
+                aria-controls="iot-mobile-menu"
+                className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-2xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
+              >
+                <div className="flex items-center gap-3">
+                   <Radio className="w-5 h-5 text-emerald-600" />
+                   <span className="font-bold text-sm uppercase tracking-widest">IoT &amp; Connected Systems</span>
+                </div>
+                <ChevronDown className={`w-5 h-5 transition-transform ${mobileActiveSubmenu === 'iot' ? 'rotate-180' : ''}`} />
+              </button>
+
+              {mobileActiveSubmenu === 'iot' && (
+                <div id="iot-mobile-menu" className="grid grid-cols-1 gap-2 pt-2 px-1">
+                  <Link
+                    to="/iot"
+                    onClick={(e) => handleLinkClick(e, '/iot')}
+                    className="flex items-center justify-between gap-4 p-4 rounded-xl bg-emerald-600 text-white"
+                  >
+                    <span className="font-bold text-sm">IoT division overview</span>
+                    <span className="text-xs font-bold uppercase tracking-widest">Open</span>
+                  </Link>
+                  {iotItems.map(item => (
+                    <Link
+                      key={item.name}
+                      to={item.href} aria-current={location.pathname === item.href ? "page" : undefined}
                       onClick={(e) => handleLinkClick(e, item.href)}
                       className="flex items-center gap-4 p-4 bg-white dark:bg-white/5 rounded-xl text-gray-900 dark:text-white border border-gray-100 dark:border-white/10"
                     >

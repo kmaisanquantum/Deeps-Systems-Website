@@ -19,6 +19,7 @@ const Footer: React.FC = () => {
   const quickLinks = [
     { name: 'Advantages', href: '/advantage' },
     { name: 'Solutions', href: '/solutions' },
+    { name: 'IoT & Connected Systems', href: '/iot' },
   ];
 
   const contactInfo = [
