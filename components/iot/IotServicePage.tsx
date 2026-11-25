@@ -23,11 +23,6 @@ const techStatusStyles: Record<IotTechnologyStatus, { label: string; className: 
     className: 'border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-300',
     dot: 'bg-amber-500',
   },
-  existing: {
-    label: 'Existing initiative',
-    className: 'border-blue-500/20 bg-blue-500/10 text-blue-700 dark:text-blue-300',
-    dot: 'bg-blue-500',
-  },
 };
 
 interface SectionHeadingProps {
@@ -261,7 +256,7 @@ const IotServicePage: React.FC<{ service: IotService }> = ({ service }) => {
               </span>
             ))}
             <span className="w-full pt-1 text-[11px] leading-relaxed">
-              Planned items are roadmap capabilities and are not offered as standard deployments. MeshSat is an existing Deeps Systems initiative presented as a potential gateway and connectivity integration component.
+              Planned items are roadmap capabilities and are not offered as standard deployments. Satellite and gateway integration options are confirmed during solution design.
             </span>
           </div>
         </div>

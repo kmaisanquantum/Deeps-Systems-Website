@@ -249,7 +249,7 @@ const IotLandingPage: React.FC = () => (
         </div>
         <IotConnectivityPath />
         <p className="mt-6 text-xs leading-relaxed text-slate-500">
-          MeshSat is an existing Deeps Systems technology initiative and may serve as a gateway or satellite backhaul component. Not every protocol or integration listed is available in every deployment; current and planned capabilities are confirmed during solution design.
+          Satellite and gateway integration options are scoped per site. Not every protocol or integration listed is available in every deployment; current and planned capabilities are confirmed during solution design.
         </p>
       </div>
     </section>
