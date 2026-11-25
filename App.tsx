@@ -9,6 +9,8 @@ import MeshSatMapEmbed from './components/MeshSatMapEmbed';
 import DeepsGuard360DemoTheme from './components/DeepsGuard360DemoTheme';
 import Home from './pages/Home';
 import SolutionsPage from './pages/SolutionsPage';
+import IotLandingPage from './pages/IotLandingPage';
+import IotServiceDetailPage from './pages/IotServiceDetailPage';
 import DeepsGuard360Page from './pages/DeepsGuard360Page';
 import DeepsGuard360DemoPage from './pages/DeepsGuard360DemoPage';
 import AgriTracePage from './pages/AgriTracePage';
@@ -41,6 +43,8 @@ const App: React.FC = () => (
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/solutions" element={<SolutionsPage />} />
+            <Route path="/iot" element={<IotLandingPage />} />
+            <Route path="/iot/:slug" element={<IotServiceDetailPage />} />
             <Route path="/deepsguard360" element={<DeepsGuard360Page />} />
             <Route path="/deepsguard360/demo" element={<DeepsGuard360DemoPage />} />
             <Route path="/agritrace" element={<AgriTracePage />} />
