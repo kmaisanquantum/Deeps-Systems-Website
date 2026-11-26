@@ -27,7 +27,7 @@ import {
 
 export type IotAccent = 'emerald' | 'blue' | 'cyan' | 'amber' | 'violet' | 'teal' | 'sky' | 'rose' | 'indigo';
 
-export type IotTechnologyStatus = 'scoped' | 'planned' | 'existing';
+export type IotTechnologyStatus = 'scoped' | 'planned';
 
 export interface IotListItem {
   title: string;
@@ -201,7 +201,7 @@ export const iotServices: IotService[] = [
       { name: 'Zigbee', description: 'Low-power mesh for building and facility devices.', status: 'scoped' },
       { name: 'Ethernet and industrial serial', description: 'Wired integration for controllers, meters and fixed equipment.', status: 'scoped' },
       { name: '4G/LTE cellular', description: 'Primary or backup backhaul where mobile coverage is available.', status: 'scoped' },
-      { name: 'Satellite backhaul', description: 'Connectivity for sites beyond terrestrial coverage, including the MeshSat initiative where suitable.', status: 'existing' },
+      { name: 'Satellite backhaul', description: 'Connectivity for sites beyond terrestrial coverage where a suitable satellite service is available.', status: 'scoped' },
       { name: 'MQTT and HTTPS transport', description: 'Standards-based data transport into IoT platforms and business systems.', status: 'scoped' },
     ],
     industries: ['Mining & exploration', 'Agriculture & plantations', 'Utilities & water', 'Logistics & transport', 'Government & remote services', 'Security & facilities'],
@@ -471,7 +471,7 @@ export const iotServices: IotService[] = [
       { name: 'Irrigation controllers', description: 'Valve and pump control for data-driven irrigation.', status: 'scoped' },
       { name: 'Livestock tags', description: 'Location and movement tracking for herds and grazing areas.', status: 'scoped' },
       { name: 'LoRaWAN and cellular backhaul', description: 'Field connectivity for dispersed sensors.', status: 'scoped' },
-      { name: 'Satellite backhaul', description: 'Connectivity for estates beyond terrestrial coverage, including the MeshSat initiative where suitable.', status: 'existing' },
+      { name: 'Satellite backhaul', description: 'Connectivity for estates beyond terrestrial coverage where a suitable satellite service is available.', status: 'scoped' },
       { name: 'Agronomy dashboards', description: 'Block, season and sensor views for farm managers.', status: 'scoped' },
     ],
     industries: ['Oil palm & plantations', 'Smallholder cooperatives', 'Livestock', 'Horticulture', 'Agro-processing', 'Agricultural finance'],
@@ -746,7 +746,7 @@ export const iotServices: IotService[] = [
       { name: 'Preventive maintenance', description: 'Scheduled service, calibration and replacement planning.', status: 'scoped' },
       { name: 'Spares and lifecycle planning', description: 'Practical planning for device ageing and replacement.', status: 'scoped' },
       { name: 'Integration and upgrade projects', description: 'Changes delivered as operational needs evolve.', status: 'scoped' },
-      { name: 'MeshSat connectivity integration', description: 'Use of the existing MeshSat initiative where satellite or gateway connectivity suits the site.', status: 'existing' },
+      { name: 'Satellite connectivity integration', description: 'Satellite connectivity integrated where it suits the site and operating model.', status: 'scoped' },
     ],
     industries: ['Mining & resources', 'Utilities', 'Agriculture & plantations', 'Logistics', 'Government', 'Commercial property'],
     howItWorks: [
@@ -823,7 +823,7 @@ export const iotLayers: IotLayer[] = [
     number: '03',
     name: 'Gateway and network integration',
     description: 'The point where field protocols are translated and secured.',
-    items: ['IoT gateways', 'MeshSat integration', 'Protocol translation', 'Device communication', 'Network management'],
+    items: ['IoT gateways', 'Gateway integration', 'Protocol translation', 'Device communication', 'Network management'],
     icon: Network,
   },
   {

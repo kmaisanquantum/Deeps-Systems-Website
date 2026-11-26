@@ -42,7 +42,7 @@ export const IotArchitecture: React.FC = () => (
       );
     })}
     <p className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4 text-xs leading-relaxed text-gray-600 dark:border-blue-400/20 dark:text-slate-300">
-      MeshSat is an existing Deeps Systems technology initiative and may serve as a gateway or satellite backhaul component within a solution. Protocol, platform and integration support varies by site and is confirmed during solution design; items described as planned are not yet offered as standard deployments.
+      Satellite and gateway integration options are scoped per site and confirmed during solution design. Protocol and platform support varies by deployment; items described as planned are not yet offered as standard deployments.
     </p>
   </div>
 );

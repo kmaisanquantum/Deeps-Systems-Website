@@ -5,7 +5,6 @@ import Footer from './components/Footer';
 import ScrollUpButton from './components/ScrollUpButton';
 import ScrollToTop from './components/ScrollToTop';
 import DeepsGuard360Tour from './components/DeepsGuard360Tour';
-import MeshSatMapEmbed from './components/MeshSatMapEmbed';
 import DeepsGuard360DemoTheme from './components/DeepsGuard360DemoTheme';
 import Home from './pages/Home';
 import SolutionsPage from './pages/SolutionsPage';
@@ -67,7 +66,6 @@ const App: React.FC = () => (
           </Routes>
         </main>
         <DeepsGuard360Tour />
-        <MeshSatMapEmbed />
         <DeepsGuard360DemoTheme />
         <Footer />
         <ScrollUpButton />
