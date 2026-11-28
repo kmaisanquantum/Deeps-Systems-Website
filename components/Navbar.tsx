@@ -8,7 +8,8 @@ import {
   Cloud,
   Radio,
   Sun,
-  Moon
+  Moon,
+  ArrowRight
 } from 'lucide-react';
 import { servicesItems, advantageItems, iotItems } from './navbarData';
 
@@ -214,6 +215,18 @@ const Navbar: React.FC = () => {
                       </Link>
                     ))}
                   </div>
+                  <div className="mt-4 flex flex-col gap-3 border-t border-gray-100 pt-4 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-xs font-bold text-gray-900 dark:text-white">Try a product free for 14 days</p>
+                      <p className="text-[11px] text-gray-500 dark:text-slate-400">Work email only. No credit card.</p>
+                    </div>
+                    <Link
+                      to="/start-trial"
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-500"
+                    >
+                      Start free trial <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
                 </div>
               </div>
             )}
@@ -396,6 +409,14 @@ const Navbar: React.FC = () => {
                       </div>
                     </Link>
                   ))}
+
+                  <Link
+                    to="/start-trial"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-sm font-bold text-white"
+                  >
+                    Start free trial <ArrowRight className="h-4 w-4" />
+                  </Link>
                 </div>
               )}
             </div>

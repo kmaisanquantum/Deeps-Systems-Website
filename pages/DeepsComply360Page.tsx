@@ -50,7 +50,7 @@ const DeepsComply360Page: React.FC = () => (
           <p className="mb-8 max-w-xl text-lg font-semibold text-gray-600 dark:text-slate-300 md:text-xl">Compliance you can prove, every day.</p>
           <p className="mb-8 max-w-xl leading-relaxed text-gray-600 dark:text-slate-400">A connected platform for tracking regulatory obligations, mapping controls and policies, monitoring risk, and producing audit-ready reports—built for organisations facing growing requirements in financial reporting, data protection, and industry standards across Papua New Guinea and the Pacific.</p>
           <div className="flex flex-wrap gap-3">
-            <Link to="/contact" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 px-7 py-3.5 font-bold text-white shadow-lg shadow-blue-500/20 transition hover:from-blue-500 hover:to-indigo-600">Request a Demo <ArrowRight className="h-4 w-4" /></Link>
+            <Link to="/start-trial?product=deepscomply360" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 px-7 py-3.5 font-bold text-white shadow-lg shadow-blue-500/20 transition hover:from-blue-500 hover:to-indigo-600">Start free trial<ArrowRight className="h-4 w-4" /></Link>
             <Link to="/deepscomply360/demo" className="inline-flex items-center gap-2 rounded-full border border-blue-600/30 px-6 py-3.5 font-bold text-blue-700 transition hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-white/5">Explore interactive demo <ArrowRight className="h-4 w-4 text-blue-500" /></Link>
           </div>
         </div>

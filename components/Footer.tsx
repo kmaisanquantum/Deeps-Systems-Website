@@ -17,6 +17,7 @@ const Footer: React.FC = () => {
   };
 
   const quickLinks = [
+    { name: 'Start Free Trial', href: '/start-trial' },
     { name: 'Advantages', href: '/advantage' },
     { name: 'Solutions', href: '/solutions' },
     { name: 'IoT & Connected Systems', href: '/iot' },

@@ -18,6 +18,8 @@ const __dirname = path.dirname(__filename);
 const distPath = path.join(__dirname, '../dist');
 
 const app = express();
+// The production server sits behind a reverse proxy; trust one hop so rate limits and logs see the client IP.
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 
 const USD_TO_PGK_RATE = parseFloat(process.env.USD_TO_PGK_RATE) || 3.6;
@@ -29,6 +31,200 @@ const markupMultiplier = 1 + (DEEPS_MARKUP_PERCENT / 100);
 const JWT_SECRET = process.env.JWT_SECRET || 'deeps_systems_jwt_secret_key_change_me_in_prod';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'kmaisan@dspng.tech';
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || bcrypt.hashSync('DeepsAdmin2026!', 10);
+
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  console.warn('[Security] JWT_SECRET is not configured. Trial and admin sessions use an insecure default secret.');
+}
+
+const parsedTrialDays = parseInt(process.env.TRIAL_DAYS || '14', 10);
+const parsedTokenTtl = parseInt(process.env.TRIAL_TOKEN_TTL_MINUTES || '30', 10);
+const TRIAL_DAYS = Number.isFinite(parsedTrialDays) && parsedTrialDays > 0 ? parsedTrialDays : 14;
+const TRIAL_TOKEN_TTL_MINUTES = Number.isFinite(parsedTokenTtl) && parsedTokenTtl > 0 ? parsedTokenTtl : 30;
+const SITE_URL = (process.env.SITE_URL || 'https://dspng.tech').replace(/\/+$/, '');
+
+const DEFAULT_SEO_TITLE = 'Deeps Systems | Digital Transformation & Optimization';
+const DEFAULT_SEO_DESCRIPTION = 'Deeps Systems: Born-in-the-Cloud (BITC) optimization for PNG SMEs, finance, and logistics. High-performance digital outcomes.';
+// Public routes that should be indexed; everything else is private or unknown.
+const INDEXABLE_PATHS = new Set([
+  '/', '/solutions', '/iot', '/advantage', '/contact', '/start-trial',
+  '/deepsguard360', '/agritrace', '/deepsflow', '/deepscare360',
+  '/deepsfleet360', '/deepscomply360', '/deepsfin360', '/deepsadvisory360',
+  '/iot/deepsconnect', '/iot/deepsfleet', '/iot/deepsindustrial',
+  '/iot/deepsutilities', '/iot/deepsagri', '/iot/deepssense',
+  '/iot/deepsiot-cloud', '/iot/deepssecure-iot', '/iot/deepsmanage-iot',
+]);
+
+// Mirrors each page's <Seo> metadata so no-JS crawlers see the same title and description.
+const PAGE_SEO = {
+  '/solutions': {
+    title: 'High-Performance Outcome Solutions | Deeps Systems',
+    description: 'Deeps Systems delivers high-performance digital transformation, data analytics, and cloud optimization outcomes for PNG SMEs, finance, and logistics.',
+  },
+  '/iot': {
+    title: 'IoT & Connected Systems | Deeps Systems PNG',
+    description: 'Deeps Systems IoT & Connected Systems connects physical assets to operational intelligence through IoT connectivity, fleet and asset tracking, industrial monitoring, smart utilities, agricultural IoT, sensors, device management, security and managed services.',
+  },
+  '/advantage': {
+    title: 'Born-in-the-Cloud (BITC) Advantages | Deeps Systems',
+    description: 'Experience the BITC advantage with Deeps Systems. Unlocking digital scalability, robust cloud optimization, and security for businesses in Papua New Guinea.',
+  },
+  '/contact': {
+    title: 'Contact Deeps Systems | PNG Digital Transformation',
+    description: 'Get in touch with Deeps Systems. Contact our digital transformation and Born-in-the-Cloud (BITC) optimization experts in Papua New Guinea.',
+  },
+  '/deepsguard360': {
+    title: 'DeepsGuard360 | Security Management SaaS for PNG & the Pacific',
+    description: 'Manage guards, patrols, incidents, and client access with DeepsGuard360, an integrated security operations platform for security companies in PNG and the Pacific.',
+  },
+  '/agritrace': {
+    title: 'AgriTrace | Agriculture Traceability-as-a-Service for PNG',
+    description: 'AgriTrace is a traceability-as-a-service platform for PNG agriculture - track farmers, plots, batches, cold chain, and export records from farm gate to export market.',
+  },
+  '/deepsflow': {
+    title: 'DeepsFlow | Cloud & Automation Platform for PNG & the Pacific',
+    description: 'DeepsFlow is a cloud and automation platform for PNG and the Pacific - design workflows, connect the systems you use, and track the hours and costs you save.',
+  },
+  '/deepscare360': {
+    title: 'DeepsCare360 | Managed IT Support Platform for PNG & the Pacific',
+    description: 'DeepsCare360 is a managed IT support platform for PNG and the Pacific - monitor devices, manage incidents, track SLAs, and report to clients from one connected workspace.',
+  },
+  '/deepsfleet360': {
+    title: 'DeepsFleet360 | Fleet & Logistics Management for PNG & the Pacific',
+    description: 'DeepsFleet360 is a fleet and logistics management platform for PNG and the Pacific - optimise routes, plan predictive maintenance, track fuel, and follow vehicles along the Highlands Highway corridor.',
+  },
+  '/deepscomply360': {
+    title: 'DeepsComply360 | Digital Compliance & Governance Platform for PNG & the Pacific',
+    description: 'DeepsComply360 is a digital compliance and governance platform for PNG and the Pacific - automate regulatory obligations, map controls and policies, monitor risk, and stay audit-ready for financial reporting, data protection, and industry standards.',
+  },
+  '/deepsfin360': {
+    title: 'DeepsFin360 | Financial Services Operations Platform for PNG & the Pacific',
+    description: 'DeepsFin360 is a financial services operations platform for PNG and the Pacific - manage customer accounts and KYC, process payments, detect fraud, and reach unbanked rural communities.',
+  },
+  '/deepsadvisory360': {
+    title: 'DeepsAdvisory360 | Strategic ICT Advisory & Digital Roadmap Platform for PNG',
+    description: 'DeepsAdvisory360 is a strategic ICT advisory and digital roadmap platform for PNG and the Pacific - assess maturity, build tailored digital roadmaps, align local growth, and modernise architecture.',
+  },
+  '/iot/deepsconnect': {
+    title: 'DeepsConnect | IoT Connectivity & LoRaWAN Gateways in PNG',
+    description: 'DeepsConnect designs and deploys LoRaWAN gateways, BLE, Wi-Fi, Zigbee and industrial connectivity with cellular and satellite backhaul for remote Papua New Guinea operations.',
+  },
+  '/iot/deepsfleet': {
+    title: 'DeepsFleet | GPS Fleet Tracking & Asset Intelligence in PNG',
+    description: 'DeepsFleet delivers GPS vehicle tracking, real-time fleet monitoring, geofencing, fuel anomaly detection, driver behaviour insight and asset utilisation reporting for Papua New Guinea operators.',
+  },
+  '/iot/deepsindustrial': {
+    title: 'DeepsIndustrial | Industrial IoT & Condition Monitoring in PNG',
+    description: 'DeepsIndustrial connects industrial equipment for condition monitoring, vibration and temperature insight, predictive maintenance planning and operational analytics across Papua New Guinea sites.',
+  },
+  '/iot/deepsutilities': {
+    title: 'DeepsUtilities | Smart Water & Utility Monitoring in PNG',
+    description: 'DeepsUtilities delivers smart water monitoring, tank level and leak detection, pump automation, electricity and generator monitoring, and remote utility management for PNG infrastructure.',
+  },
+  '/iot/deepsagri': {
+    title: 'DeepsAgri | Agricultural IoT & Smart Farming in PNG',
+    description: 'DeepsAgri provides soil moisture and weather monitoring, smart irrigation, plantation and livestock visibility, and agricultural analytics for farms and estates across Papua New Guinea.',
+  },
+  '/iot/deepssense': {
+    title: 'DeepsSense | Sensors, Telemetry & Environmental Monitoring PNG',
+    description: 'DeepsSense delivers environmental, air, water, soil, temperature, humidity, motion and proximity sensing with remote telemetry and automated alerts for PNG operations.',
+  },
+  '/iot/deepsiot-cloud': {
+    title: 'DeepsIoT Cloud | IoT Device Management Platform in PNG',
+    description: 'DeepsIoT Cloud centralises IoT device management, provisioning, telemetry processing, dashboards, historical reporting, APIs and workflow automation for PNG organisations.',
+  },
+  '/iot/deepssecure-iot': {
+    title: 'DeepsSecure IoT | IoT Cybersecurity & Device Protection PNG',
+    description: 'DeepsSecure IoT provides device authentication, identity management, encryption, access control, network segmentation, vulnerability management and security monitoring for IoT deployments in PNG.',
+  },
+  '/iot/deepsmanage-iot': {
+    title: 'DeepsManage IoT | Managed IoT Services in PNG',
+    description: 'DeepsManage IoT provides managed IoT services including consultation, architecture, installation, gateway and sensor deployment, remote monitoring, maintenance, support and upgrades across PNG.',
+  },
+};
+
+function resolvePageSeo(req) {
+  const pathname = req.path.replace(/\/+$/, '') || '/';
+  const isDemo = pathname.endsWith('/demo');
+  const isLogin = pathname === '/start-trial' && req.query.mode === 'login';
+
+  let title = DEFAULT_SEO_TITLE;
+  let description = DEFAULT_SEO_DESCRIPTION;
+  let robots = INDEXABLE_PATHS.has(pathname) ? 'index, follow' : 'noindex, nofollow';
+  let canonicalPath = pathname;
+  const pageMeta = PAGE_SEO[pathname];
+  if (pageMeta) {
+    title = pageMeta.title;
+    description = pageMeta.description;
+  }
+
+  if (isDemo) {
+    title = 'Interactive product demo | Deeps Systems';
+    description = 'Explore the Deeps Systems interactive product demo.';
+    robots = 'noindex, nofollow';
+  } else if (isLogin) {
+    title = 'Sign in to your Deeps Systems trial';
+    description = 'Enter your work email to receive a secure sign-in link for your Deeps Systems SaaS trial.';
+    robots = 'noindex, nofollow';
+    canonicalPath = '/start-trial?mode=login';
+  } else if (pathname === '/start-trial') {
+    title = 'Start a 14-day free SaaS trial | Deeps Systems';
+    description = 'Start a 14-day free trial of Deeps Systems SaaS products. Verify your work email, open your workspace and explore at your own pace.';
+    robots = 'index, follow';
+  } else if (pathname === '/trial') {
+    title = 'Your trial workspace | Deeps Systems';
+    description = 'Your Deeps Systems trial workspace.';
+    robots = 'noindex, nofollow';
+  } else if (pathname === '/trial/verify') {
+    title = 'Activating your trial | Deeps Systems';
+    description = 'Activating your Deeps Systems trial.';
+    robots = 'noindex, nofollow';
+  } else if (pathname === '/') {
+    robots = 'index, follow';
+  }
+
+  return {
+    title,
+    description,
+    robots,
+    canonicalUrl: `${SITE_URL}${canonicalPath === '/' ? '/' : canonicalPath}`,
+  };
+}
+
+function replaceStaticMeta(html, attribute, key, content) {
+  const pattern = new RegExp(`<meta ${attribute}="${key}" data-static-seo content="[^"]*"\\s*\\/?>`, 'i');
+  return html.replace(pattern, `<meta ${attribute}="${key}" data-static-seo content="${escapeHtml(content)}">`);
+}
+
+function injectPageSeo(html, req) {
+  const seo = resolvePageSeo(req);
+  let output = html.replace(
+    /<meta name="description" data-static-seo content="[^"]*"\s*\/?>/i,
+    `<meta name="description" data-static-seo content="${escapeHtml(seo.description)}">\n    <link rel="canonical" data-static-seo href="${escapeHtml(seo.canonicalUrl)}">\n    <meta name="robots" data-static-seo content="${escapeHtml(seo.robots)}">`
+  );
+  output = output.replace(
+    /<title data-static-seo>[^<]*<\/title>/i,
+    `<title data-static-seo>${escapeHtml(seo.title)}</title>`
+  );
+  output = replaceStaticMeta(output, 'property', 'og:url', seo.canonicalUrl);
+  output = replaceStaticMeta(output, 'property', 'og:title', seo.title);
+  output = replaceStaticMeta(output, 'property', 'og:description', seo.description);
+  output = replaceStaticMeta(output, 'property', 'twitter:url', seo.canonicalUrl);
+  output = replaceStaticMeta(output, 'property', 'twitter:title', seo.title);
+  output = replaceStaticMeta(output, 'property', 'twitter:description', seo.description);
+  return output;
+}
+const TRIAL_COOKIE = 'deeps_trial';
+const TRIAL_PRODUCTS = {
+  deepscare360: 'DeepsCare360',
+  deepscomply360: 'DeepsComply360',
+  deepsflow: 'DeepsFlow',
+  deepsadvisory360: 'DeepsAdvisory360',
+  deepsfin360: 'DeepsFin360',
+  deepsfleet360: 'DeepsFleet360',
+  agritrace: 'AgriTrace',
+  deepsguard360: 'DeepsGuard360',
+};
+const TRIAL_TEAM_SIZES = ['1-10', '11-50', '51-200', '201-500', '500+'];
 
 let liveRate = USD_TO_PGK_RATE;
 let lastFetched = 0;
@@ -356,9 +552,6 @@ async function initializeDatabase() {
     await client.query('ALTER TABLE products ADD COLUMN IF NOT EXISTS installation_available BOOLEAN DEFAULT false;');
     await client.query("ALTER TABLE products ADD COLUMN IF NOT EXISTS product_type VARCHAR(50) DEFAULT 'hardware';");
 
-    // Articles schema migration
-    await client.query('ALTER TABLE articles ADD COLUMN IF NOT EXISTS external_url TEXT;');
-
     // New tables: suppliers, product_price_history, bundles, bundle_items, admin_users
     await client.query(`
       CREATE TABLE IF NOT EXISTS suppliers (
@@ -439,6 +632,34 @@ async function initializeDatabase() {
       );
     `);
 
+    await client.query('ALTER TABLE articles ADD COLUMN IF NOT EXISTS external_url TEXT;');
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS trial_signups (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        company VARCHAR(255) NOT NULL,
+        product_slug VARCHAR(100) NOT NULL,
+        product_name VARCHAR(255) NOT NULL,
+        team_size VARCHAR(50),
+        phone VARCHAR(50),
+        status VARCHAR(20) NOT NULL DEFAULT 'pending',
+        email_verified BOOLEAN NOT NULL DEFAULT false,
+        trial_started_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        trial_ends_at TIMESTAMPTZ NOT NULL,
+        verification_token_hash VARCHAR(128),
+        verification_expires_at TIMESTAMPTZ,
+        verified_at TIMESTAMPTZ,
+        last_login_at TIMESTAMPTZ,
+        source VARCHAR(100),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_trial_signups_email_product ON trial_signups (email, product_slug);
+      CREATE INDEX IF NOT EXISTS idx_trial_signups_token ON trial_signups (verification_token_hash);
+    `);
+
     // Seed sample articles if articles table is empty
     const articlesCheck = await client.query('SELECT COUNT(*) FROM articles');
     if (parseInt(articlesCheck.rows[0].count, 10) === 0) {
@@ -471,7 +692,218 @@ async function initializeDatabase() {
   }
 }
 
-initializeDatabase();
+
+const databaseReady = initializeDatabase();
+
+// Trial sign-ups are stored in PostgreSQL in production and in memory in mock mode.
+const isMockDatabase = process.env.DATABASE_URL === 'mock';
+const mockTrialSignups = [];
+let mockTrialId = 0;
+
+function mapTrialRow(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    company: row.company,
+    productSlug: row.product_slug,
+    productName: row.product_name,
+    teamSize: row.team_size || null,
+    phone: row.phone || null,
+    status: row.status,
+    emailVerified: Boolean(row.email_verified),
+    trialStartedAt: row.trial_started_at,
+    trialEndsAt: row.trial_ends_at,
+    verifiedAt: row.verified_at,
+    createdAt: row.created_at,
+  };
+}
+
+const trialStore = {
+  async findByEmailAndProduct(email, productSlug) {
+    if (isMockDatabase) {
+      const row = mockTrialSignups
+        .filter((item) => item.email === email && item.product_slug === productSlug)
+        .sort((a, b) => b.id - a.id)[0];
+      return mapTrialRow(row);
+    }
+    const result = await pool.query(
+      'SELECT * FROM trial_signups WHERE email = $1 AND product_slug = $2 ORDER BY id DESC LIMIT 1',
+      [email, productSlug]
+    );
+    return mapTrialRow(result.rows[0]);
+  },
+
+  async findByEmail(email) {
+    if (isMockDatabase) {
+      const now = new Date();
+      const matches = mockTrialSignups.filter((item) => item.email === email);
+      const active = matches.filter((item) => new Date(item.trial_ends_at) > now);
+      const row = (active.length ? active : matches).sort((a, b) => b.id - a.id)[0];
+      return mapTrialRow(row);
+    }
+    const result = await pool.query(
+      `SELECT * FROM trial_signups WHERE email = $1
+       ORDER BY (trial_ends_at > NOW()) DESC, id DESC LIMIT 1`,
+      [email]
+    );
+    return mapTrialRow(result.rows[0]);
+  },
+
+  async create(data) {
+    if (isMockDatabase) {
+      const row = {
+        id: ++mockTrialId,
+        name: data.name,
+        email: data.email,
+        company: data.company,
+        product_slug: data.productSlug,
+        product_name: data.productName,
+        team_size: data.teamSize,
+        phone: data.phone,
+        status: 'pending',
+        email_verified: false,
+        trial_started_at: data.trialStartedAt,
+        trial_ends_at: data.trialEndsAt,
+        verified_at: null,
+        created_at: new Date(),
+        updated_at: new Date(),
+        verification_token_hash: data.tokenHash,
+        verification_expires_at: data.tokenExpiresAt,
+        source: data.source,
+        last_login_at: null,
+      };
+      mockTrialSignups.push(row);
+      return mapTrialRow(row);
+    }
+    const result = await pool.query(
+      `INSERT INTO trial_signups (
+        name, email, company, product_slug, product_name, team_size, phone,
+        status, trial_started_at, trial_ends_at, verification_token_hash,
+        verification_expires_at, source
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending', $8, $9, $10, $11, $12)
+      RETURNING *`,
+      [
+        data.name, data.email, data.company, data.productSlug, data.productName,
+        data.teamSize, data.phone, data.trialStartedAt, data.trialEndsAt,
+        data.tokenHash, data.tokenExpiresAt, data.source,
+      ]
+    );
+    return mapTrialRow(result.rows[0]);
+  },
+
+  async updateToken(id, tokenHash, tokenExpiresAt) {
+    if (isMockDatabase) {
+      const row = mockTrialSignups.find((item) => item.id === id);
+      if (!row) return null;
+      row.verification_token_hash = tokenHash;
+      row.verification_expires_at = tokenExpiresAt;
+      row.updated_at = new Date();
+      return mapTrialRow(row);
+    }
+    const result = await pool.query(
+      `UPDATE trial_signups
+       SET verification_token_hash = $2, verification_expires_at = $3, updated_at = NOW()
+       WHERE id = $1 RETURNING *`,
+      [id, tokenHash, tokenExpiresAt]
+    );
+    return mapTrialRow(result.rows[0]);
+  },
+
+  async resetTrial(id, tokenHash, tokenExpiresAt, trialStartedAt, trialEndsAt, profile) {
+    if (isMockDatabase) {
+      const row = mockTrialSignups.find((item) => item.id === id);
+      if (!row) return null;
+      Object.assign(row, {
+        name: profile.name,
+        company: profile.company,
+        team_size: profile.teamSize,
+        phone: profile.phone,
+        source: profile.source,
+        status: 'pending',
+        email_verified: false,
+        verified_at: null,
+        trial_started_at: trialStartedAt,
+        trial_ends_at: trialEndsAt,
+        verification_token_hash: tokenHash,
+        verification_expires_at: tokenExpiresAt,
+        updated_at: new Date(),
+      });
+      return mapTrialRow(row);
+    }
+    const result = await pool.query(
+      `UPDATE trial_signups
+       SET name = $6, company = $7, team_size = $8, phone = $9, source = $10,
+           status = 'pending', email_verified = false, verified_at = NULL,
+           trial_started_at = $2, trial_ends_at = $3,
+           verification_token_hash = $4, verification_expires_at = $5,
+           updated_at = NOW()
+       WHERE id = $1 RETURNING *`,
+      [id, trialStartedAt, trialEndsAt, tokenHash, tokenExpiresAt, profile.name, profile.company, profile.teamSize, profile.phone, profile.source]
+    );
+    return mapTrialRow(result.rows[0]);
+  },
+
+  async findByTokenHash(tokenHash) {
+    if (isMockDatabase) {
+      const now = new Date();
+      const row = mockTrialSignups
+        .filter((item) => item.verification_token_hash === tokenHash && new Date(item.verification_expires_at) > now)
+        .sort((a, b) => b.id - a.id)[0];
+      return mapTrialRow(row);
+    }
+    const result = await pool.query(
+      `SELECT * FROM trial_signups
+       WHERE verification_token_hash = $1 AND verification_expires_at > NOW()
+       ORDER BY id DESC LIMIT 1`,
+      [tokenHash]
+    );
+    return mapTrialRow(result.rows[0]);
+  },
+
+  async markVerified(id) {
+    if (isMockDatabase) {
+      const row = mockTrialSignups.find((item) => item.id === id);
+      if (!row) return null;
+      Object.assign(row, {
+        email_verified: true,
+        status: 'active',
+        verified_at: new Date(),
+        verification_token_hash: null,
+        verification_expires_at: null,
+        updated_at: new Date(),
+      });
+      return mapTrialRow(row);
+    }
+    const result = await pool.query(
+      `UPDATE trial_signups
+       SET email_verified = true, status = 'active', verified_at = NOW(),
+           verification_token_hash = NULL, verification_expires_at = NULL,
+           updated_at = NOW()
+       WHERE id = $1 RETURNING *`,
+      [id]
+    );
+    return mapTrialRow(result.rows[0]);
+  },
+
+  async findById(id) {
+    if (isMockDatabase) {
+      return mapTrialRow(mockTrialSignups.find((item) => item.id === id));
+    }
+    const result = await pool.query('SELECT * FROM trial_signups WHERE id = $1', [id]);
+    return mapTrialRow(result.rows[0]);
+  },
+
+  async touch(id) {
+    if (isMockDatabase) {
+      const row = mockTrialSignups.find((item) => item.id === id);
+      if (row) row.last_login_at = new Date();
+      return;
+    }
+    await pool.query('UPDATE trial_signups SET last_login_at = NOW(), updated_at = NOW() WHERE id = $1', [id]);
+  },
+};
 
 // Fetch initial live FX rate at startup and schedule background interval refreshes
 fetchLiveRate();
@@ -519,7 +951,8 @@ app.use((req, res, next) => {
 });
 
 // Serve static assets from Vite dist/ folder
-app.use(express.static(distPath));
+app.get('/index.html', (req, res) => res.redirect(301, '/'));
+app.use(express.static(distPath, { index: false }));
 
 // Health Check Endpoint (For internal database-aware deep testing)
 app.get('/health', async (req, res) => {
@@ -1143,6 +1576,78 @@ async function sendInquiryEmail(type, data) {
   }
 }
 
+
+async function sendTrialVerificationEmail({ to, name, productName, verificationUrl, trialEndsAt }) {
+  const expiryLabel = new Date(trialEndsAt).toLocaleDateString('en-AU', {
+    day: 'numeric', month: 'long', year: 'numeric',
+  });
+  const safeName = escapeHtml(name);
+  const safeProduct = escapeHtml(productName);
+  const safeUrl = escapeHtml(verificationUrl);
+  const canLogLink = process.env.NODE_ENV !== 'production' || process.env.SMTP_DEBUG === 'true';
+
+  const mailOptions = {
+    from: process.env.SMTP_USER
+      ? `"Deeps Systems" <${process.env.SMTP_USER}>`
+      : '"Deeps Systems" <no-reply@dspng.tech>',
+    to,
+    subject: `Activate your ${productName} trial`,
+    text: [
+      `Hi ${name},`,
+      '',
+      `Your ${productName} trial is ready. Confirm your email to open your ${TRIAL_DAYS}-day trial workspace:`,
+      verificationUrl,
+      '',
+      `This link expires in ${TRIAL_TOKEN_TTL_MINUTES} minutes. Your trial runs until ${expiryLabel}.`,
+      '',
+      "If you didn't request this, you can ignore this email.",
+    ].join('\n'),
+    html: `
+      <div style="margin:0;padding:32px 16px;background:#f4f7f6;font-family:Arial,Helvetica,sans-serif;color:#111827">
+        <div style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e5e7eb;border-radius:18px;overflow:hidden">
+          <div style="padding:28px 32px;background:linear-gradient(135deg,#047857,#0f766e);color:#ffffff">
+            <p style="margin:0;font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.85">Deeps Systems</p>
+            <h1 style="margin:8px 0 0;font-size:26px;line-height:1.2">Your trial is ready</h1>
+          </div>
+          <div style="padding:32px">
+            <p style="margin:0 0 16px">Hi ${safeName},</p>
+            <p style="margin:0 0 16px;line-height:1.6">Your <strong>${safeProduct}</strong> trial is ready. Confirm your email to open your ${TRIAL_DAYS}-day trial workspace.</p>
+            <p style="margin:28px 0;text-align:center">
+              <a href="${safeUrl}" style="display:inline-block;padding:14px 24px;border-radius:999px;background:#047857;color:#ffffff;text-decoration:none;font-weight:bold">Activate my trial</a>
+            </p>
+            <p style="margin:0 0 8px;font-size:13px;line-height:1.6;color:#6b7280">This link expires in ${TRIAL_TOKEN_TTL_MINUTES} minutes. Your trial runs until ${expiryLabel}.</p>
+            <p style="margin:0;font-size:13px;line-height:1.6;color:#6b7280">If you didn't request this, you can ignore this email.</p>
+          </div>
+        </div>
+      </div>
+    `,
+  };
+
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    if (canLogLink) {
+      console.log('[Nodemailer] SMTP credentials omitted. Trial verification link:');
+      console.log(`  To: ${to}`);
+      console.log(`  Product: ${productName}`);
+      console.log(`  Link: ${verificationUrl}`);
+    } else {
+      console.warn(`[Nodemailer] SMTP not configured; trial email for ${to} was not sent.`);
+    }
+    return { sent: false, logged: canLogLink };
+  }
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`[Nodemailer] Trial verification email sent to ${to}`);
+    return { sent: true };
+  } catch (error) {
+    console.error(`[Nodemailer] Trial verification email failed for ${to}:`, error.message);
+    if (canLogLink) {
+      console.log(`[Nodemailer] Trial verification link for ${to}: ${verificationUrl}`);
+    }
+    return { sent: false, logged: canLogLink };
+  }
+}
+
 // Direct SMTP order email notification via Nodemailer
 async function sendOrderEmail(order, items) {
   const subjectLine = `New Order #${order.id} from ${order.customer_name}`;
@@ -1569,6 +2074,9 @@ function requireAdmin(req, res, next) {
   const token = authHeader.split(' ')[1];
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
+    if (!decoded.role || decoded.scope === 'trial') {
+      return res.status(403).json({ error: 'Access denied. Admin privileges required.' });
+    }
     req.adminUser = decoded;
     next();
   } catch (err) {
@@ -2694,6 +3202,263 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 
+// Trial API helpers
+function parseCookies(req) {
+  const header = req.headers.cookie || '';
+  return header.split(';').reduce((acc, part) => {
+    const index = part.indexOf('=');
+    if (index === -1) return acc;
+    const key = part.slice(0, index).trim();
+    const value = part.slice(index + 1).trim();
+    if (!key) return acc;
+    try {
+      acc[key] = decodeURIComponent(value);
+    } catch {
+      acc[key] = value;
+    }
+    return acc;
+  }, {});
+}
+
+function serializeTrial(trial) {
+  if (!trial) return null;
+  const ends = new Date(trial.trialEndsAt);
+  return {
+    ...trial,
+    trialStartedAt: trial.trialStartedAt ? new Date(trial.trialStartedAt).toISOString() : null,
+    trialEndsAt: ends.toISOString(),
+    verifiedAt: trial.verifiedAt ? new Date(trial.verifiedAt).toISOString() : null,
+    createdAt: trial.createdAt ? new Date(trial.createdAt).toISOString() : null,
+    daysLeft: Math.max(0, Math.ceil((ends.getTime() - Date.now()) / 86400000)),
+  };
+}
+
+function trialCookieOptions(maxAgeMs) {
+  return {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: maxAgeMs,
+  };
+}
+
+function requireTrial(req, res, next) {
+  const token = parseCookies(req)[TRIAL_COOKIE];
+  if (!token) {
+    return res.status(401).json({ error: 'No active trial session. Start a trial or request a sign-in link.' });
+  }
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.scope !== 'trial' || !decoded.trialId) {
+      return res.status(401).json({ error: 'Invalid trial session.' });
+    }
+    req.trialSession = decoded;
+    return next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Your trial session has expired. Request a new sign-in link.' });
+  }
+}
+
+const TRIAL_GENERIC_MESSAGE = 'Check your inbox. If the details are valid, we have sent a secure link to continue.';
+
+const trialSignupLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many trial requests from this IP. Please try again in 15 minutes.' },
+});
+
+const trialVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many verification attempts. Please try again in 15 minutes.' },
+});
+
+app.post('/api/trials', trialSignupLimiter, async (req, res) => {
+  const { name, email, company, productSlug, teamSize, phone, source, companyWebsite, acceptTerms } = req.body || {};
+
+  if (companyWebsite) {
+    return res.status(201).json({ success: true, message: TRIAL_GENERIC_MESSAGE });
+  }
+
+  const trimmedName = typeof name === 'string' ? name.trim() : '';
+  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+  const trimmedCompany = typeof company === 'string' ? company.trim() : '';
+  const normalizedProduct = typeof productSlug === 'string' ? productSlug.trim().toLowerCase() : '';
+  const normalizedTeamSize = typeof teamSize === 'string' && TRIAL_TEAM_SIZES.includes(teamSize) ? teamSize : null;
+  const normalizedPhone = typeof phone === 'string' ? phone.trim().slice(0, 40) : null;
+  const normalizedSource = typeof source === 'string' ? source.trim().slice(0, 100) : 'website';
+
+  if (trimmedName.length < 2 || trimmedName.length > 120) {
+    return res.status(400).json({ error: 'Please enter your full name.' });
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || normalizedEmail.length > 254) {
+    return res.status(400).json({ error: 'Please enter a valid work email address.' });
+  }
+  if (trimmedCompany.length < 2 || trimmedCompany.length > 160) {
+    return res.status(400).json({ error: 'Please enter your company name.' });
+  }
+  if (!TRIAL_PRODUCTS[normalizedProduct]) {
+    return res.status(400).json({ error: 'Please choose a product to trial.' });
+  }
+  if (acceptTerms !== true) {
+    return res.status(400).json({ error: 'Please accept the trial terms to continue.' });
+  }
+
+  try {
+    await databaseReady;
+    const now = new Date();
+    const trialEndsAt = new Date(now.getTime() + TRIAL_DAYS * 86400000);
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const tokenExpiresAt = new Date(now.getTime() + TRIAL_TOKEN_TTL_MINUTES * 60000);
+    const productName = TRIAL_PRODUCTS[normalizedProduct];
+
+    let trial = await trialStore.findByEmailAndProduct(normalizedEmail, normalizedProduct);
+    if (!trial) {
+      trial = await trialStore.create({
+        name: trimmedName,
+        email: normalizedEmail,
+        company: trimmedCompany,
+        productSlug: normalizedProduct,
+        productName,
+        teamSize: normalizedTeamSize,
+        phone: normalizedPhone,
+        trialStartedAt: now,
+        trialEndsAt,
+        tokenHash,
+        tokenExpiresAt,
+        source: normalizedSource,
+      });
+    } else if (new Date(trial.trialEndsAt) <= now) {
+      trial = await trialStore.resetTrial(trial.id, tokenHash, tokenExpiresAt, now, trialEndsAt, {
+        name: trimmedName,
+        company: trimmedCompany,
+        teamSize: normalizedTeamSize,
+        phone: normalizedPhone,
+        source: normalizedSource,
+      });
+    } else {
+      trial = await trialStore.updateToken(trial.id, tokenHash, tokenExpiresAt);
+    }
+
+    const verificationUrl = `${SITE_URL}/trial/verify?token=${encodeURIComponent(rawToken)}`;
+    const delivery = await sendTrialVerificationEmail({
+      to: normalizedEmail,
+      name: trimmedName,
+      productName,
+      verificationUrl,
+      trialEndsAt: trial?.trialEndsAt || trialEndsAt,
+    });
+
+    if (!delivery.sent && !delivery.logged) {
+      return res.status(503).json({ error: 'We could not send the activation email. Please try again or contact wokman@dspng.tech.' });
+    }
+
+    return res.status(201).json({ success: true, message: TRIAL_GENERIC_MESSAGE });
+  } catch (err) {
+    console.error('[Trials API] Error creating trial:', err);
+    return res.status(500).json({ error: 'We could not start your trial. Please try again.' });
+  }
+});
+
+app.post('/api/trials/verify', trialVerifyLimiter, async (req, res) => {
+  const { token } = req.body || {};
+  if (typeof token !== 'string' || !/^[a-f0-9]{64}$/i.test(token.trim())) {
+    return res.status(400).json({ error: 'This trial link is invalid. Request a new link.' });
+  }
+
+  try {
+    await databaseReady;
+    const tokenHash = crypto.createHash('sha256').update(token.trim()).digest('hex');
+    const trial = await trialStore.findByTokenHash(tokenHash);
+    if (!trial) {
+      return res.status(400).json({ error: 'This trial link is invalid or has expired. Request a new link.' });
+    }
+
+    const verified = await trialStore.markVerified(trial.id);
+    if (!verified) {
+      return res.status(400).json({ error: 'We could not activate this trial. Request a new link.' });
+    }
+
+    const maxAge = Math.max(60000, new Date(verified.trialEndsAt).getTime() - Date.now());
+    const session = jwt.sign(
+      { scope: 'trial', trialId: verified.id, email: verified.email, productSlug: verified.productSlug },
+      JWT_SECRET,
+      { expiresIn: Math.floor(maxAge / 1000) }
+    );
+    res.cookie(TRIAL_COOKIE, session, trialCookieOptions(maxAge));
+    return res.json({ success: true, trial: serializeTrial(verified) });
+  } catch (err) {
+    console.error('[Trials API] Error verifying trial:', err);
+    return res.status(500).json({ error: 'We could not activate your trial. Please try again.' });
+  }
+});
+
+app.get('/api/trials/me', requireTrial, async (req, res) => {
+  try {
+    await databaseReady;
+    const trial = await trialStore.findById(req.trialSession.trialId);
+    if (!trial) {
+      res.clearCookie(TRIAL_COOKIE, { path: '/' });
+      return res.status(401).json({ error: 'Trial not found. Start a new trial.' });
+    }
+    if (!trial.emailVerified || trial.status !== 'active') {
+      res.clearCookie(TRIAL_COOKIE, { path: '/' });
+      return res.status(401).json({ error: 'Your trial is not active. Request a new link.' });
+    }
+    if (new Date(trial.trialEndsAt) <= new Date()) {
+      res.clearCookie(TRIAL_COOKIE, { path: '/' });
+      return res.status(401).json({ error: 'Your trial has ended. Contact us to continue.' });
+    }
+    await trialStore.touch(trial.id);
+    return res.json({ trial: serializeTrial(trial) });
+  } catch (err) {
+    console.error('[Trials API] Error loading trial:', err);
+    return res.status(500).json({ error: 'We could not load your trial. Please try again.' });
+  }
+});
+
+app.post('/api/trials/logout', (req, res) => {
+  res.clearCookie(TRIAL_COOKIE, { path: '/' });
+  return res.json({ success: true });
+});
+
+app.post('/api/trials/magic-link', trialSignupLimiter, async (req, res) => {
+  const { email } = req.body || {};
+  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    return res.json({ success: true, message: TRIAL_GENERIC_MESSAGE });
+  }
+
+  try {
+    await databaseReady;
+    const trial = await trialStore.findByEmail(normalizedEmail);
+    if (trial && new Date(trial.trialEndsAt) > new Date()) {
+      const rawToken = crypto.randomBytes(32).toString('hex');
+      const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+      const tokenExpiresAt = new Date(Date.now() + TRIAL_TOKEN_TTL_MINUTES * 60000);
+      await trialStore.updateToken(trial.id, tokenHash, tokenExpiresAt);
+      await sendTrialVerificationEmail({
+        to: normalizedEmail,
+        name: trial.name,
+        productName: trial.productName,
+        verificationUrl: `${SITE_URL}/trial/verify?token=${encodeURIComponent(rawToken)}`,
+        trialEndsAt: trial.trialEndsAt,
+      });
+    }
+    return res.json({ success: true, message: TRIAL_GENERIC_MESSAGE });
+  } catch (err) {
+    console.error('[Trials API] Error sending magic link:', err);
+    return res.status(500).json({ error: 'We could not send a sign-in link. Please try again.' });
+  }
+});
+
 // Inquiries API Endpoint
 app.post('/api/inquiries', async (req, res) => {
   const { type, name, email, business, subject, service, message } = req.body;
@@ -2791,9 +3556,25 @@ app.head('*', (req, res) => {
   res.status(200).end();
 });
 
-// Catch-all route to serve the React SPA index.html for non-API requests
-app.get('*', (req, res) => {
-  res.sendFile(path.join(distPath, 'index.html'));
+// Catch-all route to serve the React SPA shell with route-specific SEO tags.
+const indexPath = path.join(distPath, 'index.html');
+let indexHtmlCache = { html: null, mtimeMs: 0 };
+
+async function readIndexHtml() {
+  const stats = await fs.stat(indexPath);
+  if (!indexHtmlCache.html || stats.mtimeMs !== indexHtmlCache.mtimeMs) {
+    indexHtmlCache = { html: await fs.readFile(indexPath, 'utf-8'), mtimeMs: stats.mtimeMs };
+  }
+  return indexHtmlCache.html;
+}
+
+app.get('*', async (req, res) => {
+  try {
+    res.type('html').send(injectPageSeo(await readIndexHtml(), req));
+  } catch (error) {
+    console.error('[Server] Failed to serve the application shell:', error);
+    res.status(500).send('Unable to load the application.');
+  }
 });
 
 // Start listening

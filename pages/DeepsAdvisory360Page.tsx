@@ -57,7 +57,7 @@ const DeepsAdvisory360Page: React.FC = () => (
           <p className="mb-8 max-w-xl text-lg font-semibold text-gray-600 dark:text-slate-300 md:text-xl">Your digital strategy, aligned with PNG&apos;s opportunities.</p>
           <p className="mb-8 max-w-xl leading-relaxed text-gray-600 dark:text-slate-400">Independent advisory that turns business goals into a clear technology roadmap—covering strategic planning, tailored 3-horizon roadmaps, architecture modernisation, and local growth alignment for organisations in Papua New Guinea and the Pacific.</p>
           <div className="flex flex-wrap gap-3">
-            <Link to="/contact" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-600 to-green-700 px-7 py-3.5 font-bold text-white shadow-lg shadow-emerald-500/20 transition hover:from-emerald-500 hover:to-green-600">Book a session <ArrowRight className="h-4 w-4" /></Link>
+            <Link to="/start-trial?product=deepsadvisory360" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-600 to-green-700 px-7 py-3.5 font-bold text-white shadow-lg shadow-emerald-500/20 transition hover:from-emerald-500 hover:to-green-600">Start free trial<ArrowRight className="h-4 w-4" /></Link>
             <Link to="/deepsadvisory360/demo" className="inline-flex items-center gap-2 rounded-full border border-emerald-600/30 px-6 py-3.5 font-bold text-emerald-700 transition hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-white/5">Explore interactive demo <ArrowRight className="h-4 w-4 text-emerald-500" /></Link>
           </div>
         </div>

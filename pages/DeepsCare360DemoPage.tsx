@@ -109,7 +109,7 @@ const DeepsCare360DemoPage: React.FC = () => {
   const openTickets = data.tickets.filter(ticket => ticket.status !== 'Resolved').length;
   const resolvedTickets = data.tickets.filter(ticket => ticket.status === 'Resolved');
   const slaCompliance = resolvedTickets.length ? Math.round((resolvedTickets.filter(ticket => ticket.slaMet).length / resolvedTickets.length) * 100) : 100;
-  const resolvedByAssignee = resolvedTickets.reduce<Record<string, number>>((counts, ticket) => ({ ...counts, [ticket.assignee]: (counts[ticket.assignee] ?? 0) + 1 }), {});
+  const resolvedByAssignee: Record<string, number> = resolvedTickets.reduce<Record<string, number>>((counts, ticket) => ({ ...counts, [ticket.assignee]: (counts[ticket.assignee] ?? 0) + 1 }), {});
   const fastestResponder = Object.entries(resolvedByAssignee).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '';
   const resolvedPct = data.tickets.length ? Math.round((resolvedTickets.length / data.tickets.length) * 100) : 0;
   const uptime = data.devices.length ? Math.round((data.devices.filter(device => device.status !== 'Offline').length / data.devices.length) * 1000) / 10 : 100;

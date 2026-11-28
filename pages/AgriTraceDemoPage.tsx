@@ -108,7 +108,7 @@ const AgriTraceDemoPage: React.FC = () => {
   const plotName = (id: string) => data.plots.find(plot => plot.id === id)?.name ?? 'Unassigned plot';
   const buyerName = (id: string) => data.buyers.find(buyer => buyer.id === id)?.name ?? 'Unassigned buyer';
   const alerts = data.coldStorage.filter(reading => reading.temperatureC >= 20).length;
-  const batchesByFarmer = data.batches.reduce<Record<string, number>>((counts, batch) => { const plot = data.plots.find(item => item.id === batch.plotId); return plot ? { ...counts, [plot.farmerId]: (counts[plot.farmerId] ?? 0) + 1 } : counts; }, {});
+  const batchesByFarmer: Record<string, number> = data.batches.reduce<Record<string, number>>((counts, batch) => { const plot = data.plots.find(item => item.id === batch.plotId); return plot ? { ...counts, [plot.farmerId]: (counts[plot.farmerId] ?? 0) + 1 } : counts; }, {});
   const topFarmerId = Object.entries(batchesByFarmer).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '';
   const farmerLeaderboard = [...data.farmers].sort((a, b) => (batchesByFarmer[b.id] ?? 0) - (batchesByFarmer[a.id] ?? 0) || (b.streak ?? 0) - (a.streak ?? 0)).slice(0, 3);
   const certifiedBatches = data.batches.filter(batch => batch.stage === 'Export-ready' || batch.stage === 'Shipped').length;

@@ -50,7 +50,7 @@ const DeepsCare360Page: React.FC = () => (
           <p className="mb-8 max-w-xl text-lg font-semibold text-gray-600 dark:text-slate-300 md:text-xl">Your digital backbone, managed.</p>
           <p className="mb-8 max-w-xl leading-relaxed text-gray-600 dark:text-slate-400">A connected platform for monitoring devices, managing incidents, tracking service levels, and reporting to clients—designed for businesses in Papua New Guinea and across the Pacific.</p>
           <div className="flex flex-wrap gap-3">
-            <Link to="/contact" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-teal-600 to-cyan-700 px-7 py-3.5 font-bold text-white shadow-lg shadow-teal-500/20 transition hover:from-teal-500 hover:to-cyan-600">Request a Demo <ArrowRight className="h-4 w-4" /></Link>
+            <Link to="/start-trial?product=deepscare360" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-teal-600 to-cyan-700 px-7 py-3.5 font-bold text-white shadow-lg shadow-teal-500/20 transition hover:from-teal-500 hover:to-cyan-600">Start free trial<ArrowRight className="h-4 w-4" /></Link>
             <Link to="/deepscare360/demo" className="inline-flex items-center gap-2 rounded-full border border-teal-600/30 px-6 py-3.5 font-bold text-teal-700 transition hover:bg-teal-50 dark:text-teal-300 dark:hover:bg-white/5">Explore interactive demo <ArrowRight className="h-4 w-4 text-teal-500" /></Link>
           </div>
         </div>
