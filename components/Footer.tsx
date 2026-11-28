@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, Mail, MapPin } from 'lucide-react';
+import { Mail, MapPin } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -111,15 +111,6 @@ const Footer: React.FC = () => {
             © {currentYear} Deeps Systems. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <a
-              href="https://www.dspng.space"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-600 dark:text-slate-400 text-xs hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-2"
-            >
-              <Building2 className="w-4 h-4" />
-              Head Office
-            </a>
             <a
               href="https://mail.dspng.tech:2096/"
               target="_blank"
