@@ -46,7 +46,7 @@ const DeepsFlowPage: React.FC = () => (
           <p className="mb-8 max-w-xl text-lg font-semibold text-gray-600 dark:text-slate-300 md:text-xl">Automate the work that slows you down.</p>
           <p className="mb-8 max-w-xl leading-relaxed text-gray-600 dark:text-slate-400">A cloud-native platform for designing workflows, connecting the systems you already use, tracking automation runs, and measuring the hours and costs you save—built for organisations in Papua New Guinea and across the Pacific.</p>
           <div className="flex flex-wrap gap-3">
-            <Link to="/contact" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-700 px-7 py-3.5 font-bold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-500 hover:to-violet-600">Request a Demo <ArrowRight className="h-4 w-4" /></Link>
+            <Link to="/start-trial?product=deepsflow" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-700 px-7 py-3.5 font-bold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-500 hover:to-violet-600">Start free trial<ArrowRight className="h-4 w-4" /></Link>
             <Link to="/deepsflow/demo" className="inline-flex items-center gap-2 rounded-full border border-indigo-600/30 px-6 py-3.5 font-bold text-indigo-700 transition hover:bg-indigo-50 dark:text-indigo-300 dark:hover:bg-white/5">Explore interactive demo <ArrowRight className="h-4 w-4 text-indigo-500" /></Link>
           </div>
         </div>

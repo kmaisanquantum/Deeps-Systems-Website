@@ -116,7 +116,7 @@ const DeepsFin360DemoPage: React.FC = () => {
   const verifiedAccounts = data.accounts.filter(account => account.kyc === 'Verified').length;
   const totalBalances = data.accounts.reduce((sum, account) => sum + account.balance, 0);
   const satisfaction = data.satisfaction ?? 0;
-  const branchSuccess = data.transactions.filter(txn => txn.status === 'Completed').reduce<Record<string, number>>((counts, txn) => { const account = data.accounts.find(item => item.id === txn.accountId); return account ? { ...counts, [account.branch]: (counts[account.branch] ?? 0) + 1 } : counts; }, {});
+  const branchSuccess: Record<string, number> = data.transactions.filter(txn => txn.status === 'Completed').reduce<Record<string, number>>((counts, txn) => { const account = data.accounts.find(item => item.id === txn.accountId); return account ? { ...counts, [account.branch]: (counts[account.branch] ?? 0) + 1 } : counts; }, {});
   const topBranch = Object.entries(branchSuccess).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '';
   const fraudFreeStreak = data.fraudFreeStreak ?? 0;
   const topAgent = data.nodes.find(node => node.type === 'Agent' && node.status === 'Active')?.name ?? '';

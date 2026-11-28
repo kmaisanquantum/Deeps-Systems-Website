@@ -92,7 +92,7 @@ const DemoPage: React.FC = () => {
   const updateCompany = (patch: Partial<CompanyProfile>) => setData(prev => ({ ...prev, company: { ...prev.company, ...patch } }));
   const openIncidents = data.incidents.filter(incident => incident.status !== 'Resolved').length;
   const onDuty = data.guards.filter(guard => guard.status === 'On duty').length;
-  const resolvedCounts = data.incidents.filter(incident => incident.status === 'Resolved' && incident.assignee).reduce<Record<string, number>>((counts, incident) => ({ ...counts, [incident.assignee]: (counts[incident.assignee] ?? 0) + 1 }), {});
+  const resolvedCounts: Record<string, number> = data.incidents.filter(incident => incident.status === 'Resolved' && incident.assignee).reduce<Record<string, number>>((counts, incident) => ({ ...counts, [incident.assignee]: (counts[incident.assignee] ?? 0) + 1 }), {});
   const topPerformer = Object.entries(resolvedCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '';
   const resolvedLeaderboard = Object.entries(resolvedCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
   const levelFor = (xp: number) => Math.floor((xp ?? 0) / 500) + 1;

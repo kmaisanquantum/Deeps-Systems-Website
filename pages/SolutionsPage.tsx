@@ -4,6 +4,7 @@ import { ArrowRight, ShieldCheck } from 'lucide-react';
 import Solutions from '../components/Solutions';
 import AdvancedSolutions from '../components/AdvancedSolutions';
 import Comparison from '../components/Comparison';
+import TrialCallout from '../components/trial/TrialCallout';
 import Seo from '../components/Seo';
 
 const SolutionsPage: React.FC = () => {
@@ -15,6 +16,7 @@ const SolutionsPage: React.FC = () => {
         canonicalUrl="https://dspng.tech/solutions"
       />
       <Solutions />
+      <TrialCallout />
       <section className="bg-gray-50 px-5 py-16 dark:bg-white/[0.02] md:px-6 md:py-20">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 rounded-3xl border border-gray-100 bg-white p-8 dark:border-white/10 dark:bg-white/[0.03] md:flex-row md:items-center md:p-12">
           <div className="max-w-3xl">

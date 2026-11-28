@@ -50,7 +50,7 @@ const DeepsFin360Page: React.FC = () => (
           <p className="mb-8 max-w-xl text-lg font-semibold text-gray-600 dark:text-slate-300 md:text-xl">Banking that reaches everyone.</p>
           <p className="mb-8 max-w-xl leading-relaxed text-gray-600 dark:text-slate-400">A connected platform for managing customer accounts, processing payments, detecting fraud, and reaching unbanked and rural communities—designed for banks, microfinance institutions, savings &amp; loan societies, and fintechs in Papua New Guinea and the Pacific.</p>
           <div className="flex flex-wrap gap-3">
-            <Link to="/contact" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 px-7 py-3.5 font-bold text-white shadow-lg shadow-amber-500/20 transition hover:from-amber-400 hover:to-orange-500">Request a Demo <ArrowRight className="h-4 w-4" /></Link>
+            <Link to="/start-trial?product=deepsfin360" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 px-7 py-3.5 font-bold text-white shadow-lg shadow-amber-500/20 transition hover:from-amber-400 hover:to-orange-500">Start free trial<ArrowRight className="h-4 w-4" /></Link>
             <Link to="/deepsfin360/demo" className="inline-flex items-center gap-2 rounded-full border border-amber-600/30 px-6 py-3.5 font-bold text-amber-700 transition hover:bg-amber-50 dark:text-amber-300 dark:hover:bg-white/5">Explore interactive demo <ArrowRight className="h-4 w-4 text-amber-500" /></Link>
           </div>
         </div>
